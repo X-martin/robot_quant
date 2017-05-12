@@ -1,5 +1,5 @@
 # robot_quant
-This is an open sourced project,feel free to use it under LICENSE.
+This is an open sourced project,feel free to use it under MIT License.
 
 robot quant is a project makes computer understand common natural language to do backtest of your investment ideas.
 
@@ -18,7 +18,7 @@ The project is just started,We are now looking for teammates to strive and progr
 
 # robot_quant
 
-robot quant 是一个开源项目,目标是建立自然语言支持的投资策略回测系统,在遵守许可文件下免费使用
+robot quant 是一个开源项目,目标是建立自然语言支持的投资策略回测系统,在遵守许可文件 MIT License 下免费使用
 
 项目分为2个主要部分
 
