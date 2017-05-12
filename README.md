@@ -5,7 +5,7 @@ robot quant is a project makes computer understand common natural language to do
 
 The project can be divided into two tasks
 
-Task one is to design a quasi-natural language readable to the one who dont write program,mapped to computer language.
+Task one is to design a quasi-natural language readable to one who doesnt write program and able to mapped to computer language.
 
 Task two is to design a natrual language processing to map our quasi-natural language to human language.
 
