@@ -1,4 +1,4 @@
-# robot_quant
+ # robot_quant
 This is an open sourced project,feel free to use it under MIT License.
 
 robot quant is a project makes computer understand common natural language to do backtest of your investment ideas.
