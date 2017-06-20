@@ -26,7 +26,7 @@ CREATE TABLE `r_order` (
   `money` decimal(32,16) DEFAULT NULL,
   `num` decimal(8,0) DEFAULT NULL,
   PRIMARY KEY (`strategy_id`,`stockcode`,`tradedate`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for r_position
@@ -39,7 +39,7 @@ CREATE TABLE `r_position` (
   `money` decimal(32,16) DEFAULT NULL,
   `num` decimal(8,0) DEFAULT NULL,
   PRIMARY KEY (`strategy_id`,`tradedate`,`stockcode`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for r_strategy
@@ -49,7 +49,7 @@ CREATE TABLE `r_strategy` (
   `strategy_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`strategy_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for sys_tradeday
@@ -60,4 +60,4 @@ CREATE TABLE `sys_tradeday` (
   `tradedate` date NOT NULL,
   `type` smallint(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8352 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=8352 DEFAULT CHARSET=utf8;
