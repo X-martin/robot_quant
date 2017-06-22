@@ -38,7 +38,7 @@ def code_index():
 '''
 @app.route('/result_index', methods=['POST', 'GET'])
 def result_index():
-    pass
+    return render_template('strategy_result.html')
 
 
 if __name__ == "__main__":
