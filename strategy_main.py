@@ -31,7 +31,7 @@ def choice_index():
 '''
 @app.route('/code_index', methods=['POST', 'GET'])
 def code_index():
-    pass
+    return render_template('strategy_code.html')
 
 '''
 结果展示界面
