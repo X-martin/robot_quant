@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+        <title>向导式策略</title>
+        <meta name="keywords" content="量化交易,量化平台,量化投资,量化策略,程序化交易,量化交易平台,python,金融工程">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <link type="text/css" href="{{ url_for('static', filename='css/lib.css') }}" rel="stylesheet">
+        <link type="text/css" href="{{ url_for('static', filename='css/common.css') }}" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/jq-common.css') }}">
+        <link rel="icon" href="https://cdn.joinquant.com/common/img/favicon-16-16.png?v=2" type="image/x-icon">
+        <link href="{{ url_for('static', filename='css/jquery-ui-jq.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/algorithm.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/wizard.css') }}" rel="stylesheet">
+
+<style>
+    .kk_body{
+        padding-bottom:0px;
+    }
+</style>
+
+                                                        <style>
+        span.new{
+        background: rgba(0,0,0,0);
+    }
+    .side-bar .top .name.user-alias img{
+        width:16px;
+        height:16px;
+        float: none;
+        margin-right:0;
+    }
+    .kk_footer .wp20.last img{
+        position: relative;
+        top:-2px;
+    }
+    .kk_footer .wp20.last .item>a{
+        position: relative;
+        left:-5px;
+    }
+    </style>
+    </head>
+    <body>
+        <div class="kk_main in_wrap">
+            <!--header-- id="kk_nav" class="fixed-top kk_nav navbar narbar-static-top">
+                                    <div class="navbar-header clear">
+                        <button id="btn_menu" class="navbar-toggle" type="button" data-toggle="collapse" data-target="#kk_navbar">
+                            <span class="sr-only">Toggle nav</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a href="https://www.joinquant.com/" title="joinQuant" class="navbar-brand  fleft "></a>
+                                            </div>
+                    <nav id="kk_navbar" class="kk_navbar collapse navbar-collapse " aria-expanded="false">
+
+                        <ul class="nav navbar-nav">
+                            <li><a href="https://www.joinquant.com/">首页</a></li>
+                            <li class="relative"><a href="https://www.joinquant.com/algorithm/live/shareList">策略擂台<img class="icon_new" src="{{ url_for('static', filename='images/hot.png') }}" alt=""></a></li>
+                            <li><a href="https://www.joinquant.com/research">投资研究</a></li>
+                            <li class="active"><a href="https://www.joinquant.com/algorithm/index/list">我的策略</a></li>
+                            <li><a href="https://www.joinquant.com/algorithm/trade/list">我的交易</a></li>
+                            <li><a href="https://www.joinquant.com/data" target="_blank">数据</a></li>
+
+                            <li data-step="5" data-intro="遇到问题，查看常见问题和API文档" data-position="bottom">
+                                                                <a href="javascript:void(0)">帮助</a>
+
+                                <div class="submenu" id="help-submenu">
+                                    <span class="sanjiao"></span>
+                                    <a href="https://www.joinquant.com/faq" class="item">常见问题</a>
+                                    <a href="https://www.joinquant.com/api" class="item" target="_blank">API文档</a>
+                                    <a href="https://www.joinquant.com/algorithm/apishare/list" class="item">共享函数库</a>
+                                    <a href="https://www.joinquant.com/study#link=python" class="item" target="_blank">Python教程</a>
+                                    <a href="https://www.joinquant.com/lectures" class="item hidden" target="_blank">教程</a>
+                                    <a href="https://www.joinquant.com/post/553" class="item">系统更新日志</a>
+                                    <a href="https://www.joinquant.com/post/4089" class="item" target="_blank">数据调整记录</a>
+                                </div>
+                                			                </li>
+                            <li><a href="https://www.joinquant.com/study">量化课堂</a></li>
+                            <li data-step="6" data-intro="查看其它小伙伴分享的策略" data-position="bottom"><a href="https://www.joinquant.com/community">社区</a></li>
+                            <!--
+                            <li class="navQQ">
+                                <a target='_blank' href='http://qm.qq.com/cgi-bin/qm/qr?k=o2z9MjcIO2Y_rE-KlAo2x2FkZujbyaEV'>QQ<span class="mqq">群 : 429620025</span></a>
+                                <div class="qqQrcode">
+                					<p class="mb_0 text-center">QQ群 : <a target='_blank' href='http://qm.qq.com/cgi-bin/qm/qr?k=o2z9MjcIO2Y_rE-KlAo2x2FkZujbyaEV'>429620025</a></p>
+                					<span class="sanjiao"></span><i class="img"></i>
+                				</div>
+                            </li>
+                                                        <div class="hidden" id="userInfoForCs" _userid="12554" _alias="时光" _mob="13263359450"></div>
+                            <li class="last">
+                                                                <a href="javascript:void(0)">个人账号<span class="message-badge-nav hidden">79</span></a>
+                                <div class="submenu">
+                                    <span class="sanjiao"></span>
+                                    <a href="https://www.joinquant.com/user/account/index" class="item overdot">时光</a>                                    <a href="https://www.joinquant.com/user/msg/list" class="item">消息<span class="message-badge hidden">79</span></a>
+                                    <a href="https://www.joinquant.com/user/account/setting" class="item">账号设置</a>
+                                    <a href="https://www.joinquant.com/user/login/logout" class="item">退出</a>
+                                </div>
+                                                            </li>
+                                                    </ul>
+                    </nav>
+                            </header-->
+
+            <!--/header-->
+            <div class="kk_body  top_50">
+                <input id="algorithmId" value="570643" type="hidden">
+
+<div class="head">
+	<div class="head-con clear">
+		<a href="https://www.joinquant.com/algorithm/index/list" class="algo-back" title="返回策略列表"></a>
+		<span class="algo-title basic" title="点击修改策略名称" data="name">向导式策略-111</span>
+		<span class="beta-label"></span>
+        <input class="algo-title-box medium hidden " id="title-box" role="setName" size="30" value="向导式策略" type="text">
+		<div class="fright">
+            <a class="active no-decoration btn-item" href="#algorithm" id="algo-button">
+                编辑策略
+            </a>
+            <a class="no-decoration btn-item disabled" href="" id="algo-backtest">
+                回测详情
+            </a>
+            <span class="line_bg"></span>
+            <a class="no-decoration btn-item" href="javascript:void(0);" id="edit-button">
+                编译运行列表
+            </a>
+            <a class="no-decoration btn-item" href="javascript:void(0);" id="backtest-button">
+                回测列表
+            </a>
+		</div>
+
+	</div>
+</div>
+
+<div class="content clear">
+	<div class="fleft left">
+		<div class="content-title clear">
+			<button class="" id="save">
+				<span class="active-text" id="save-span" title="保存策略(Ctrl+S)">
+                    <span class="underlined_char">保  存</span>
+                </span>
+                <span class="busy-text" id="save-busy-text">保存中</span>
+                <span class="done-text" id="save-done-text">已保存</span>
+			</button>
+			<div class="fright templates hidden">
+				<button class="mr_5" id="my_templates">调用模板</button>
+				<button id="save_templates">存为模板</button>
+			</div>
+		</div>
+		<div class="content-container">
+			<div class="clc-container stock_pool" url="stock_pool" index="1">
+				<div class="clc-title relative">
+					<span class="bold title f14 mr_5">股票池</span>
+					<span class="grey f12">您一共可以添加<span class="qualified">10</span>个指标</span>
+					<span show="false" class="show-btn shows"><span class="fright mr_20 open"></span></span>
+				</div>
+				<div class="clc-table-box" style="display: block;">
+					<div class="clc-item">
+						<div class="clc-moren clear">
+							<div class="fleft moren-td">
+								<span class="mr_5  moren-name" data="security_universe">股票池:</span>
+								<select class="moren-select" role="security_universe_select">
+									<option value="000300.XSHG">沪深300</option>
+									<option value="000002.XSHG">上证A股</option>
+									<option value="399106.XSHE">深证A股</option>
+									<option value="000016.XSHG">上证50</option>
+									<option value="000905.XSHG">中证500</option>
+									<option value="399101.XSHE">中小板</option>
+									<option value="399102.XSHE">创业板指</option>
+									<option value="000002.XSHG+399106.XSHE" selected="selected">全A股</option>
+								</select>
+							</div>
+							<div class="fleft moren-td">
+								<span class="mr_5 moren-name" data="filter_st">ST选项:</span>
+								<select class="moren-select" role="filter_st_select">
+									<option value="True" selected="selected">过滤ST</option>
+									<option value="False">不过滤ST</option>
+									<option value="False/True">只包含ST</option>
+								</select>
+							</div>
+							<div class="fleft moren-td">
+								<span class="mr_5 moren-name" data="filter_delisted">过滤退市:</span>
+								<select class="moren-select" role="filter_delisted_select">
+									<option value="True" selected="selected">是</option>
+									<option value="False">否</option>
+								</select>
+							</div>
+							<div class="fleft moren-td">
+								<span class="mr_5 moren-name" data="filter_paused">过滤停牌:</span>
+								<select class="moren-select" role="filter_paused_select">
+									<option value="True" selected="selected">是</option>
+									<option value="False">否</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<ul class="nav nav-tabs sortTab" role="tablist">
+						<li role="presentation" class="active"><a href="#OptionalStock" aria-controls="home" role="tab" data-toggle="tab">选股</a></li>
+						<li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">排序</a></li>
+
+					</ul>
+					<div class="tab-content">
+						<div role="tabpanel" class="tab-pane active" id="OptionalStock">
+							<table class="selectGu clc-table table clc-container" url="stock_pool" index="2">
+								<thead class="thead">
+								<tr style="display: table-row;">
+									<td class="td tleft">指标名称</td>
+									<td class="td tcenter">选项</td>
+									<td class="td tcenter">值</td>
+									<td class="td tcenter">编辑</td>
+									<td class="td tright">操作</td>
+								</tr>
+								</thead>
+								<tbody class="tbody">
+
+								<tr data="check_stocks_refresh_rate" url="additive" class=""><td class="td tleft"><span class="name">股票池更新频率</span></td><td class="td tcenter"><span class="null"></span></td><td class="td tcenter"><input class="mr_5" value="20" style="width: 80px; border-color: rgb(232, 236, 240); color: rgb(0, 25, 47);" role="stock_pool_check_stocks_refresh_rate_input" error="false" type="text"><span class="danwei" role="stock_pool_check_stocks_refresh_rate_unit">交易日/次</span></td><td class="td tcenter"><span class="null"></span></td><td class="td tright"><span class="todo"></span></td></tr></tbody>
+							</table>
+							<div class="more" href="#stock_pool" style="display: block"></div>
+						</div>
+						<div role="tabpanel" class="tab-pane" id="profile">
+							<div class="sortBox">
+								排序<span class="afterSpan" data-toggle="popover" data-placement="bottom" data-original-title="" title="" data-content="每只股票根据每条排序条件的次序与权重，会分别得到一个排名分；最后将排名分加和，得到股票的总排名分；用户根据选择降序或升序确定优先买入分数高或低的股票；"></span> :
+								<div class="sortCtn">
+									<span data-value="desc" class="sortDown sortSpan activeSort">降序<i class="icon icon-arrow-down"></i></span>
+									<span data-value="asc" class="sortUp sortSpan ">升序<i class="icon icon-arrow-up"></i></span>
+								</div>
+							</div>
+							<table class="sortTable clc-table table clc-container sortCard" url="sortCard" index="3">
+								<thead class="thead">
+								<tr style="display: table-row;">
+									<td class="td tleft">指标名称</td>
+									<td class="td tcenter">次序</td>
+									<td class="td tcenter">权重</td>
+									<td class="td tcenter">编辑</td>
+									<td class="td tright">操作</td>
+								</tr>
+								</thead>
+								<tbody class="tbody">
+
+								<tr data="valuation.market_cap" url="sortBox" class=""><td class="td tleft"><span class="name">总市值</span></td><td class="td tcenter"><select class="sortSelect" role="sortCard_valuation.market_cap_select"> <option value="asc" selected="selected">从小到大</option><option value="desc">从大到小</option> </select></td><td class="td tcenter"><input class="mr_5 indecCount" value="1" style="width: 80px; border-color: rgb(232, 236, 240); color: rgb(0, 25, 47);" role="sortCard_valuation.market_cap_input" error="false" type="text"></td><td class="td tcenter"><span class="null"></span></td><td class="td tright"><span class="todo"></span></td></tr></tbody>
+							</table>
+							<div class="more" href="#sortCard" style="display: block"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="clc-container market_timing disable hidden" url="market_timing" index="4" style="">
+				<div class="clc-title relative ">
+					<span class="check_box"><input id="market_timing_flag" type="checkbox"></span>
+					<span class="bold title f14 mr_5">大盘择时</span>
+					<span class="grey f12">您一共可以添加<span class="qualified">10</span>个指标</span>
+					<span show="true" class=" market_timing_show"><span class="fright mr_20"></span></span>
+				</div>
+				<div class="clc-table-box">
+					<div class="clc-item">
+						<div class="clc-moren clear">
+							<div class="fleft moren-td">
+								<span class="mr_5  moren-name" data="set_index">指数设定:</span>
+								<select class="moren-select" role="set_index_select">
+									<option value="000300.XSHG" selected="selected">沪深300</option>
+									<option value="000001.XSHG">上证指数</option>
+									<option value="399001.XSHE">深证成指</option>
+									<option value="000016.XSHG">上证50</option>
+									<option value="000905.XSHG">中证500</option>
+									<option value="399005.XSHE">中小板指</option>
+									<option value="399006.XSHE">创业板指</option>
+								</select>
+							</div>
+							<div class="fleft moren-td">
+								<span class="mr_5  moren-name" data="Initialize_state">初始牛熊设定:</span>
+								<select class="moren-select" role="Initialize_state_select">
+									<option value="allow_buy_sell" selected="selected">牛</option>
+									<option value="allow_only_sell">熊</option>
+								</select>
+							</div>
+							<div class="moren-td">
+								<span data="index_num_state1" class="moren-name">当至少满足“牛市”标签中</span>
+								<input value="1" role="index_num_state1_input" class="moren-input" type="text">
+								<span>个条件时，由熊转牛；</span>
+							</div>
+							<div class="moren-td">
+								<span data="index_num_state2" class="moren-name">当至少满足“熊市”标签中</span>
+								<input value="1" role="index_num_state2_input" class="moren-input" type="text">
+								<span>个条件时，由牛转熊；</span>
+							</div>
+						</div>
+						<div class="tips f12">牛市：策略可进行买卖操作；熊市：策略只进行卖出操作</div>
+					</div>
+					<div class="niu_shi mt_20 niu_xio market_timing_niu" url="market_timing_niu" role="state1">
+						<p class="bold niu_xio_p relative">牛市<span show="true" class="show-span"> <span class="fright mr_20"></span> </span></p>
+						<table class="clc-table table">
+							<thead class="thead">
+								<tr>
+									<td class="td tleft">指标名称</td>
+									<td class="td tcenter">选项</td>
+									<td class="td tcenter">值</td>
+									<td class="td tcenter">编辑</td>
+									<td class="td tright">操作</td>
+								</tr>
+							</thead>
+							<tbody class="tbody"></tbody>
+						</table>
+						<div class="more" href="#market_timing_niu"></div>
+					</div>
+					<div class="xio_shi mt_20 niu_xio market_timing_xio" url="market_timing_xio" role="state2">
+						<p class="bold niu_xio_p relative">熊市<span show="true" class="show-span"> <span class="fright mr_20"></span> </span></p>
+						<table class="clc-table table">
+							<thead class="thead">
+								<tr>
+									<td class="td tleft">指标名称</td>
+									<td class="td tcenter">选项</td>
+									<td class="td tcenter">值</td>
+									<td class="td tcenter">编辑</td>
+									<td class="td tright">操作</td>
+								</tr>
+							</thead>
+							<tbody class="tbody"></tbody>
+						</table>
+						<div class="more" href="#market_timing_xio"></div>
+					</div>
+				</div>
+			</div>
+			<div class="clc-container buy_setting" url="buy_setting" index="5">
+				<div class="clc-title relative">
+					<span class="bold title f14 mr_5">个股买入设置</span>
+					<span class="grey f12">您一共可以添加<span class="qualified">10</span>个指标</span>
+					<span show="true" class="show-btn"> <span class="fright mr_20"></span> </span>
+				</div>
+				<div class="clc-table-box">
+					<table class="clc-table table">
+						<thead class="thead">
+							<tr>
+								<td class="td tleft">指标名称</td>
+								<td class="td tcenter">选项</td>
+								<td class="td tcenter">值</td>
+								<td class="td tcenter">编辑</td>
+								<td class="td tright">操作</td>
+							</tr>
+						</thead>
+						<tbody class="tbody">
+
+						<tr data="filter_holded" url="additive"><td class="td tleft"><span class="name">是否可重复买入</span></td><td class="td tcenter"><select class="select" role="buy_setting_filter_holded_select"> <option value="False" selected="selected">否</option><option value="True">是</option> </select></td><td class="td tcenter"><span class="null"></span><span class="danwei hidden">undefined</span></td><td class="td tcenter"><span class="null"></span></td><td class="td tright"><span class="null"></span></td></tr><tr data="order_style_str" url="additive"><td class="td tleft"><span class="name">买入方式</span></td><td class="td tcenter"><select class="select" role="buy_setting_order_style_str_select"> <option value="by_cap_mean" selected="selected">平分可用资金</option><option value="by_amount">按固定数量</option><option value="by_market_cap_percent">按总市值比例</option><option value="by_circulating_market_cap_percent">按流通市值比例</option> </select></td><td class="td tcenter"><span class="null"></span></td><td class="td tcenter"><span class="null"></span></td><td class="td tright"><span class="null"></span></td></tr></tbody>
+					</table>
+					<div class="more" href="#buy_setting"></div>
+				</div>
+			</div>
+			<div class="clc-container sell_setting" url="sell_setting" index="6">
+				<div class="clc-title relative">
+					<span class="bold title f14 mr_5">个股卖出设置</span>
+					<span class="grey f12">您一共可以添加<span class="qualified">10</span>个指标</span>
+					<span show="true" class="show-btn "> <span class="fright mr_20"></span> </span>
+				</div>
+				<div class="clc-table-box">
+					<table class="clc-table table">
+						<thead class="thead">
+							<tr>
+								<td class="td tleft">指标名称</td>
+								<td class="td tcenter">选项</td>
+								<td class="td tcenter">值</td>
+								<td class="td tcenter">编辑</td>
+								<td class="td tright">操作</td>
+							</tr>
+						</thead>
+						<tbody class="tbody">
+
+						<tr data="sell_will_buy" url="additive"><td class="td tleft"><span class="name">卖出欲买进股票</span></td><td class="td tcenter"><select class="select" role="sell_setting_sell_will_buy_select"> <option value="False" selected="selected">否</option><option value="True">是</option> </select></td><td class="td tcenter"><span class="null"></span><span class="danwei hidden">undefined</span></td><td class="td tcenter"><span class="null"></span></td><td class="td tright"><span class="null"></span></td></tr></tbody>
+					</table>
+					<div class="more" href="#sell_setting"></div>
+				</div>
+			</div>
+			<div class="clc-container risk_control" url="risk_control" index="7">
+				<div class="clc-title relative">
+					<span class="bold title f14 mr_5">风险控制</span>
+					<span show="false" class="show-btn "> <span class="fright mr_20 open"></span> </span>
+				</div>
+				<div class="clc-table-box" style="display: block;">
+					<table class="clc-table table">
+						<thead class="thead">
+							<tr style="display: table-row;">
+								<td class="td tleft">指标名称</td>
+								<td class="td tcenter">选项</td>
+								<td class="td tcenter">值</td>
+								<td class="td tcenter">编辑</td>
+								<td class="td tright">操作</td>
+							</tr>
+						</thead>
+						<tbody class="tbody">
+
+						<tr data="max_buy_style" url="other" class="focus"><td class="td tleft"><span class="name">每笔委托数量上限或金额上限</span></td><td class="td tcenter"><select class="select" role="risk_control_max_buy_style_select"> <option value="amount" selected="selected">数量</option><option value="value">金额</option> </select></td><td class="td tcenter"><input class="mr_5" value="10000" style="width: 80px; border-color: rgb(232, 236, 240); color: rgb(0, 25, 47);" role="risk_control_max_buy_style_input" error="false" type="text"><span class="danwei" role="risk_control_max_buy_style_unit">股</span></td><td class="td tcenter"><span class="null"></span></td><td class="td tright"><span class="todo"></span></td></tr></tbody>
+					</table>
+					<div class="more" href="#risk_control" style="display: block;"></div>
+				</div>
+			</div>
+			<div class="clc-container other_params" url="other_params" index="8">
+				<div class="clc-title relative">
+					<span class="bold title f14 mr_5">其他参数</span>
+					<span show="true" class="show-btn "> <span class="fright mr_20"></span> </span>
+				</div>
+				<div class="clc-table-box">
+					<table class="clc-table table">
+						<thead class="thead">
+							<tr>
+								<td class="td tleft">指标名称</td>
+								<td class="td tcenter">选项</td>
+								<td class="td tcenter">值</td>
+								<td class="td tcenter">编辑</td>
+								<td class="td tright">操作</td>
+							</tr>
+						</thead>
+						<tbody class="tbody">
+
+						<tr data="max_hold_stocknum" url="other_parameters"><td class="td tleft"><span class="name">最大建仓数量</span></td><td class="td tcenter"><span class="null"></span></td><td class="td tcenter"><input class="mr_5" value="5" style="width: 80px; border-color: rgb(232, 236, 240); color: rgb(0, 25, 47);" role="other_params_max_hold_stocknum_input" error="false" type="text"><span class="danwei" role="other_params_max_hold_stocknum_unit">只</span></td><td class="td tcenter"><span class="null"></span></td><td class="td tright"><span class="null"></span></td></tr></tbody>
+					</table>
+					<div class="more" href="#other_params"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="fleft guodu"></div>
+	<div class="fleft right">
+		<div class="content-title clear">
+			<div id="setting-btn-group">
+				<div class="setbtn_group">
+					<div class="mr_5 basic inline-block" data="Algorithm_cycle">
+						<input data="startTime" class="time allows hasDatepicker" placeholder="请选择日期" value="2007-01-01" id="dp1498094744619" style="border-color: rgb(232, 236, 240); color: rgb(0, 25, 47);" error="false" type="text">
+						至
+						<input data="endTime" class="time allows hasDatepicker" placeholder="请选择日期" value="2016-12-01" id="dp1498094744620" style="border-color: rgb(232, 236, 240); color: rgb(0, 25, 47);" error="false" type="text">
+					</div>
+					<div class=" mr_5 inline-block">
+						<input data="starting_cash" class="basic wid capital" value="100000" style="padding-left: 10px; border-color: rgb(232, 236, 240); color: rgb(0, 25, 47);" error="false" type="text">
+					</div>
+					<button class="mr_5" id="more_select">更多</button>
+					<div class="fright">
+						<button class="mr_5" id="new">快速回测</button>
+						<button class="btn-primary build" id="build">运行回测</button>
+					</div>
+				</div>
+				<div class="more_select_box">
+					<div class="inline-block mr_5">
+						<span>基准:</span>
+						<select name="" class="basic" data="set_benchmark">
+							<option value="000300.XSHG" selected="selected">沪深300</option>
+							<option value="000001.XSHG">上证指数</option>
+							<option value="399001.XSHE">深证成指</option>
+							<option value="000016.XSHG">上证50</option>
+							<option value="000905.XSHG">中证500</option>
+							<option value="399005.XSHE">中小板指</option>
+							<option value="399006.XSHE">创业板指</option>
+						</select>
+					</div>
+					<div class="inline-block">
+						<span>频率:</span>
+						<input value="每天" readonly="readonly" type="text">
+					</div>
+				</div>
+
+			</div>
+			<div id="dailybars-status" class="hidden">
+                <!-- <img class="loading-image"> -->
+                <span class="loading-text"></span>
+                <div class="progress-pane">
+                    <div class="progress">
+                        <div style="width: 0%" id="dailybars-progressbar" class="progress-bar"></div>
+                    </div>
+                    <span id="dailybars-progresslabel" class="progress-label"></span>
+                    <button id="cancel-daily-backtest-button" class="cancel-button">取 消</button>
+                </div>
+            </div>
+		</div>
+		<div class="right-container relative">
+			<div class="right-crc">
+				<div id="output-pane" style="" class="splitter-pane">
+    <div class="dailybars-output height_100pct">
+        <div class="dailybars-results" style="height:365px" id="dailybars-results">
+            <div id="dailybar-stats">
+                <div class="dailybar-stat blue">
+                    <div class="title">策略收益</div>
+                    <div id="total_returns" class="value relative"><span class="no-message-2 no-message"></span></div>
+                </div>
+                <div class="dailybar-stat red">
+                    <div class="title">基准收益</div>
+                    <div id="benchmark_returns" class="value relative"><span class="no-message-1 no-message"></span></div>
+                </div>
+                <div class="dailybar-stat">
+                    <div class="title">Alpha</div>
+                    <div id="alpha" class="value relative"><span class="no-message-3 no-message"></span></div>
+                </div>
+                <div class="dailybar-stat">
+                    <div class="title">Beta</div>
+                    <div id="beta" class="value relative"><span class="no-message-3 no-message"></span></div>
+                </div>
+                <div class="dailybar-stat">
+                    <div class="title">Sharpe</div>
+                    <div id="sharpe" class="value relative"><span class="no-message-3 no-message"></span></div>
+                </div>
+                <div class="dailybar-stat">
+                    <div class="title">
+                        最大回撤
+                        <i class="icon icon-question-sign risk-icon  popover-right" data-toggle="popover" data-original-title="" title=""></i>
+                    </div>
+                    <div id="max_drawdown" class="value relative"><span class="no-message-3 no-message"></span></div>
+                </div>
+            </div>
+            <div id="dailybar-chart-outer-container">
+                <div id="dailybar-watermark">
+                    <span>点击”快速回测"进行快速回测(Ctrl-Alt-B)</span>
+                    <span>或者 点击"运行回测"进行详细的回测</span>
+                </div>
+            </div>
+        </div>
+        <div class="tabbable" style="height: 74px;" id="tabbable">
+            <div class="maxmin-button">
+                <span id="daily-toggle-logs-button" class="show_more">
+
+                </span>
+            </div>
+            <ul class="nav nav-tabs" id="nav-tabs">
+                <li class="active">
+                    <a id="daily-logs-link" href="#daily-logs-tab" data-toggle="tab">日志</a>
+                </li>
+                <li>
+                    <a id="daily-error-tab-link" href="#daily-errors-tab" data-toggle="tab">错误<i class="icon icon-circle tiny-icon hidden" style="color:red;vertical-align:super;"></i></a>
+                </li>
+            </ul>
+            <div class="tab-content no-padding" id="tab-content" style="height: 46px;">
+                <div id="daily-logs-tab" class="tab-pane active">
+                    <div id="daily-logs-container" class="logs-output">
+                        <div class="logs-container position-relative" id="log"><pre></pre></div>
+                        <div class="logs-footer hidden" id="logs-init">
+                            <div class="loading-image border"></div>
+                            <span class="message">正在加载日志...</span>
+                        </div>
+                        <div class="logs-finished hidden">
+                            结束.
+                        </div>
+                    </div>
+                </div>
+                <div id="daily-errors-tab" class="tab-pane">
+                    <div id="dailybars-errors" class="error-info">
+                        <div class="error-container">
+                            <div class="error-details" id="error-log"><pre></pre></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Modal title</h4>
+                </div>
+                <div class="modal-body">
+                    <p>One fine body…</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>			</div>
+			<div class="right-container-btnBox translate" id="stock_pool" style="">
+				<div class="rcb-title f16 tcenter bold"><span class="closee"></span><span>股票池选股指标</span></div>
+				<div class="right-con-content">
+					<div class="rl-title">
+						<div class="rl-title-item inline-block active" href=".finance">财务因子</div>
+						<div class="rl-title-item inline-block hidden" href=".hangq">行情</div>
+						<div class="rl-title-item inline-block hidden" href=".techn">技术指标</div>
+						<div class="rl-title-item inline-block hidden" href=".form">形态指标</div>
+						<div class="rl-title-item inline-block" href=".additive">附加条件</div>
+					</div>
+					<div class="rl-content">
+						<div class="btns finance active" url="finance">
+							<div class="btns-box clear">
+								<p class="mb_8 bold">成长类因子<img class="tips ml_5 after clc-title-img" data-toggle="popover" data-placement="bottom" data-content="取到的数据是可获得最近季报的数据，不会有未来函数。&lt;br&gt;成长类因子：与股票的业绩成长等相关的因子，常见的净利润增长率、营业收入增长率等等。" src="{{ url_for('static', filename='images/zhuj_002.png') }}" alt="" data-original-title="" title="">：</p>
+								<btn data="indicator.inc_revenue_year_on_year" _title="营业收入同比增长率=(本季度的营业收入-上年本季度的营业收入)/ABS上年本季度的营业收入 * 100%"><span class="btn_span">营业收入同比增长率</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="营业收入同比增长率=(本季度的营业收入-上年本季度的营业收入)/ABS上年本季度的营业收入 * 100%" data-original-title="" title=""></span></btn>
+								<btn data="indicator.inc_revenue_annual" _title="营业收入环比增长率=(本季度营业收入-上季度营业收入)/ABS上季度营业收入 * 100%"><span class="btn_span">营业收入环比增长率</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="营业收入环比增长率=(本季度营业收入-上季度营业收入)/ABS上季度营业收入 * 100%" data-original-title="" title=""></span></btn>
+								<btn data="indicator.inc_net_profit_year_on_year" _title="净利润同比增长率=(本季度的净利润-上年本季度的净利润)/ABS上年本季度的净利润 * 100%"><span class="btn_span">净利润同比增长率</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="净利润同比增长率=(本季度的净利润-上年本季度的净利润)/ABS上年本季度的净利润 * 100%" data-original-title="" title=""></span></btn>
+								<btn data="indicator.inc_net_profit_annual" _title="净利润环比增长率=(本季度净利润-上季度净利润)/ABS上季度净利润 * 100%"><span class="btn_span">净利润环比增长率</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="净利润环比增长率=(本季度净利润-上季度净利润)/ABS上季度净利润 * 100%" data-original-title="" title=""></span></btn>
+								<btn data="indicator.operation_profit_to_total_revenue" _title="营业利润率 = 本季度营业利润/本季度营业总收入 * 100%"><span class="btn_span">营业利润率</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="营业利润率 = 本季度营业利润/本季度营业总收入 * 100%" data-original-title="" title=""></span></btn>
+								<btn data="indicator.net_profit_margin" _title="销售净利率 = 本季度净利润/本季度营业收入 * 100%"><span class="btn_span">销售净利率</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="销售净利率 = 本季度净利润/本季度营业收入 * 100%" data-original-title="" title=""></span></btn>
+								<btn data="indicator.gross_profit_margin" _title="销售毛利率 = 本季度毛利/本季度营业收入 * 100%"><span class="btn_span">销售毛利率</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="销售毛利率 = 本季度毛利/本季度营业收入 * 100%" data-original-title="" title=""></span></btn>
+							</div>
+							<div class="btns-box clear">
+								<p class="mb_8 bold">规模类因子<img class="tips ml_5 after clc-title-img" data-toggle="popover" data-placement="bottom" data-content="取到的数据是可获得最近季报的数据，不会有未来函数。&lt;br&gt;规模类因子：与股票规模相关的因子，常见的总资产、总市值等等。" src="{{ url_for('static', filename='images/zhuj_002.png') }}" alt="" data-original-title="" title="">：</p>
+								<btn role="szh" data="valuation.market_cap" _title="总市值是指在某特定的时间内，交易所挂牌交易全部证券(以总股本计)按当时价格计算的证券总值"><span class="btn_span">总市值</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="总市值是指在某特定的时间内，交易所挂牌交易全部证券(以总股本计)按当时价格计算的证券总值" data-original-title="" title=""></span></btn>
+								<btn role="szh" data="valuation.circulating_market_cap" _title="流通市值指在某特定时间内当时可交易的流通股股数乘以当时股价得出的流通股票总价值"><span class="btn_span">流通市值</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="流通市值指在某特定时间内当时可交易的流通股股数乘以当时股价得出的流通股票总价值" data-original-title="" title=""></span></btn>
+								<btn role="gub" data="valuation.capitalization" _title="公司已发行的普通股股份总数(包含A股，B股和H股的总股本)"><span class="btn_span">总股本</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="公司已发行的普通股股份总数(包含A股，B股和H股的总股本)" data-original-title="" title=""></span></btn>
+								<btn role="gub" data="valuation.circulating_cap" _title="公司已发行的境内上市流通、以人民币兑换的股份总数(A股市场的流通股本)"><span class="btn_span">流通股本</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="公司已发行的境内上市流通、以人民币兑换的股份总数(A股市场的流通股本)" data-original-title="" title=""></span></btn>
+							</div>
+							<div class="btns-box clear">
+								<p class="mb_8 bold">价值类因子<img class="tips ml_5 after clc-title-img" data-toggle="popover" data-placement="bottom" data-content="取到的数据是可获得最近季报的数据，不会有未来函数。&lt;br&gt;价值类因子：与股票估值相关的因子，包括常见的PE、PB等等。" src="{{ url_for('static', filename='images/zhuj_002.png') }}" alt="" data-original-title="" title="">：</p>
+								<btn data="valuation.pb_ratio" role="ratio" _title="市净率指的是每股股价与每股净资产的比率。 市净率可用于股票投资分析，一般来说市净率较低的股票，投资价值较高，相反，则投资价值较低。&lt;br&gt;市净率=（股票在指定交易日期的收盘价*当日人民币外汇牌价*截至当日公司总股本）/归属母公司股东的权益。"><span class="btn_span">市净率</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="市净率指的是每股股价与每股净资产的比率。 市净率可用于股票投资分析，一般来说市净率较低的股票，投资价值较高，相反，则投资价值较低。&lt;br&gt;市净率=（股票在指定交易日期的收盘价*当日人民币外汇牌价*截至当日公司总股本）/归属母公司股东的权益。" data-original-title="" title=""></span></btn>
+								<btn data="valuation.ps_ratio" role="ratio" _title="市销率为股票价格与每股销售收入之比，市销率越小，通常被认为投资价值越高。&lt;br&gt;市销率TTM=（股票在指定交易日期的收盘价*当日人民币外汇牌价*截至当日公司总股本）/营业总收入TTM"><span class="btn_span">市销率</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="市销率为股票价格与每股销售收入之比，市销率越小，通常被认为投资价值越高。&lt;br&gt;市销率TTM=（股票在指定交易日期的收盘价*当日人民币外汇牌价*截至当日公司总股本）/营业总收入TTM" data-original-title="" title=""></span></btn>
+								<btn data="valuation.pcf_ratio" role="ratio" _title="市现率是股票价格与过去12个月每股现金流量的比率。市现率可用于评价股票的价格水平和风险水平。市现率越小，表明上市公司的每股现金增加额越多，经营压力越小。&lt;br&gt;市现率=（股票在指定交易日期的收盘价*当日人民币外汇牌价*截至当日公司总股本）/现金及现金等价物净增加额TTM"><span class="btn_span">市现率</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="市现率是股票价格与过去12个月每股现金流量的比率。市现率可用于评价股票的价格水平和风险水平。市现率越小，表明上市公司的每股现金增加额越多，经营压力越小。&lt;br&gt;市现率=（股票在指定交易日期的收盘价*当日人民币外汇牌价*截至当日公司总股本）/现金及现金等价物净增加额TTM" data-original-title="" title=""></span></btn>
+								<btn data="valuation.pe_ratio" role="ratio" _title="每股市价为每股收益的倍数，反映投资人对每元净利润所愿支付的价格，用来估计股票的投资报酬和风险。&lt;br&gt;市盈率（PE，TTM）=（股票在指定交易日期的收盘价*当日人民币外汇挂牌价*截止当日公司总股本）/归属于母公司股东的净利润。"><span class="btn_span">动态市盈率</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="每股市价为每股收益的倍数，反映投资人对每元净利润所愿支付的价格，用来估计股票的投资报酬和风险。&lt;br&gt;市盈率（PE，TTM）=（股票在指定交易日期的收盘价*当日人民币外汇挂牌价*截止当日公司总股本）/归属于母公司股东的净利润。" data-original-title="" title=""></span></btn>
+								<btn data="valuation.pe_ratio_lyr" role="ratio" _title="静态市盈率是总市值与截止日期前最近公布年报披露的净利润比。&lt;br&gt;市盈率（PE，LYR）=（股票总市值）/最近年报披露的归属母公司股东的净利润"><span class="btn_span">静态市盈率</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="静态市盈率是总市值与截止日期前最近公布年报披露的净利润比。&lt;br&gt;市盈率（PE，LYR）=（股票总市值）/最近年报披露的归属母公司股东的净利润" data-original-title="" title=""></span></btn>
+							</div>
+							<div class="btns-box clear">
+								<p class="mb_8 bold">质量类因子<img class="tips ml_5 after clc-title-img" data-toggle="popover" data-placement="bottom" data-content="取到的数据是可获得最近季报的数据，不会有未来函数。&lt;br&gt;质量类因子：与股票的财务质量、资本结构相关的因子，如ROE、资产负债率等。" src="{{ url_for('static', filename='images/zhuj_002.png') }}" alt="" data-original-title="" title="">：</p>
+								<btn data="indicator.roe" _title="该指标反映股东权益的收益水平，用以衡量公司运用自有资本的效率。指标值越高，说明投资带来的收益越高。&lt;br&gt;净资产收益率ROE = 单季度归属母公司股东的净利润*2/（期初归属母公司股东的净资产+期末归属母公司股东的净资产）"><span class="btn_span">净资产收益率ROE</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="该指标反映股东权益的收益水平，用以衡量公司运用自有资本的效率。指标值越高，说明投资带来的收益越高。&lt;br&gt;净资产收益率ROE = 单季度归属母公司股东的净利润*2/（期初归属母公司股东的净资产+期末归属母公司股东的净资产）" data-original-title="" title=""></span></btn>
+								<btn data="indicator.roa" _title="总资产收益率的高低直接反映了公司的竞争实力和发展能力,也是决定公司是否应举债经营的重要依据。&lt;br&gt;总资产净利率ROA = 单季度净利润*2/（期初净资产+期末净资产）"><span class="btn_span">总资产净利率ROA</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="总资产收益率的高低直接反映了公司的竞争实力和发展能力,也是决定公司是否应举债经营的重要依据。&lt;br&gt;总资产净利率ROA = 单季度净利润*2/（期初净资产+期末净资产）" data-original-title="" title=""></span></btn>
+							</div>
+						</div>
+						<div class="btns hangq" url="hangq">
+							<div class="btns-box clear">
+								<btn data="open" _title="标的昨日开盘价"><span class="btn_span">昨日开盘价</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="标的昨日开盘价" data-original-title="" title=""></span></btn>
+								<btn data="close" _title="标的昨日收盘价"><span class="btn_span">昨日收盘价</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="标的昨日收盘价" data-original-title="" title=""></span></btn>
+								<btn data="high" _title="标的昨日最高价"><span class="btn_span">昨日最高价</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="标的昨日最高价" data-original-title="" title=""></span></btn>
+								<btn data="low" _title="标的昨日最低价"><span class="btn_span">昨日最低价</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="标的昨日最低价" data-original-title="" title=""></span></btn>
+								<btn data="volume" role="volume" _title="标的昨日成交量"><span class="btn_span">昨日成交量</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="标的昨日成交量" data-original-title="" title=""></span></btn>
+								<btn data="money" _title="标的昨日成交额"><span class="btn_span">昨日成交额</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="标的昨日成交额" data-original-title="" title=""></span></btn>
+								<btn data="avg" role="avg" _title="标的昨日均价"><span class="btn_span">昨日日均价</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="标的昨日均价" data-original-title="" title=""></span></btn>
+								<btn role="N" data="n_day_chg_filter" _title="标的N日累计涨幅，正为涨幅、负为跌幅。“跌幅大于20%”设置格式为：跌幅 小于 -20%"><span class="btn_span">N日涨幅</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="标的N日累计涨幅，正为涨幅、负为跌幅。“跌幅大于20%”设置格式为：跌幅 小于 -20%" data-original-title="" title=""></span></btn>
+								<btn role="numb_day" data="ipo_days_filter" _title="标的从上市日到当日的自然日天数"><span class="btn_span">上市天数</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="标的从上市日到当日的自然日天数" data-original-title="" title=""></span></btn>
+							</div>
+						</div>
+						<div class="btns techn" url="techn">
+							<div class="btns-box clear relative">
+								<btn role="hybrid" data="ma" _title="移动平均线，它是将某一段时间（默认5日）的收盘价之和除以该周期。&lt;br&gt;金叉：MA短线由下向上突破 MA长线&lt;br&gt;死叉：MA短线由上向下突破 MA长线&lt;br&gt;多头：MA短线位于MA长线上方&lt;br&gt;空头：MA短线位于 MA长线下方"><span class="btn_span">MA</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="移动平均线，它是将某一段时间（默认5日）的收盘价之和除以该周期。&lt;br&gt;金叉：MA短线由下向上突破 MA长线&lt;br&gt;死叉：MA短线由上向下突破 MA长线&lt;br&gt;多头：MA短线位于MA长线上方&lt;br&gt;空头：MA短线位于 MA长线下方" data-original-title="" title=""></span></btn>
+								<btn class="drap" _title="指数平滑移动平均线">
+									<span class="drap_text">MACD </span>
+									<span class="drap_span"></span>
+								<span class="after" data-toggle="popover" data-placement="bottom" data-content="指数平滑移动平均线" data-original-title="" title=""></span></btn>
+								<div class="drap_div hidden">
+									<btn data="dif" _title="由快的指数移动平均线（DIF短线，默认12日）减去慢的指数移动平均线（DIF长线，默认26日）得到"><span class="btn_span">DIF</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="由快的指数移动平均线（DIF短线，默认12日）减去慢的指数移动平均线（DIF长线，默认26日）得到" data-original-title="" title=""></span></btn>
+									<btn data="dea" _title="DIF的N日（默认9日）指数平滑移动平均线"><span class="btn_span">DEA</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="DIF的N日（默认9日）指数平滑移动平均线" data-original-title="" title=""></span></btn>
+									<btn data="hist" _title="2×（DIF- DEA）"><span class="btn_span">HIST</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="2×（DIF- DEA）" data-original-title="" title=""></span></btn>
+									<btn role="hybrid_f" data="macd" _title="指数平滑移动平均线&lt;br&gt;金叉：DIF 由下向上突破 DEA&lt;br&gt;死叉：DIF 由上向下突破 DEA&lt;br&gt;多头：DIF 位于 DEA 上方&lt;br&gt;空头：DIF 位于 DEA 下方"><span class="btn_span">MACD</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="指数平滑移动平均线&lt;br&gt;金叉：DIF 由下向上突破 DEA&lt;br&gt;死叉：DIF 由上向下突破 DEA&lt;br&gt;多头：DIF 位于 DEA 上方&lt;br&gt;空头：DIF 位于 DEA 下方" data-original-title="" title=""></span></btn>
+									<span class="sanjiao"></span>
+								</div>
+								<btn data="rsi" _title="代表股票在过去N日（默认14日）的相对强弱情况。值域在0到100之间，值越大，股票表现越强势RSl大多数时间在30到70之间震荡。RSI&gt;80，代表超买，股价回调的可能性加大；RSl&lt;20，代表超卖，股价反弹的可能性增大。"><span class="btn_span">RSI</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="代表股票在过去N日（默认14日）的相对强弱情况。值域在0到100之间，值越大，股票表现越强势RSl大多数时间在30到70之间震荡。RSI&gt;80，代表超买，股价回调的可能性加大；RSl&lt;20，代表超卖，股价反弹的可能性增大。" data-original-title="" title=""></span></btn>
+								<btn data="bias" _title="乖离率(BIAS)，又称偏离率，是通过计算市场指数或收盘价与某条移动平均线之间的差距百分比，以反映一定时期内价格与其MA偏离程度的指标，从而得出价格在剧烈波动时因偏离移动平均趋势而造成回档或反弹的可能性，以及价格在正常波动范围内移动而形成继续原有势的可信度。"><span class="btn_span">BIAS</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="乖离率(BIAS)，又称偏离率，是通过计算市场指数或收盘价与某条移动平均线之间的差距百分比，以反映一定时期内价格与其MA偏离程度的指标，从而得出价格在剧烈波动时因偏离移动平均趋势而造成回档或反弹的可能性，以及价格在正常波动范围内移动而形成继续原有势的可信度。" data-original-title="" title=""></span></btn>
+								<btn role="BBI" data="bbi" _title="多空指数，是通过将几条不同天数移动平均线用加权平均方法计算出的一条移动平均线的综合指标，一般将3日、6日、12日和24日的四种平均股价（或指数）作为计算的参数。&lt;br&gt;多头：股价位于BBI 上方&lt;br&gt;空头：股价位于BBI 下方"><span class="btn_span">BBI</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="多空指数，是通过将几条不同天数移动平均线用加权平均方法计算出的一条移动平均线的综合指标，一般将3日、6日、12日和24日的四种平均股价（或指数）作为计算的参数。&lt;br&gt;多头：股价位于BBI 上方&lt;br&gt;空头：股价位于BBI 下方" data-original-title="" title=""></span></btn>
+								<btn data="cci" _title="CC1 N日(默认14日)顺势指标，测量股价是否已超出常态分布范围。+100以上为超买区，一100以下为超卖区，+100到一100之间为震荡区。"><span class="btn_span">CCI</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="CC1 N日(默认14日)顺势指标，测量股价是否已超出常态分布范围。+100以上为超买区，一100以下为超卖区，+100到一100之间为震荡区。" data-original-title="" title=""></span></btn>
+								<btn data="atr" _title="平均直实波动范围，真实波幅等于当日股价振幅、最高与昨收差价、最低与昨收差价中的最大值。ATR=真实波幅的N日（默认14日）移动平均。"><span class="btn_span">ATR</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="平均直实波动范围，真实波幅等于当日股价振幅、最高与昨收差价、最低与昨收差价中的最大值。ATR=真实波幅的N日（默认14日）移动平均。" data-original-title="" title=""></span></btn>
+								<btn role="hybrid_f" data="trix" _title="三重指数平滑移动平均，长线操作时采用本指标的讯号，可以过滤掉一些短期波动的干扰，避免交易次数过于频繁，造成部分无利润的买卖，及手续费的损失。&lt;br&gt;金叉：TRIX由下向上突破其均线&lt;br&gt;死叉：TRIX由上向下突破其均线&lt;br&gt;多头：TRIX位于其均线上方&lt;br&gt;空头：TRIX位于其均线下方"><span class="btn_span">TRIX</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="三重指数平滑移动平均，长线操作时采用本指标的讯号，可以过滤掉一些短期波动的干扰，避免交易次数过于频繁，造成部分无利润的买卖，及手续费的损失。&lt;br&gt;金叉：TRIX由下向上突破其均线&lt;br&gt;死叉：TRIX由上向下突破其均线&lt;br&gt;多头：TRIX位于其均线上方&lt;br&gt;空头：TRIX位于其均线下方" data-original-title="" title=""></span></btn>
+								<btn role="hybrid_f" data="ema" _title="指数平均数指标，是一种趋向类指标，指数平均数指标是以指数式递减加权的移动平均。&lt;br&gt;金叉：EMA短线由下向上突破EMA长线&lt;br&gt;死叉：EMA短线由上向下突破EMA长线&lt;br&gt;多头：EMA短线位于EMA长线上方&lt;br&gt;空头：EMA短线位于EMA长线下方"><span class="btn_span">EMA</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="指数平均数指标，是一种趋向类指标，指数平均数指标是以指数式递减加权的移动平均。&lt;br&gt;金叉：EMA短线由下向上突破EMA长线&lt;br&gt;死叉：EMA短线由上向下突破EMA长线&lt;br&gt;多头：EMA短线位于EMA长线上方&lt;br&gt;空头：EMA短线位于EMA长线下方" data-original-title="" title=""></span></btn>
+								<btn role="hybrid_f" data="dma" _title="平行线差，是利用两条不同期间的平均线，来判断当前买卖能量的大小和未来价格趋势。 DMA指标是一种中短期指标。&lt;br&gt;金叉：DMA由下向上突破AMA&lt;br&gt;死叉：DMA由上向下突破AMA&lt;br&gt;多头：DMA位于AMA上方&lt;br&gt;空头：DMA位于AMA下方"><span class="btn_span">DMA</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="平行线差，是利用两条不同期间的平均线，来判断当前买卖能量的大小和未来价格趋势。 DMA指标是一种中短期指标。&lt;br&gt;金叉：DMA由下向上突破AMA&lt;br&gt;死叉：DMA由上向下突破AMA&lt;br&gt;多头：DMA位于AMA上方&lt;br&gt;空头：DMA位于AMA下方" data-original-title="" title=""></span></btn>
+								<btn class="drap" _title="布林线，是股市技术分析的常用工具之一，通过计算股价的“标准差”，再求股价的“信赖区间”。">
+									<span class="drap_text">布林线 </span>
+									<span class="drap_span"></span>
+								<span class="after" data-toggle="popover" data-placement="bottom" data-content="布林线，是股市技术分析的常用工具之一，通过计算股价的“标准差”，再求股价的“信赖区间”。" data-original-title="" title=""></span></btn>
+								<div class="drap_div bulin hidden">
+									<btn data="BBands_upperband" _title="中轨线=N日的移动平均线&lt;br&gt;上轨线=中轨线+两倍的标准差"><span class="btn_span">布林上线</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="中轨线=N日的移动平均线&lt;br&gt;上轨线=中轨线+两倍的标准差" data-original-title="" title=""></span></btn>
+									<btn data="BBands_lowerband" _title="中轨线=N日的移动平均线&lt;br&gt;下轨线=中轨线－两倍的标准差"><span class="btn_span">布林下线</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="中轨线=N日的移动平均线&lt;br&gt;下轨线=中轨线－两倍的标准差" data-original-title="" title=""></span></btn>
+									<span class="sanjiao"></span>
+								</div>
+								<btn role="hybrid" data="ma_money" _title="将某一段时间（默认5日）的成交量之和除以该周期。&lt;br&gt;金叉：MA_MONEY短线由下向上突破MA_MONEY长线&lt;br&gt;死叉：MA_MONEY短线由上向下突破MA_MONEY长线&lt;br&gt;多头：MA_MONEY短线位于MA_MONEY长线上方&lt;br&gt;空头：MA_MONEY短线位于MA_MONEY长线下方"><span class="btn_span">N日平均成交额</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="将某一段时间（默认5日）的成交量之和除以该周期。&lt;br&gt;金叉：MA_MONEY短线由下向上突破MA_MONEY长线&lt;br&gt;死叉：MA_MONEY短线由上向下突破MA_MONEY长线&lt;br&gt;多头：MA_MONEY短线位于MA_MONEY长线上方&lt;br&gt;空头：MA_MONEY短线位于MA_MONEY长线下方" data-original-title="" title=""></span></btn>
+								<btn role="hybrid" data="ma_volume" _title="将某一段时间（默认5日）的成交额之和除以该周期。&lt;br&gt;金叉：MA_VOLUME短线由下向上突破MA_VOLUME长线&lt;br&gt;死叉：MA_VOLUME短线由上向下突破MA_VOLUME长线&lt;br&gt;多头：MA_VOLUME短线位于MA_VOLUME长线上方&lt;br&gt;空头：MA_VOLUME短线位于MA_VOLUME长线下方"><span class="btn_span">N日平均成交量</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="将某一段时间（默认5日）的成交额之和除以该周期。&lt;br&gt;金叉：MA_VOLUME短线由下向上突破MA_VOLUME长线&lt;br&gt;死叉：MA_VOLUME短线由上向下突破MA_VOLUME长线&lt;br&gt;多头：MA_VOLUME短线位于MA_VOLUME长线上方&lt;br&gt;空头：MA_VOLUME短线位于MA_VOLUME长线下方" data-original-title="" title=""></span></btn>
+							</div>
+						</div>
+
+						<div class="btns form" url="form">
+							<div class="btns-box">
+								<btn data="CDL3WHITESOLDIERS" _title="红三兵其特征是：在上涨趋势中，出现3根连续创新高的小阳线。红三兵是推动股价上涨的信号，一般来说在股价见底回升，或在横盘后出现红三兵，表明多方正在积蓄能量，准备发力上攻。"><span class="btn_span">红三兵</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="红三兵其特征是：在上涨趋势中，出现3根连续创新高的小阳线。红三兵是推动股价上涨的信号，一般来说在股价见底回升，或在横盘后出现红三兵，表明多方正在积蓄能量，准备发力上攻。" data-original-title="" title=""></span></btn>
+								<btn data="CDLHAMMER" _title="锤头线其特征是K线实体很小，一般无上影线(即使有，上影线也很短），但下影线长。通常，在下跌过程中，尤其是股价大幅下跌后出现锤头线，股价转跌为升的可能性较大。"><span class="btn_span">锤</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="锤头线其特征是K线实体很小，一般无上影线(即使有，上影线也很短），但下影线长。通常，在下跌过程中，尤其是股价大幅下跌后出现锤头线，股价转跌为升的可能性较大。" data-original-title="" title=""></span></btn>
+								<btn data="CDLINVERTEDHAMMER" _title="倒锤头线因形状像个倒转锤头而得名。其特征是：在下跌趋势中出现。K线实体（可阴可阳）很小，下影线很短或者没有，但有一根较长的上影线。倒锤头出现在下跌过程中，具有止跌回升的意义。如果倒锤头与早晨之星同时出现，则行情反转向上的可能性就更大。"><span class="btn_span">倒锤</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="倒锤头线因形状像个倒转锤头而得名。其特征是：在下跌趋势中出现。K线实体（可阴可阳）很小，下影线很短或者没有，但有一根较长的上影线。倒锤头出现在下跌过程中，具有止跌回升的意义。如果倒锤头与早晨之星同时出现，则行情反转向上的可能性就更大。" data-original-title="" title=""></span></btn>
+								<btn data="CDL2CROWS" _title="是指市场的高位出现了三个连续跳高开盘，第一天是长阳线，第二天高开收出带上升缺口的阴线，表示向上攻击失败，第三天再次跳高开盘，收出阴线，收盘比前一日阴线低，但仍高于第一天阳线的收盘价，这是股价暴跌的前兆"><span class="btn_span">两只乌鸦</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="是指市场的高位出现了三个连续跳高开盘，第一天是长阳线，第二天高开收出带上升缺口的阴线，表示向上攻击失败，第三天再次跳高开盘，收出阴线，收盘比前一日阴线低，但仍高于第一天阳线的收盘价，这是股价暴跌的前兆" data-original-title="" title=""></span></btn>
+								<btn data="CDL3BLACKCROWS" _title="是指股价在运行时突然出现连续三根阴线的K线组合，是一种下跌的信号。"><span class="btn_span">三只乌鸦</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="是指股价在运行时突然出现连续三根阴线的K线组合，是一种下跌的信号。" data-original-title="" title=""></span></btn>
+								<btn data="CDLMORNINGSTAR" _title="早晨之星又称希望之星。早燥之星的特征是：由3根K线组成。在下跌过程中，先出现一根中阴线或大阴线，第二天出现了一根低开的小阳线(亦可以是小阴线），随后市场转跌为升，出现了一根中阳线或大阳线。早晨之星的技术含义和早晨十字星相同，都是一种见底回升信号。"><span class="btn_span">早晨之星</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="早晨之星又称希望之星。早燥之星的特征是：由3根K线组成。在下跌过程中，先出现一根中阴线或大阴线，第二天出现了一根低开的小阳线(亦可以是小阴线），随后市场转跌为升，出现了一根中阳线或大阳线。早晨之星的技术含义和早晨十字星相同，都是一种见底回升信号。" data-original-title="" title=""></span></btn>
+								<btn data="CDLEVENINGSTAR" _title="黄昏之星是由3根K线组成，第一根K线是一根实体较长的阳线；第二根K线是实体较短的K线(阴线、阳线均可，但阴线的下跌力度要强于阳线），人们标它喻之为“星”，这是K线组合中的主体部分，第三根K线是一根实体较长的阴线，它深人到第一根K线实体之内。黄昏之星是股价见顶回落的信号，预测股市下跌可靠性较高。"><span class="btn_span">黄昏之星</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="黄昏之星是由3根K线组成，第一根K线是一根实体较长的阳线；第二根K线是实体较短的K线(阴线、阳线均可，但阴线的下跌力度要强于阳线），人们标它喻之为“星”，这是K线组合中的主体部分，第三根K线是一根实体较长的阴线，它深人到第一根K线实体之内。黄昏之星是股价见顶回落的信号，预测股市下跌可靠性较高。" data-original-title="" title=""></span></btn>
+								<btn data="CDLDARKCLOUDCOVER" _title="乌云盖顶其特征是：在上涨行情中，出现一根中阳线或大阳线后，第二天股跳空高开，但没有高走，反而高开低走，收了一根中阴线或大阴线，阴线的实体已经深入到第一根阳线实体的二分之一以下处。这预示股价上升势头已尽轮跌势即将开始。投资者见到此K线图形，应警觉市况有变，以抛售出局为宜。"><span class="btn_span">乌云盖顶</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="乌云盖顶其特征是：在上涨行情中，出现一根中阳线或大阳线后，第二天股跳空高开，但没有高走，反而高开低走，收了一根中阴线或大阴线，阴线的实体已经深入到第一根阳线实体的二分之一以下处。这预示股价上升势头已尽轮跌势即将开始。投资者见到此K线图形，应警觉市况有变，以抛售出局为宜。" data-original-title="" title=""></span></btn>
+								<btn data="CDLSHOOTINGSTAR" _title="流星线在形态上要求实体部分很小且位于K线底部，流星线通常要求要有很长的上影线，没有下影线或者下影线很小,实体是阴是阳不重要，下面的带有阴线小实体K线也应当视作流星线。 &lt;br&gt;从技术上来讲，在一轮升势后出现流行线表示市场已经失去了上升的持久力，多方已抵抗不住空方打击，股价随时可能见顶回落。因此，投资者在股价大幅上扬后，见到流星线应退出观望为宜。"><span class="btn_span">流星线</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="流星线在形态上要求实体部分很小且位于K线底部，流星线通常要求要有很长的上影线，没有下影线或者下影线很小,实体是阴是阳不重要，下面的带有阴线小实体K线也应当视作流星线。 &lt;br&gt;从技术上来讲，在一轮升势后出现流行线表示市场已经失去了上升的持久力，多方已抵抗不住空方打击，股价随时可能见顶回落。因此，投资者在股价大幅上扬后，见到流星线应退出观望为宜。" data-original-title="" title=""></span></btn>
+							</div>
+						</div>
+						<div class="btns additive" url="additive">
+							<div class="btns-box clear">
+								<btn data="check_stocks_refresh_rate" _title="每多少个交易日更新一次股票池"><span class="btn_span grey" flag="false">股票池更新频率</span><span class="after" data-toggle="popover" data-placement="bottom" data-content="每多少个交易日更新一次股票池" data-original-title="" title=""></span></btn>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="right-container-btnBox" id="sortCard">
+				<div class="rcb-title f16 tcenter bold"><span class="closee"></span><span>股票池排序指标</span></div>
+				<div class="right-con-content">
+					<div class="rl-title">
+						<div class="rl-title-item inline-block active" href="">财务因子</div>
+					</div>
+					<div class="rl-content">
+						<div class="btns finance active" url="sortBox">
+							<div class="btns-box clear">
+								<p class="mb_8 bold">成长类因子<img class="tips ml_5 after clc-title-img" data-toggle="popover" data-placement="bottom" data-content="取到的数据是可获得最近季报的数据，不会有未来函数。&lt;br&gt;成长类因子：与股票的业绩成长等相关的因子，常见的净利润增长率、营业收入增长率等等。" src="{{ url_for('static', filename='images/zhuj.png') }}" alt="" data-original-title="" title="">：</p>
+								<btn data="indicator.inc_revenue_year_on_year" _title="营业收入同比增长率=(本季度的营业收入-上年本季度的营业收入)/ABS上年本季度的营业收入 * 100%"><span class="btn_span">营业收入同比增长率</span></btn>
+								<btn data="indicator.inc_revenue_annual" _title="营业收入环比增长率=(本季度营业收入-上季度营业收入)/ABS上季度营业收入 * 100%"><span class="btn_span">营业收入环比增长率</span></btn>
+								<btn data="indicator.inc_net_profit_year_on_year" _title="净利润同比增长率=(本季度的净利润-上年本季度的净利润)/ABS上年本季度的净利润 * 100%"><span class="btn_span">净利润同比增长率</span></btn>
+								<btn data="indicator.inc_net_profit_annual" _title="净利润环比增长率=(本季度净利润-上季度净利润)/ABS上季度净利润 * 100%"><span class="btn_span">净利润环比增长率</span></btn>
+								<btn data="indicator.operation_profit_to_total_revenue" _title="营业利润率 = 本季度营业利润/本季度营业总收入 * 100%"><span class="btn_span">营业利润率</span></btn>
+								<btn data="indicator.net_profit_margin" _title="销售净利率 = 本季度净利润/本季度营业收入 * 100%"><span class="btn_span">销售净利率</span></btn>
+								<btn data="indicator.gross_profit_margin" _title="销售毛利率 = 本季度毛利/本季度营业收入 * 100%"><span class="btn_span">销售毛利率</span></btn>
+							</div>
+							<div class="btns-box clear">
+								<p class="mb_8 bold">规模类因子<img class="tips ml_5 after clc-title-img" data-toggle="popover" data-placement="bottom" data-content="取到的数据是可获得最近季报的数据，不会有未来函数。&lt;br&gt;规模类因子：与股票规模相关的因子，常见的总资产、总市值等等。" src="{{ url_for('static', filename='images/zhuj.png') }}" alt="" data-original-title="" title="">：</p>
+								<btn role="szh" data="valuation.market_cap" _title="总市值是指在某特定的时间内，交易所挂牌交易全部证券(以总股本计)按当时价格计算的证券总值"><span class="btn_span grey" flag="false">总市值</span></btn>
+								<btn role="szh" data="valuation.circulating_market_cap" _title="流通市值指在某特定时间内当时可交易的流通股股数乘以当时股价得出的流通股票总价值"><span class="btn_span">流通市值</span></btn>
+								<btn role="gub" data="valuation.capitalization" _title="公司已发行的普通股股份总数(包含A股，B股和H股的总股本)"><span class="btn_span">总股本</span></btn>
+								<btn role="gub" data="valuation.circulating_cap" _title="公司已发行的境内上市流通、以人民币兑换的股份总数(A股市场的流通股本)"><span class="btn_span">流通股本</span></btn>
+							</div>
+							<div class="btns-box clear">
+								<p class="mb_8 bold">价值类因子<img class="tips ml_5 after clc-title-img" data-toggle="popover" data-placement="bottom" data-content="取到的数据是可获得最近季报的数据，不会有未来函数。&lt;br&gt;价值类因子：与股票估值相关的因子，包括常见的PE、PB等等。" src="{{ url_for('static', filename='images/zhuj.png') }}" alt="" data-original-title="" title="">：</p>
+								<btn data="valuation.pb_ratio" role="ratio" _title="市净率指的是每股股价与每股净资产的比率。 市净率可用于股票投资分析，一般来说市净率较低的股票，投资价值较高，相反，则投资价值较低。&lt;br&gt;市净率=（股票在指定交易日期的收盘价*当日人民币外汇牌价*截至当日公司总股本）/归属母公司股东的权益。"><span class="btn_span">市净率</span></btn>
+								<btn data="valuation.ps_ratio" role="ratio" _title="市销率为股票价格与每股销售收入之比，市销率越小，通常被认为投资价值越高。&lt;br&gt;市销率TTM=（股票在指定交易日期的收盘价*当日人民币外汇牌价*截至当日公司总股本）/营业总收入TTM"><span class="btn_span">市销率</span></btn>
+								<btn data="valuation.pcf_ratio" role="ratio" _title="市现率是股票价格与过去12个月每股现金流量的比率。市现率可用于评价股票的价格水平和风险水平。市现率越小，表明上市公司的每股现金增加额越多，经营压力越小。&lt;br&gt;市现率=（股票在指定交易日期的收盘价*当日人民币外汇牌价*截至当日公司总股本）/现金及现金等价物净增加额TTM"><span class="btn_span">市现率</span></btn>
+								<btn data="valuation.pe_ratio" role="ratio" _title="每股市价为每股收益的倍数，反映投资人对每元净利润所愿支付的价格，用来估计股票的投资报酬和风险。&lt;br&gt;市盈率（PE，TTM）=（股票在指定交易日期的收盘价*当日人民币外汇挂牌价*截止当日公司总股本）/归属于母公司股东的净利润。"><span class="btn_span">动态市盈率</span></btn>
+								<btn data="valuation.pe_ratio_lyr" role="ratio" _title="静态市盈率是总市值与截止日期前最近公布年报披露的净利润比。&lt;br&gt;市盈率（PE，LYR）=（股票总市值）/最近年报披露的归属母公司股东的净利润"><span class="btn_span">静态市盈率</span></btn>
+							</div>
+							<div class="btns-box clear">
+								<p class="mb_8 bold">质量类因子<img class="tips ml_5 after clc-title-img" data-toggle="popover" data-placement="bottom" data-content="取到的数据是可获得最近季报的数据，不会有未来函数。&lt;br&gt;质量类因子：与股票的财务质量、资本结构相关的因子，如ROE、资产负债率等。" src="{{ url_for('static', filename='images/zhuj.png') }}" alt="" data-original-title="" title="">：</p>
+								<btn data="indicator.roe" _title="该指标反映股东权益的收益水平，用以衡量公司运用自有资本的效率。指标值越高，说明投资带来的收益越高。&lt;br&gt;净资产收益率ROE = 单季度归属母公司股东的净利润*2/（期初归属母公司股东的净资产+期末归属母公司股东的净资产）"><span class="btn_span">净资产收益率ROE</span></btn>
+								<btn data="indicator.roa" _title="总资产收益率的高低直接反映了公司的竞争实力和发展能力,也是决定公司是否应举债经营的重要依据。&lt;br&gt;总资产净利率ROA = 单季度净利润*2/（期初净资产+期末净资产）"><span class="btn_span">总资产净利率ROA</span></btn>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="right-container-btnBox market_timings" id="market_timing_niu">
+				<div class="rcb-title f16 tcenter bold"><span class="closee"></span><span>牛市大盘择时指标</span></div>
+				<div class="right-con-content">
+					<div class="rl-title">
+						<div class="rl-title-item inline-block active" href=".hangq">行情</div>
+						<div class="rl-title-item inline-block" href=".techn">技术指标</div>
+						<div class="rl-title-item inline-block" href=".form">形态指标</div>
+					</div>
+					<div class="rl-content">
+						<div class="btns active hangq" url="hangq">
+							<div class="btns-box clear">
+								<btn data="open" _title="标的昨日开盘价"><span class="btn_span">昨日开盘价</span></btn>
+								<btn data="close" _title="标的昨日收盘价"><span class="btn_span">昨日收盘价</span></btn>
+								<btn data="high" _title="标的昨日最高价"><span class="btn_span">昨日最高价</span></btn>
+								<btn data="low" _title="标的昨日最低价"><span class="btn_span">昨日最低价</span></btn>
+								<btn data="volume" role="volume" _title="标的昨日成交量"><span class="btn_span">昨日成交量</span></btn>
+								<btn data="money" _title="标的昨日成交额"><span class="btn_span">昨日成交额</span></btn>
+								<btn data="avg" role="avg" _title="标的昨日均价"><span class="btn_span">昨日日均价</span></btn>
+								<btn role="N" data="n_day_chg_filter" _title="标的N日累计涨幅，正为涨幅、负为跌幅。“跌幅大于20%”设置格式为：跌幅 小于 -20%"><span class="btn_span">N日涨幅</span></btn>
+
+							</div>
+						</div>
+						<div class="btns techn" url="techn">
+							<div class="btns-box clear relative">
+								<btn role="hybrid" data="ma" _title="移动平均线，它是将某一段时间（默认5日）的收盘价之和除以该周期。&lt;br&gt;金叉：MA短线由下向上突破 MA长线&lt;br&gt;死叉：MA短线由上向下突破 MA长线&lt;br&gt;多头：MA短线位于MA长线上方&lt;br&gt;空头：MA短线位于 MA长线下方"><span class="btn_span">MA</span></btn>
+								<btn class="drap" _title="指数平滑移动平均线">
+									<span class="drap_text">MACD </span>
+									<span class="drap_span"></span>
+								</btn>
+								<div class="drap_div hidden">
+									<btn data="dif" _title="由快的指数移动平均线（DIF短线，默认12日）减去慢的指数移动平均线（DIF长线，默认26日）得到"><span class="btn_span">DIF</span></btn>
+									<btn data="dea" _title="DIF的N日（默认9日）指数平滑移动平均线"><span class="btn_span">DEA</span></btn>
+									<btn data="hist" _title="2×（DIF- DEA）"><span class="btn_span">HIST</span></btn>
+									<btn role="hybrid_f" data="macd" _title="指数平滑移动平均线&lt;br&gt;金叉：DIF 由下向上突破 DEA&lt;br&gt;死叉：DIF 由上向下突破 DEA&lt;br&gt;多头：DIF 位于 DEA 上方&lt;br&gt;空头：DIF 位于 DEA 下方"><span class="btn_span">MACD</span></btn>
+									<span class="sanjiao"></span>
+								</div>
+								<btn data="rsi" _title="代表股票在过去N日（默认14日）的相对强弱情况。值域在0到100之间，值越大，股票表现越强势RSl大多数时间在30到70之间震荡。RSI&gt;80，代表超买，股价回调的可能性加大；RSl&lt;20，代表超卖，股价反弹的可能性增大。"><span class="btn_span">RSI</span></btn>
+								<btn data="bias" _title="乖离率(BIAS)，又称偏离率，是通过计算市场指数或收盘价与某条移动平均线之间的差距百分比，以反映一定时期内价格与其MA偏离程度的指标，从而得出价格在剧烈波动时因偏离移动平均趋势而造成回档或反弹的可能性，以及价格在正常波动范围内移动而形成继续原有势的可信度。"><span class="btn_span">BIAS</span></btn>
+								<btn role="BBI" data="bbi" _title="多空指数，是通过将几条不同天数移动平均线用加权平均方法计算出的一条移动平均线的综合指标，一般将3日、6日、12日和24日的四种平均股价（或指数）作为计算的参数。&lt;br&gt;多头：股价位于BBI 上方&lt;br&gt;空头：股价位于BBI 下方"><span class="btn_span">BBI</span></btn>
+								<btn data="cci" _title="CC1 N日(默认14日)顺势指标，测量股价是否已超出常态分布范围。+100以上为超买区，一100以下为超卖区，+100到一100之间为震荡区。"><span class="btn_span">CCI</span></btn>
+								<btn data="atr" _title="平均直实波动范围，真实波幅等于当日股价振幅、最高与昨收差价、最低与昨收差价中的最大值。ATR=真实波幅的N日（默认14日）移动平均。"><span class="btn_span">ATR</span></btn>
+								<btn role="hybrid_f" data="trix" _title="三重指数平滑移动平均，长线操作时采用本指标的讯号，可以过滤掉一些短期波动的干扰，避免交易次数过于频繁，造成部分无利润的买卖，及手续费的损失。&lt;br&gt;金叉：TRIX由下向上突破其均线&lt;br&gt;死叉：TRIX由上向下突破其均线&lt;br&gt;多头：TRIX位于其均线上方&lt;br&gt;空头：TRIX位于其均线下方"><span class="btn_span">TRIX</span></btn>
+								<btn role="hybrid_f" data="ema" _title="指数平均数指标，是一种趋向类指标，指数平均数指标是以指数式递减加权的移动平均。&lt;br&gt;金叉：EMA短线由下向上突破EMA长线&lt;br&gt;死叉：EMA短线由上向下突破EMA长线&lt;br&gt;多头：EMA短线位于EMA长线上方&lt;br&gt;空头：EMA短线位于EMA长线下方"><span class="btn_span">EMA</span></btn>
+								<btn role="hybrid_f" data="dma" _title="平行线差，是利用两条不同期间的平均线，来判断当前买卖能量的大小和未来价格趋势。 DMA指标是一种中短期指标。&lt;br&gt;金叉：DMA由下向上突破AMA&lt;br&gt;死叉：DMA由上向下突破AMA&lt;br&gt;多头：DMA位于AMA上方&lt;br&gt;空头：DMA位于AMA下方"><span class="btn_span">DMA</span></btn>
+								<btn class="drap" _title="布林线，是股市技术分析的常用工具之一，通过计算股价的“标准差”，再求股价的“信赖区间”。">
+									<span class="drap_text">布林线 </span>
+									<span class="drap_span"></span>
+								</btn>
+								<div class="drap_div bulin hidden">
+									<btn data="BBands_upperband" _title="中轨线=N日的移动平均线&lt;br&gt;上轨线=中轨线+两倍的标准差"><span class="btn_span">布林上线</span></btn>
+									<btn data="BBands_lowerband" _title="中轨线=N日的移动平均线&lt;br&gt;下轨线=中轨线－两倍的标准差"><span class="btn_span">布林下线</span></btn>
+									<span class="sanjiao"></span>
+								</div>
+								<btn role="hybrid" data="ma_money" _title="将某一段时间（默认5日）的成交量之和除以该周期。&lt;br&gt;金叉：MA_MONEY短线由下向上突破MA_MONEY长线&lt;br&gt;死叉：MA_MONEY短线由上向下突破MA_MONEY长线&lt;br&gt;多头：MA_MONEY短线位于MA_MONEY长线上方&lt;br&gt;空头：MA_MONEY短线位于MA_MONEY长线下方"><span class="btn_span">N日平均成交额</span></btn>
+								<btn role="hybrid" data="ma_volume" _title="将某一段时间（默认5日）的成交额之和除以该周期。&lt;br&gt;金叉：MA_VOLUME短线由下向上突破MA_VOLUME长线&lt;br&gt;死叉：MA_VOLUME短线由上向下突破MA_VOLUME长线&lt;br&gt;多头：MA_VOLUME短线位于MA_VOLUME长线上方&lt;br&gt;空头：MA_VOLUME短线位于MA_VOLUME长线下方"><span class="btn_span">N日平均成交量</span></btn>
+							</div>
+						</div>
+						<div class="btns form" url="form">
+							<div class="btns-box">
+								<btn data="CDL3WHITESOLDIERS" _title="红三兵其特征是：在上涨趋势中，出现3根连续创新高的小阳线。红三兵是推动股价上涨的信号，一般来说在股价见底回升，或在横盘后出现红三兵，表明多方正在积蓄能量，准备发力上攻。"><span class="btn_span">红三兵</span></btn>
+								<btn data="CDLHAMMER" _title="锤头线其特征是K线实体很小，一般无上影线(即使有，上影线也很短），但下影线长。通常，在下跌过程中，尤其是股价大幅下跌后出现锤头线，股价转跌为升的可能性较大。"><span class="btn_span">锤</span></btn>
+								<btn data="CDLINVERTEDHAMMER" _title="倒锤头线因形状像个倒转锤头而得名。其特征是：在下跌趋势中出现。K线实体（可阴可阳）很小，下影线很短或者没有，但有一根较长的上影线。倒锤头出现在下跌过程中，具有止跌回升的意义。如果倒锤头与早晨之星同时出现，则行情反转向上的可能性就更大。"><span class="btn_span">倒锤</span></btn>
+								<btn data="CDL2CROWS" _title="是指市场的高位出现了三个连续跳高开盘，第一天是长阳线，第二天高开收出带上升缺口的阴线，表示向上攻击失败，第三天再次跳高开盘，收出阴线，收盘比前一日阴线低，但仍高于第一天阳线的收盘价，这是股价暴跌的前兆"><span class="btn_span">两只乌鸦</span></btn>
+								<btn data="CDL3BLACKCROWS" _title="是指股价在运行时突然出现连续三根阴线的K线组合，是一种下跌的信号。"><span class="btn_span">三只乌鸦</span></btn>
+								<btn data="CDLMORNINGSTAR" _title="早晨之星又称希望之星。早燥之星的特征是：由3根K线组成。在下跌过程中，先出现一根中阴线或大阴线，第二天出现了一根低开的小阳线(亦可以是小阴线），随后市场转跌为升，出现了一根中阳线或大阳线。早晨之星的技术含义和早晨十字星相同，都是一种见底回升信号。"><span class="btn_span">早晨之星</span></btn>
+								<btn data="CDLEVENINGSTAR" _title="黄昏之星是由3根K线组成，第一根K线是一根实体较长的阳线；第二根K线是实体较短的K线(阴线、阳线均可，但阴线的下跌力度要强于阳线），人们标它喻之为“星”，这是K线组合中的主体部分，第三根K线是一根实体较长的阴线，它深人到第一根K线实体之内。黄昏之星是股价见顶回落的信号，预测股市下跌可靠性较高。"><span class="btn_span">黄昏之星</span></btn>
+								<btn data="CDLDARKCLOUDCOVER" _title="乌云盖顶其特征是：在上涨行情中，出现一根中阳线或大阳线后，第二天股跳空高开，但没有高走，反而高开低走，收了一根中阴线或大阴线，阴线的实体已经深入到第一根阳线实体的二分之一以下处。这预示股价上升势头已尽轮跌势即将开始。投资者见到此K线图形，应警觉市况有变，以抛售出局为宜。"><span class="btn_span">乌云盖顶</span></btn>
+								<btn data="CDLSHOOTINGSTAR" _title="流星线在形态上要求实体部分很小且位于K线底部，流星线通常要求要有很长的上影线，没有下影线或者下影线很小,实体是阴是阳不重要，下面的带有阴线小实体K线也应当视作流星线。 &lt;br&gt;从技术上来讲，在一轮升势后出现流行线表示市场已经失去了上升的持久力，多方已抵抗不住空方打击，股价随时可能见顶回落。因此，投资者在股价大幅上扬后，见到流星线应退出观望为宜。"><span class="btn_span">流星线</span></btn>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="right-container-btnBox market_timings" id="market_timing_xio">
+				<div class="rcb-title f16 tcenter bold"><span class="closee"></span><span>熊市大盘择时指标</span></div>
+				<div class="right-con-content">
+					<div class="rl-title">
+						<div class="rl-title-item inline-block active" href=".hangq">行情</div>
+						<div class="rl-title-item inline-block" href=".techn">技术指标</div>
+						<div class="rl-title-item inline-block" href=".form">形态指标</div>
+					</div>
+					<div class="rl-content">
+						<div class="btns active hangq" url="hangq">
+							<div class="btns-box clear">
+								<btn data="open" _title="标的昨日开盘价"><span class="btn_span">昨日开盘价</span></btn>
+								<btn data="close" _title="标的昨日收盘价"><span class="btn_span">昨日收盘价</span></btn>
+								<btn data="high" _title="标的昨日最高价"><span class="btn_span">昨日最高价</span></btn>
+								<btn data="low" _title="标的昨日最低价"><span class="btn_span">昨日最低价</span></btn>
+								<btn data="volume" role="volume" _title="标的昨日成交量"><span class="btn_span">昨日成交量</span></btn>
+								<btn data="money" _title="标的昨日成交额"><span class="btn_span">昨日成交额</span></btn>
+								<btn data="avg" role="avg" _title="标的昨日均价"><span class="btn_span">昨日日均价</span></btn>
+								<btn role="N" data="n_day_chg_filter" _title="标的N日累计涨幅，正为涨幅、负为跌幅。“跌幅大于20%”设置格式为：跌幅 小于 -20%"><span class="btn_span">N日涨幅</span></btn>
+
+							</div>
+						</div>
+						<div class="btns techn" url="techn">
+							<div class="btns-box clear relative">
+								<btn role="hybrid" data="ma" _title="移动平均线，它是将某一段时间（默认5日）的收盘价之和除以该周期。&lt;br&gt;金叉：MA短线由下向上突破 MA长线&lt;br&gt;死叉：MA短线由上向下突破 MA长线&lt;br&gt;多头：MA短线位于MA长线上方&lt;br&gt;空头：MA短线位于 MA长线下方"><span class="btn_span">MA</span></btn>
+								<btn class="drap" _title="指数平滑移动平均线">
+									<span class="drap_text">MACD </span>
+									<span class="drap_span"></span>
+								</btn>
+								<div class="drap_div hidden">
+									<btn data="dif" _title="由快的指数移动平均线（DIF短线，默认12日）减去慢的指数移动平均线（DIF长线，默认26日）得到"><span class="btn_span">DIF</span></btn>
+									<btn data="dea" _title="DIF的N日（默认9日）指数平滑移动平均线"><span class="btn_span">DEA</span></btn>
+									<btn data="hist" _title="2×（DIF- DEA）"><span class="btn_span">HIST</span></btn>
+									<btn role="hybrid_f" data="macd" _title="指数平滑移动平均线&lt;br&gt;金叉：DIF 由下向上突破 DEA&lt;br&gt;死叉：DIF 由上向下突破 DEA&lt;br&gt;多头：DIF 位于 DEA 上方&lt;br&gt;空头：DIF 位于 DEA 下方"><span class="btn_span">MACD</span></btn>
+									<span class="sanjiao"></span>
+								</div>
+								<btn data="rsi" _title="代表股票在过去N日（默认14日）的相对强弱情况。值域在0到100之间，值越大，股票表现越强势RSl大多数时间在30到70之间震荡。RSI&gt;80，代表超买，股价回调的可能性加大；RSl&lt;20，代表超卖，股价反弹的可能性增大。"><span class="btn_span">RSI</span></btn>
+								<btn data="bias" _title="乖离率(BIAS)，又称偏离率，是通过计算市场指数或收盘价与某条移动平均线之间的差距百分比，以反映一定时期内价格与其MA偏离程度的指标，从而得出价格在剧烈波动时因偏离移动平均趋势而造成回档或反弹的可能性，以及价格在正常波动范围内移动而形成继续原有势的可信度。"><span class="btn_span">BIAS</span></btn>
+								<btn role="BBI" data="bbi" _title="多空指数，是通过将几条不同天数移动平均线用加权平均方法计算出的一条移动平均线的综合指标，一般将3日、6日、12日和24日的四种平均股价（或指数）作为计算的参数。&lt;br&gt;多头：股价位于BBI 上方&lt;br&gt;空头：股价位于BBI 下方"><span class="btn_span">BBI</span></btn>
+								<btn data="cci" _title="CC1 N日(默认14日)顺势指标，测量股价是否已超出常态分布范围。+100以上为超买区，一100以下为超卖区，+100到一100之间为震荡区。"><span class="btn_span">CCI</span></btn>
+								<btn data="atr" _title="平均直实波动范围，真实波幅等于当日股价振幅、最高与昨收差价、最低与昨收差价中的最大值。ATR=真实波幅的N日（默认14日）移动平均。"><span class="btn_span">ATR</span></btn>
+								<btn role="hybrid_f" data="trix" _title="三重指数平滑移动平均，长线操作时采用本指标的讯号，可以过滤掉一些短期波动的干扰，避免交易次数过于频繁，造成部分无利润的买卖，及手续费的损失。&lt;br&gt;金叉：TRIX由下向上突破其均线&lt;br&gt;死叉：TRIX由上向下突破其均线&lt;br&gt;多头：TRIX位于其均线上方&lt;br&gt;空头：TRIX位于其均线下方"><span class="btn_span">TRIX</span></btn>
+								<btn role="hybrid_f" data="ema" _title="指数平均数指标，是一种趋向类指标，指数平均数指标是以指数式递减加权的移动平均。&lt;br&gt;金叉：EMA短线由下向上突破EMA长线&lt;br&gt;死叉：EMA短线由上向下突破EMA长线&lt;br&gt;多头：EMA短线位于EMA长线上方&lt;br&gt;空头：EMA短线位于EMA长线下方"><span class="btn_span">EMA</span></btn>
+								<btn role="hybrid_f" data="dma" _title="平行线差，是利用两条不同期间的平均线，来判断当前买卖能量的大小和未来价格趋势。 DMA指标是一种中短期指标。&lt;br&gt;金叉：DMA由下向上突破AMA&lt;br&gt;死叉：DMA由上向下突破AMA&lt;br&gt;多头：DMA位于AMA上方&lt;br&gt;空头：DMA位于AMA下方"><span class="btn_span">DMA</span></btn>
+								<btn class="drap" _title="布林线，是股市技术分析的常用工具之一，通过计算股价的“标准差”，再求股价的“信赖区间”。">
+									<span class="drap_text">布林线 </span>
+									<span class="drap_span"></span>
+								</btn>
+								<div class="drap_div bulin hidden">
+									<btn data="BBands_upperband" _title="中轨线=N日的移动平均线&lt;br&gt;上轨线=中轨线+两倍的标准差"><span class="btn_span">布林上线</span></btn>
+									<btn data="BBands_lowerband" _title="中轨线=N日的移动平均线&lt;br&gt;下轨线=中轨线－两倍的标准差"><span class="btn_span">布林下线</span></btn>
+									<span class="sanjiao"></span>
+								</div>
+								<btn role="hybrid" data="ma_money" _title="将某一段时间（默认5日）的成交量之和除以该周期。&lt;br&gt;金叉：MA_MONEY短线由下向上突破MA_MONEY长线&lt;br&gt;死叉：MA_MONEY短线由上向下突破MA_MONEY长线&lt;br&gt;多头：MA_MONEY短线位于MA_MONEY长线上方&lt;br&gt;空头：MA_MONEY短线位于MA_MONEY长线下方"><span class="btn_span">N日平均成交额</span></btn>
+								<btn role="hybrid" data="ma_volume" _title="将某一段时间（默认5日）的成交额之和除以该周期。&lt;br&gt;金叉：MA_VOLUME短线由下向上突破MA_VOLUME长线&lt;br&gt;死叉：MA_VOLUME短线由上向下突破MA_VOLUME长线&lt;br&gt;多头：MA_VOLUME短线位于MA_VOLUME长线上方&lt;br&gt;空头：MA_VOLUME短线位于MA_VOLUME长线下方"><span class="btn_span">N日平均成交量</span></btn>
+							</div>
+						</div>
+						<div class="btns form" url="form">
+							<div class="btns-box">
+								<btn data="CDL3WHITESOLDIERS" _title="红三兵其特征是：在上涨趋势中，出现3根连续创新高的小阳线。红三兵是推动股价上涨的信号，一般来说在股价见底回升，或在横盘后出现红三兵，表明多方正在积蓄能量，准备发力上攻。"><span class="btn_span">红三兵</span></btn>
+								<btn data="CDLHAMMER" _title="锤头线其特征是K线实体很小，一般无上影线(即使有，上影线也很短），但下影线长。通常，在下跌过程中，尤其是股价大幅下跌后出现锤头线，股价转跌为升的可能性较大。"><span class="btn_span">锤</span></btn>
+								<btn data="CDLINVERTEDHAMMER" _title="倒锤头线因形状像个倒转锤头而得名。其特征是：在下跌趋势中出现。K线实体（可阴可阳）很小，下影线很短或者没有，但有一根较长的上影线。倒锤头出现在下跌过程中，具有止跌回升的意义。如果倒锤头与早晨之星同时出现，则行情反转向上的可能性就更大。"><span class="btn_span">倒锤</span></btn>
+								<btn data="CDL2CROWS" _title="是指市场的高位出现了三个连续跳高开盘，第一天是长阳线，第二天高开收出带上升缺口的阴线，表示向上攻击失败，第三天再次跳高开盘，收出阴线，收盘比前一日阴线低，但仍高于第一天阳线的收盘价，这是股价暴跌的前兆"><span class="btn_span">两只乌鸦</span></btn>
+								<btn data="CDL3BLACKCROWS" _title="是指股价在运行时突然出现连续三根阴线的K线组合，是一种下跌的信号。"><span class="btn_span">三只乌鸦</span></btn>
+								<btn data="CDLMORNINGSTAR" _title="早晨之星又称希望之星。早燥之星的特征是：由3根K线组成。在下跌过程中，先出现一根中阴线或大阴线，第二天出现了一根低开的小阳线(亦可以是小阴线），随后市场转跌为升，出现了一根中阳线或大阳线。早晨之星的技术含义和早晨十字星相同，都是一种见底回升信号。"><span class="btn_span">早晨之星</span></btn>
+								<btn data="CDLEVENINGSTAR" _title="黄昏之星是由3根K线组成，第一根K线是一根实体较长的阳线；第二根K线是实体较短的K线(阴线、阳线均可，但阴线的下跌力度要强于阳线），人们标它喻之为“星”，这是K线组合中的主体部分，第三根K线是一根实体较长的阴线，它深人到第一根K线实体之内。黄昏之星是股价见顶回落的信号，预测股市下跌可靠性较高。"><span class="btn_span">黄昏之星</span></btn>
+								<btn data="CDLDARKCLOUDCOVER" _title="乌云盖顶其特征是：在上涨行情中，出现一根中阳线或大阳线后，第二天股跳空高开，但没有高走，反而高开低走，收了一根中阴线或大阴线，阴线的实体已经深入到第一根阳线实体的二分之一以下处。这预示股价上升势头已尽轮跌势即将开始。投资者见到此K线图形，应警觉市况有变，以抛售出局为宜。"><span class="btn_span">乌云盖顶</span></btn>
+								<btn data="CDLSHOOTINGSTAR" _title="流星线在形态上要求实体部分很小且位于K线底部，流星线通常要求要有很长的上影线，没有下影线或者下影线很小,实体是阴是阳不重要，下面的带有阴线小实体K线也应当视作流星线。 &lt;br&gt;从技术上来讲，在一轮升势后出现流行线表示市场已经失去了上升的持久力，多方已抵抗不住空方打击，股价随时可能见顶回落。因此，投资者在股价大幅上扬后，见到流星线应退出观望为宜。"><span class="btn_span">流星线</span></btn>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="right-container-btnBox" id="buy_setting">
+				<div class="rcb-title f16 tcenter bold"><span class="closee"></span><span>个股买入设置指标</span></div>
+				<div class="right-con-content">
+					<div class="rl-title">
+						<div class="rl-title-item inline-block active" href=".hangq">行情</div>
+						<div class="rl-title-item inline-block" href=".techn">技术指标</div>
+						<div class="rl-title-item inline-block" href=".form">形态指标</div>
+						<div class="rl-title-item inline-block" href=".additive">附加条件</div>
+					</div>
+					<div class="rl-content">
+						<div class="btns active hangq" url="hangq">
+							<div class="btns-box clear">
+								<btn data="open" _title="标的昨日开盘价"><span class="btn_span">昨日开盘价</span></btn>
+								<btn data="close" _title="标的昨日收盘价"><span class="btn_span">昨日收盘价</span></btn>
+								<btn data="high" _title="标的昨日最高价"><span class="btn_span">昨日最高价</span></btn>
+								<btn data="low" _title="标的昨日最低价"><span class="btn_span">昨日最低价</span></btn>
+								<btn data="volume" role="volume" _title="标的昨日成交量"><span class="btn_span">昨日成交量</span></btn>
+								<btn data="money" _title="标的昨日成交额"><span class="btn_span">昨日成交额</span></btn>
+								<btn data="avg" role="avg" _title="标的昨日均价"><span class="btn_span">昨日日均价</span></btn>
+								<btn role="N" data="n_day_chg_filter" _title="标的N日累计涨幅，正为涨幅、负为跌幅。“跌幅大于20%”设置格式为：跌幅 小于 -20%"><span class="btn_span">N日涨幅</span></btn>
+								<btn role="numb_day" data="ipo_days_filter" _title="标的从上市日到当日的自然日天数"><span class="btn_span">上市天数</span></btn>
+							</div>
+						</div>
+						<div class="btns techn" url="techn">
+							<div class="btns-box clear relative">
+								<btn role="hybrid" data="ma" _title="移动平均线，它是将某一段时间（默认5日）的收盘价之和除以该周期。&lt;br&gt;金叉：MA短线由下向上突破 MA长线&lt;br&gt;死叉：MA短线由上向下突破 MA长线&lt;br&gt;多头：MA短线位于MA长线上方&lt;br&gt;空头：MA短线位于 MA长线下方"><span class="btn_span">MA</span></btn>
+								<btn class="drap" _title="指数平滑移动平均线">
+									<span class="drap_text">MACD </span>
+									<span class="drap_span"></span>
+								</btn>
+								<div class="drap_div hidden">
+									<btn data="dif" _title="由快的指数移动平均线（DIF短线，默认12日）减去慢的指数移动平均线（DIF长线，默认26日）得到"><span class="btn_span">DIF</span></btn>
+									<btn data="dea" _title="DIF的N日（默认9日）指数平滑移动平均线"><span class="btn_span">DEA</span></btn>
+									<btn data="hist" _title="2×（DIF- DEA）"><span class="btn_span">HIST</span></btn>
+									<btn role="hybrid_f" data="macd" _title="指数平滑移动平均线&lt;br&gt;金叉：DIF 由下向上突破 DEA&lt;br&gt;死叉：DIF 由上向下突破 DEA&lt;br&gt;多头：DIF 位于 DEA 上方&lt;br&gt;空头：DIF 位于 DEA 下方"><span class="btn_span">MACD</span></btn>
+									<span class="sanjiao"></span>
+								</div>
+								<btn data="rsi" _title="代表股票在过去N日（默认14日）的相对强弱情况。值域在0到100之间，值越大，股票表现越强势RSl大多数时间在30到70之间震荡。RSI&gt;80，代表超买，股价回调的可能性加大；RSl&lt;20，代表超卖，股价反弹的可能性增大。"><span class="btn_span">RSI</span></btn>
+								<btn data="bias" _title="乖离率(BIAS)，又称偏离率，是通过计算市场指数或收盘价与某条移动平均线之间的差距百分比，以反映一定时期内价格与其MA偏离程度的指标，从而得出价格在剧烈波动时因偏离移动平均趋势而造成回档或反弹的可能性，以及价格在正常波动范围内移动而形成继续原有势的可信度。"><span class="btn_span">BIAS</span></btn>
+								<btn role="BBI" data="bbi" _title="多空指数，是通过将几条不同天数移动平均线用加权平均方法计算出的一条移动平均线的综合指标，一般将3日、6日、12日和24日的四种平均股价（或指数）作为计算的参数。&lt;br&gt;多头：股价位于BBI 上方&lt;br&gt;空头：股价位于BBI 下方"><span class="btn_span">BBI</span></btn>
+								<btn data="cci" _title="CC1 N日(默认14日)顺势指标，测量股价是否已超出常态分布范围。+100以上为超买区，一100以下为超卖区，+100到一100之间为震荡区。"><span class="btn_span">CCI</span></btn>
+								<btn data="atr" _title="平均直实波动范围，真实波幅等于当日股价振幅、最高与昨收差价、最低与昨收差价中的最大值。ATR=真实波幅的N日（默认14日）移动平均。"><span class="btn_span">ATR</span></btn>
+								<btn role="hybrid_f" data="trix" _title="三重指数平滑移动平均，长线操作时采用本指标的讯号，可以过滤掉一些短期波动的干扰，避免交易次数过于频繁，造成部分无利润的买卖，及手续费的损失。&lt;br&gt;金叉：TRIX由下向上突破其均线&lt;br&gt;死叉：TRIX由上向下突破其均线&lt;br&gt;多头：TRIX位于其均线上方&lt;br&gt;空头：TRIX位于其均线下方"><span class="btn_span">TRIX</span></btn>
+								<btn role="hybrid_f" data="ema" _title="指数平均数指标，是一种趋向类指标，指数平均数指标是以指数式递减加权的移动平均。&lt;br&gt;金叉：EMA短线由下向上突破EMA长线&lt;br&gt;死叉：EMA短线由上向下突破EMA长线&lt;br&gt;多头：EMA短线位于EMA长线上方&lt;br&gt;空头：EMA短线位于EMA长线下方"><span class="btn_span">EMA</span></btn>
+								<btn role="hybrid_f" data="dma" _title="平行线差，是利用两条不同期间的平均线，来判断当前买卖能量的大小和未来价格趋势。 DMA指标是一种中短期指标。&lt;br&gt;金叉：DMA由下向上突破AMA&lt;br&gt;死叉：DMA由上向下突破AMA&lt;br&gt;多头：DMA位于AMA上方&lt;br&gt;空头：DMA位于AMA下方"><span class="btn_span">DMA</span></btn>
+								<btn class="drap" _title="布林线，是股市技术分析的常用工具之一，通过计算股价的“标准差”，再求股价的“信赖区间”。">
+									<span class="drap_text">布林线 </span>
+									<span class="drap_span"></span>
+								</btn>
+								<div class="drap_div bulin hidden">
+									<btn data="BBands_upperband" _title="中轨线=N日的移动平均线&lt;br&gt;上轨线=中轨线+两倍的标准差"><span class="btn_span">布林上线</span></btn>
+									<btn data="BBands_lowerband" _title="中轨线=N日的移动平均线&lt;br&gt;下轨线=中轨线－两倍的标准差"><span class="btn_span">布林下线</span></btn>
+									<span class="sanjiao"></span>
+								</div>
+								<btn role="hybrid" data="ma_money" _title="将某一段时间（默认5日）的成交量之和除以该周期。&lt;br&gt;金叉：MA_MONEY短线由下向上突破MA_MONEY长线&lt;br&gt;死叉：MA_MONEY短线由上向下突破MA_MONEY长线&lt;br&gt;多头：MA_MONEY短线位于MA_MONEY长线上方&lt;br&gt;空头：MA_MONEY短线位于MA_MONEY长线下方"><span class="btn_span">N日平均成交额</span></btn>
+								<btn role="hybrid" data="ma_volume" _title="将某一段时间（默认5日）的成交额之和除以该周期。&lt;br&gt;金叉：MA_VOLUME短线由下向上突破MA_VOLUME长线&lt;br&gt;死叉：MA_VOLUME短线由上向下突破MA_VOLUME长线&lt;br&gt;多头：MA_VOLUME短线位于MA_VOLUME长线上方&lt;br&gt;空头：MA_VOLUME短线位于MA_VOLUME长线下方"><span class="btn_span">N日平均成交量</span></btn>
+							</div>
+						</div>
+						<div class="btns form" url="form">
+							<div class="btns-box">
+								<btn data="CDL3WHITESOLDIERS" _title="红三兵其特征是：在上涨趋势中，出现3根连续创新高的小阳线。红三兵是推动股价上涨的信号，一般来说在股价见底回升，或在横盘后出现红三兵，表明多方正在积蓄能量，准备发力上攻。"><span class="btn_span">红三兵</span></btn>
+								<btn data="CDLHAMMER" _title="锤头线其特征是K线实体很小，一般无上影线(即使有，上影线也很短），但下影线长。通常，在下跌过程中，尤其是股价大幅下跌后出现锤头线，股价转跌为升的可能性较大。"><span class="btn_span">锤</span></btn>
+								<btn data="CDLINVERTEDHAMMER" _title="倒锤头线因形状像个倒转锤头而得名。其特征是：在下跌趋势中出现。K线实体（可阴可阳）很小，下影线很短或者没有，但有一根较长的上影线。倒锤头出现在下跌过程中，具有止跌回升的意义。如果倒锤头与早晨之星同时出现，则行情反转向上的可能性就更大。"><span class="btn_span">倒锤</span></btn>
+								<btn data="CDL2CROWS" _title="是指市场的高位出现了三个连续跳高开盘，第一天是长阳线，第二天高开收出带上升缺口的阴线，表示向上攻击失败，第三天再次跳高开盘，收出阴线，收盘比前一日阴线低，但仍高于第一天阳线的收盘价，这是股价暴跌的前兆"><span class="btn_span">两只乌鸦</span></btn>
+								<btn data="CDL3BLACKCROWS" _title="是指股价在运行时突然出现连续三根阴线的K线组合，是一种下跌的信号。"><span class="btn_span">三只乌鸦</span></btn>
+								<btn data="CDLMORNINGSTAR" _title="早晨之星又称希望之星。早燥之星的特征是：由3根K线组成。在下跌过程中，先出现一根中阴线或大阴线，第二天出现了一根低开的小阳线(亦可以是小阴线），随后市场转跌为升，出现了一根中阳线或大阳线。早晨之星的技术含义和早晨十字星相同，都是一种见底回升信号。"><span class="btn_span">早晨之星</span></btn>
+								<btn data="CDLEVENINGSTAR" _title="黄昏之星是由3根K线组成，第一根K线是一根实体较长的阳线；第二根K线是实体较短的K线(阴线、阳线均可，但阴线的下跌力度要强于阳线），人们标它喻之为“星”，这是K线组合中的主体部分，第三根K线是一根实体较长的阴线，它深人到第一根K线实体之内。黄昏之星是股价见顶回落的信号，预测股市下跌可靠性较高。"><span class="btn_span">黄昏之星</span></btn>
+								<btn data="CDLDARKCLOUDCOVER" _title="乌云盖顶其特征是：在上涨行情中，出现一根中阳线或大阳线后，第二天股跳空高开，但没有高走，反而高开低走，收了一根中阴线或大阴线，阴线的实体已经深入到第一根阳线实体的二分之一以下处。这预示股价上升势头已尽轮跌势即将开始。投资者见到此K线图形，应警觉市况有变，以抛售出局为宜。"><span class="btn_span">乌云盖顶</span></btn>
+								<btn data="CDLSHOOTINGSTAR" _title="流星线在形态上要求实体部分很小且位于K线底部，流星线通常要求要有很长的上影线，没有下影线或者下影线很小,实体是阴是阳不重要，下面的带有阴线小实体K线也应当视作流星线。 &lt;br&gt;从技术上来讲，在一轮升势后出现流行线表示市场已经失去了上升的持久力，多方已抵抗不住空方打击，股价随时可能见顶回落。因此，投资者在股价大幅上扬后，见到流星线应退出观望为宜。"><span class="btn_span">流星线</span></btn>
+							</div>
+						</div>
+						<div class="btns additive" url="additive">
+							<div class="btns-box clear">
+								<btn data="filter_holded" _title="当持有标的时，是否可以再次买入"><span class="btn_span grey" flag="false">是否可重复买入</span></btn>
+								<btn data="order_style_str" _title="平分可用资金：每次买入一定金额的股票。买入金额=(持仓成本+可用资金)/最大持股数&lt;br&gt;按固定数量：每次买入固定数量的股票&lt;br&gt;按总市值比例：根据股票的总市值大小，按比例买入股票。所占比例=股票A总市值/(股票A总市值+股票B总市值+股票C总市值+...)&lt;br&gt;按流通市值比例：根据股票的流通市值大小，按比例买入股票。所占比例=股票A流通市值/(股票A流通市值+股票B流通市值+股票C流通市值+...)"><span class="btn_span grey" flag="false">买入方式</span></btn>
+								<btn role="N" data="filter_n_tradeday_not_buy" _title="同一标的继上次卖出N天不再买入" style="width:26%"><span class="btn_span">同一标的卖出N天内不再买入</span></btn>
+								<btn role="refresh_rate" data="buy_refresh_rat_e" _title="每多少个交易日执行一次买入操作"><span class="btn_span">买入频率</span></btn>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="right-container-btnBox" id="sell_setting">
+				<div class="rcb-title f16 tcenter bold"><span class="closee"></span><span>个股卖出设置指标</span></div>
+				<div class="right-con-content">
+					<div class="rl-title">
+						<div class="rl-title-item inline-block active" href=".hangq">行情</div>
+						<div class="rl-title-item inline-block" href=".techn">技术指标</div>
+						<div class="rl-title-item inline-block" href=".form">形态指标</div>
+						<div class="rl-title-item inline-block" href=".additive">附加条件</div>
+					</div>
+					<div class="rl-content">
+						<div class="btns active hangq" url="hangq">
+							<div class="btns-box clear">
+								<btn data="open" _title="标的昨日开盘价"><span class="btn_span">昨日开盘价</span></btn>
+								<btn data="close" _title="标的昨日收盘价"><span class="btn_span">昨日收盘价</span></btn>
+								<btn data="high" _title="标的昨日最高价"><span class="btn_span">昨日最高价</span></btn>
+								<btn data="low" _title="标的昨日最低价"><span class="btn_span">昨日最低价</span></btn>
+								<btn data="volume" role="volume" _title="标的昨日成交量"><span class="btn_span">昨日成交量</span></btn>
+								<btn data="money" _title="标的昨日成交额"><span class="btn_span">昨日成交额</span></btn>
+								<btn data="avg" role="avg" _title="标的昨日均价"><span class="btn_span">昨日日均价</span></btn>
+								<btn role="N" data="n_day_chg_filter" _title="标的N日累计涨幅，正为涨幅、负为跌幅。“跌幅大于20%”设置格式为：跌幅 小于 -20%"><span class="btn_span">N日涨幅</span></btn>
+								<btn role="numb_day" data="ipo_days_filter" _title="标的从上市日到当日的自然日天数"><span class="btn_span">上市天数</span></btn>
+							</div>
+						</div>
+						<div class="btns techn" url="techn">
+							<div class="btns-box clear relative">
+								<btn role="hybrid" data="ma" _title="移动平均线，它是将某一段时间（默认5日）的收盘价之和除以该周期。&lt;br&gt;金叉：MA短线由下向上突破 MA长线&lt;br&gt;死叉：MA短线由上向下突破 MA长线&lt;br&gt;多头：MA短线位于MA长线上方&lt;br&gt;空头：MA短线位于 MA长线下方"><span class="btn_span">MA</span></btn>
+								<btn class="drap" _title="指数平滑移动平均线">
+									<span class="drap_text">MACD </span>
+									<span class="drap_span"></span>
+								</btn>
+								<div class="drap_div hidden">
+									<btn data="dif" _title="由快的指数移动平均线（DIF短线，默认12日）减去慢的指数移动平均线（DIF长线，默认26日）得到"><span class="btn_span">DIF</span></btn>
+									<btn data="dea" _title="DIF的N日（默认9日）指数平滑移动平均线"><span class="btn_span">DEA</span></btn>
+									<btn data="hist" _title="2×（DIF- DEA）"><span class="btn_span">HIST</span></btn>
+									<btn role="hybrid_f" data="macd" _title="指数平滑移动平均线&lt;br&gt;金叉：DIF 由下向上突破 DEA&lt;br&gt;死叉：DIF 由上向下突破 DEA&lt;br&gt;多头：DIF 位于 DEA 上方&lt;br&gt;空头：DIF 位于 DEA 下方"><span class="btn_span">MACD</span></btn>
+									<span class="sanjiao"></span>
+								</div>
+								<btn data="rsi" _title="代表股票在过去N日（默认14日）的相对强弱情况。值域在0到100之间，值越大，股票表现越强势RSl大多数时间在30到70之间震荡。RSI&gt;80，代表超买，股价回调的可能性加大；RSl&lt;20，代表超卖，股价反弹的可能性增大。"><span class="btn_span">RSI</span></btn>
+								<btn data="bias" _title="乖离率(BIAS)，又称偏离率，是通过计算市场指数或收盘价与某条移动平均线之间的差距百分比，以反映一定时期内价格与其MA偏离程度的指标，从而得出价格在剧烈波动时因偏离移动平均趋势而造成回档或反弹的可能性，以及价格在正常波动范围内移动而形成继续原有势的可信度。"><span class="btn_span">BIAS</span></btn>
+								<btn role="BBI" data="bbi" _title="多空指数，是通过将几条不同天数移动平均线用加权平均方法计算出的一条移动平均线的综合指标，一般将3日、6日、12日和24日的四种平均股价（或指数）作为计算的参数。&lt;br&gt;多头：股价位于BBI 上方&lt;br&gt;空头：股价位于BBI 下方"><span class="btn_span">BBI</span></btn>
+								<btn data="cci" _title="CC1 N日(默认14日)顺势指标，测量股价是否已超出常态分布范围。+100以上为超买区，一100以下为超卖区，+100到一100之间为震荡区。"><span class="btn_span">CCI</span></btn>
+								<btn data="atr" _title="平均直实波动范围，真实波幅等于当日股价振幅、最高与昨收差价、最低与昨收差价中的最大值。ATR=真实波幅的N日（默认14日）移动平均。"><span class="btn_span">ATR</span></btn>
+								<btn role="hybrid_f" data="trix" _title="三重指数平滑移动平均，长线操作时采用本指标的讯号，可以过滤掉一些短期波动的干扰，避免交易次数过于频繁，造成部分无利润的买卖，及手续费的损失。&lt;br&gt;金叉：TRIX由下向上突破其均线&lt;br&gt;死叉：TRIX由上向下突破其均线&lt;br&gt;多头：TRIX位于其均线上方&lt;br&gt;空头：TRIX位于其均线下方"><span class="btn_span">TRIX</span></btn>
+								<btn role="hybrid_f" data="ema" _title="指数平均数指标，是一种趋向类指标，指数平均数指标是以指数式递减加权的移动平均。&lt;br&gt;金叉：EMA短线由下向上突破EMA长线&lt;br&gt;死叉：EMA短线由上向下突破EMA长线&lt;br&gt;多头：EMA短线位于EMA长线上方&lt;br&gt;空头：EMA短线位于EMA长线下方"><span class="btn_span">EMA</span></btn>
+								<btn role="hybrid_f" data="dma" _title="平行线差，是利用两条不同期间的平均线，来判断当前买卖能量的大小和未来价格趋势。 DMA指标是一种中短期指标。&lt;br&gt;金叉：DMA由下向上突破AMA&lt;br&gt;死叉：DMA由上向下突破AMA&lt;br&gt;多头：DMA位于AMA上方&lt;br&gt;空头：DMA位于AMA下方"><span class="btn_span">DMA</span></btn>
+								<btn class="drap" _title="布林线，是股市技术分析的常用工具之一，通过计算股价的“标准差”，再求股价的“信赖区间”。">
+									<span class="drap_text">布林线 </span>
+									<span class="drap_span"></span>
+								</btn>
+								<div class="drap_div bulin hidden">
+									<btn data="BBands_upperband" _title="中轨线=N日的移动平均线&lt;br&gt;上轨线=中轨线+两倍的标准差"><span class="btn_span">布林上线</span></btn>
+									<btn data="BBands_lowerband" _title="中轨线=N日的移动平均线&lt;br&gt;下轨线=中轨线－两倍的标准差"><span class="btn_span">布林下线</span></btn>
+									<span class="sanjiao"></span>
+								</div>
+								<btn role="hybrid" data="ma_money" _title="将某一段时间（默认5日）的成交量之和除以该周期。&lt;br&gt;金叉：MA_MONEY短线由下向上突破MA_MONEY长线&lt;br&gt;死叉：MA_MONEY短线由上向下突破MA_MONEY长线&lt;br&gt;多头：MA_MONEY短线位于MA_MONEY长线上方&lt;br&gt;空头：MA_MONEY短线位于MA_MONEY长线下方"><span class="btn_span">N日平均成交额</span></btn>
+								<btn role="hybrid" data="ma_volume" _title="将某一段时间（默认5日）的成交额之和除以该周期。&lt;br&gt;金叉：MA_VOLUME短线由下向上突破MA_VOLUME长线&lt;br&gt;死叉：MA_VOLUME短线由上向下突破MA_VOLUME长线&lt;br&gt;多头：MA_VOLUME短线位于MA_VOLUME长线上方&lt;br&gt;空头：MA_VOLUME短线位于MA_VOLUME长线下方"><span class="btn_span">N日平均成交量</span></btn>
+							</div>
+						</div>
+						<div class="btns form" url="form">
+							<div class="btns-box">
+								<btn data="CDL3WHITESOLDIERS" _title="红三兵其特征是：在上涨趋势中，出现3根连续创新高的小阳线。红三兵是推动股价上涨的信号，一般来说在股价见底回升，或在横盘后出现红三兵，表明多方正在积蓄能量，准备发力上攻。"><span class="btn_span">红三兵</span></btn>
+								<btn data="CDLHAMMER" _title="锤头线其特征是K线实体很小，一般无上影线(即使有，上影线也很短），但下影线长。通常，在下跌过程中，尤其是股价大幅下跌后出现锤头线，股价转跌为升的可能性较大。"><span class="btn_span">锤</span></btn>
+								<btn data="CDLINVERTEDHAMMER" _title="倒锤头线因形状像个倒转锤头而得名。其特征是：在下跌趋势中出现。K线实体（可阴可阳）很小，下影线很短或者没有，但有一根较长的上影线。倒锤头出现在下跌过程中，具有止跌回升的意义。如果倒锤头与早晨之星同时出现，则行情反转向上的可能性就更大。"><span class="btn_span">倒锤</span></btn>
+								<btn data="CDL2CROWS" _title="是指市场的高位出现了三个连续跳高开盘，第一天是长阳线，第二天高开收出带上升缺口的阴线，表示向上攻击失败，第三天再次跳高开盘，收出阴线，收盘比前一日阴线低，但仍高于第一天阳线的收盘价，这是股价暴跌的前兆"><span class="btn_span">两只乌鸦</span></btn>
+								<btn data="CDL3BLACKCROWS" _title="是指股价在运行时突然出现连续三根阴线的K线组合，是一种下跌的信号。"><span class="btn_span">三只乌鸦</span></btn>
+								<btn data="CDLMORNINGSTAR" _title="早晨之星又称希望之星。早燥之星的特征是：由3根K线组成。在下跌过程中，先出现一根中阴线或大阴线，第二天出现了一根低开的小阳线(亦可以是小阴线），随后市场转跌为升，出现了一根中阳线或大阳线。早晨之星的技术含义和早晨十字星相同，都是一种见底回升信号。"><span class="btn_span">早晨之星</span></btn>
+								<btn data="CDLEVENINGSTAR" _title="黄昏之星是由3根K线组成，第一根K线是一根实体较长的阳线；第二根K线是实体较短的K线(阴线、阳线均可，但阴线的下跌力度要强于阳线），人们标它喻之为“星”，这是K线组合中的主体部分，第三根K线是一根实体较长的阴线，它深人到第一根K线实体之内。黄昏之星是股价见顶回落的信号，预测股市下跌可靠性较高。"><span class="btn_span">黄昏之星</span></btn>
+								<btn data="CDLDARKCLOUDCOVER" _title="乌云盖顶其特征是：在上涨行情中，出现一根中阳线或大阳线后，第二天股跳空高开，但没有高走，反而高开低走，收了一根中阴线或大阴线，阴线的实体已经深入到第一根阳线实体的二分之一以下处。这预示股价上升势头已尽轮跌势即将开始。投资者见到此K线图形，应警觉市况有变，以抛售出局为宜。"><span class="btn_span">乌云盖顶</span></btn>
+								<btn data="CDLSHOOTINGSTAR" _title="流星线在形态上要求实体部分很小且位于K线底部，流星线通常要求要有很长的上影线，没有下影线或者下影线很小,实体是阴是阳不重要，下面的带有阴线小实体K线也应当视作流星线。 &lt;br&gt;从技术上来讲，在一轮升势后出现流行线表示市场已经失去了上升的持久力，多方已抵抗不住空方打击，股价随时可能见顶回落。因此，投资者在股价大幅上扬后，见到流星线应退出观望为宜。"><span class="btn_span">流星线</span></btn>
+							</div>
+						</div>
+						<div class="btns additive" url="additive">
+							<div class="btns-box clear">
+								<btn role="N" data="not_sell_in_n_days" _title="当持有标的天数（交易日）小于设定的值时，不卖出该标的"><span class="btn_span">持有天数不足不卖出</span></btn>
+								<btn role="N" data="max_hold_days" _title="标的最长持有天数，当超过设定的值时，则卖出该标的"><span class="btn_span">最长持有天数</span></btn>
+								<btn role="Null" data="limit_filter" _title="交易时，当标的涨停，则不卖出"><span class="btn_span">调仓日交易时涨停不卖</span></btn>
+								<btn role="Null" data="per_limit_filter" _title="当前一交易日收盘涨停时，则不卖出"><span class="btn_span">调仓前一日收盘涨停不卖</span></btn>
+								<btn role="fixed" data="sell_by_style" _title="按固定数量或者持仓的百分比卖出"><span class="btn_span">固定出仓</span></btn>
+								<btn role="sell_will_buy" data="sell_will_buy" _title="是否卖出欲买入的股票，卖出可能会造成手续费上涨"><span class="btn_span grey" flag="false">卖出欲买进股票</span></btn>
+								<btn role="refresh_rate" data="sell_refresh_rate" _title="每多少个交易日执行一次卖出操作"><span class="btn_span">卖出频率</span></btn>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="right-container-btnBox" id="risk_control">
+				<div class="rcb-title f16 tcenter bold"><span class="closee"></span><span>风险控制指标</span></div>
+				<div class="right-con-content">
+					<div class="rl-title">
+						<div class="rl-title-item inline-block active" href=".stop_check_surplus">止损止盈</div>
+						<div class="rl-title-item inline-block" href=".other">其他</div>
+					</div>
+					<div class="rl-content">
+						<div class="btns active stop_check_surplus" url="stop_check_surplus">
+							<div class="btns-box clear">
+								<btn data="security_stoploss" _title="当个股亏损超过止损线，则清仓止损"><span class="btn_span" flag="true">个股止损</span></btn>
+								<btn data="security_stopprofit" _title="当个股盈利超过止盈线，则清仓止盈"><span class="btn_span" flag="true">个股止盈</span></btn>
+								<btn data="portfolio_stoploss" _title="当策略持仓价值总亏损超过设定的止损线，清仓止损"><span class="btn_span">持仓价值止损</span></btn>
+								<btn data="portfolio_stopprofit" _title="当策略持仓价值总盈利超过设定的止赢线，清仓止盈"><span class="btn_span">持仓价值止盈</span></btn>
+								<btn data="portfolio_max_stoploss" _title="当策略总亏损超过设定的止损线，则策略清仓止损，并停止交易。"><span class="btn_span">策略最大亏损</span></btn>
+								<btn data="portfolio_max_stopprofit" _title="当策略总盈利超过设定的止盈线，则策略清仓止盈，并停止交易。"><span class="btn_span">策略最大盈利</span></btn>
+								<btn role="dapan" data="index_stoploss" _title="根据均线止损：当大盘N日均线与昨日收盘价构成“死叉”，则清仓止损；根据跌幅止损：当大盘N日内跌幅超过止损线，则清仓止损"><span class="btn_span">大盘信号止损</span></btn>
+							</div>
+						</div>
+						<div class="btns other" url="other">
+							<div class="btns-box clear">
+								<btn role="shxian" data="max_buy_style" _title="设置每笔委托的数量或金额上限，当超过设定值时，则按最大设定值买入。"><span class="btn_span grey" flag="false">每笔委托数量上限或金额上限</span></btn>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="right-container-btnBox" id="other_params">
+				<div class="rcb-title f16 tcenter bold"><span class="closee"></span><span>其他参数指标</span></div>
+				<div class="right-con-content">
+					<div class="rl-content">
+						<div class="btns active other_parameters" url="other_parameters">
+							<div class="btns-box clear">
+								<btn data="max_hold_stocknum" _title="策略最多持有的标的数量"><span class="btn_span grey" flag="false">最大建仓数量</span></btn>
+								<btn data="set_slippage" _title="当您下单后, 真实的成交价格与下单时预期的价格总会有一定偏差,因此我们加入了滑点模式来帮您更好的模拟真实市场的表现。  当您下达一个买单指令的时候, 成交的价格等于当时(您执行order函数所在的单位时间)的平均价格加上价差的一半；当您下达一个卖出指令的时候，卖出的价格等于当时的平均价格减去价差的一半."><span class="btn_span">滑点</span></btn>
+								<btn data="commission" _title="可以设定交易税费、印花税、券商手续费和最低佣金"><span class="btn_span">交易佣金</span></btn>
+								<btn data="use_real_price" _title="回测中每天获得的当天价格为除权价格，往前取到的价格为基于该日期的前复权价格。详情参看[&lt;a href='/api#设置动态复权真实价格模式' target='_blank'&gt;相关API&lt;/a&gt;]，原理详解[&lt;a href='/post/1629' target='_blank'&gt;点这里&lt;/a&gt;]。"><span class="btn_span">动态复权模式</span></btn>
+								<btn data="order_volume_ratio" _title="根据实际行情限制每个订单的成交量. 成交量不超过: 每日成交量 * value"><span class="btn_span">成交量比例</span></btn>
+								<btn data="security_max_proportion" _title="标的持仓价值在策略中的最大占比"><span class="btn_span">个股最大持仓比重</span></btn>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+
+
+
+
+
+
+            </div>
+            <!--/body-->
+
+
+
+        </div>
+                        <!-- 回到顶部 联系我们 -->
+                <div id="leftsead" class="hidden">
+                    <ul>
+                        <li id="btn">
+                        <a id="top_btn">
+                            <img src="{{ url_for('static', filename='images/toTop.png') }}" class="shows" show="false" width="47" height="49">
+                        </a>
+                        </li>
+                    </ul>
+                </div>
+
+        <script>
+        var g_staticHost = 'https://cdn.joinquant.com';
+
+                var g_isMobile = false;
+
+                var g_isLogin = true;
+
+                var g_isWinApp= false;
+
+        </script>
+	            <script src="{{ url_for('static', filename='js/lib.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/setGroIO.js') }}"></script>
+
+
+
+        <script>
+        $('.dropdown-toggle').dropdown();
+        $("body").delegate("a","click",function(){
+            if ($(this)[0].hostname.length>0 && $(this)[0].hostname != window.location.hostname) {
+                window.open($(this)[0].href);
+                return false;
+            }
+        });
+
+        function addUserIcon(){
+            var user = {
+                "4c2438ee379986919782ec5aaea31ac0":'<i class="icon icon-trophy icon-trophy-gold" title="2015年最受欢迎策略冠军"></i><img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/fire.png" alt="" title="2016年度分享达人">',
+                "a9a94cbf1fbc67a98acd312753232aec":'<i class="icon icon-trophy icon-trophy-silver" title="2015年最受欢迎策略亚军"></i>',
+                "179b1b0056b901e816d968d28fa8e81e":'<i class="icon icon-trophy icon-trophy-copper" title="2015年最受欢迎策略季军"></i><img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/huang.png" alt="" title="2016年度明星Quant">',
+                "16fd60756833d488b18dac0554f03244":'<i class="icon icon-trophy icon-trophy-gold" title="2015年圣诞节最受欢迎策略冠军"></i>',
+                "eca7f63f7c3df62982dc6e8e8b29b2ab":'<i class="icon icon-trophy icon-trophy-silver" title="2015年圣诞节最受欢迎策略亚军"></i>',
+                "a4c98dec350e69891a6df83add745e26":'<i class="icon icon-trophy icon-trophy-copper" title="2015年圣诞节最受欢迎策略季军"></i>',
+                "aa87bf18818ee992b8583c1330ef846d":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/fire.png" alt="" title="2016年度分享达人">',
+                "0f914195a39242d21c29934566e18396":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/fire.png" alt="" title="2016年度分享达人">',
+                "f405ebf43640edc10f4f7e12d954ec87":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/fire.png" alt="" title="2016年度分享达人">',
+                "47ba0b58397b94aa4ac1a49cb6aa6c66":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/fire.png" alt="" title="2016年度分享达人">',
+                "51fcdf0e00a2508bfb79941d668f82a1":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/fire.png" alt="" title="2016年度分享达人">',
+                "48c6200451d21c4b3fe6093a39fbd9df":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/fire.png" alt="" title="2016年度分享达人">',
+                "31f1ab9f679923fe3f7c9fdfc6257a10":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/fire.png" alt="" title="2016年度分享达人">',
+                "9eb156885cf6b7314d8534d630dad77b":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/fire.png" alt="" title="2016年度分享达人">',
+                "42c36f513d5a18b2364c6ac8e37dc03e":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/fire.png" alt="" title="2016年度分享达人">',
+                "fcf44ad36423fb2cac78ea69ab510919":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/huang.png" alt="" title="2016年度明星Quant">',
+                "7cc9c0254e6d756a55d208487d2196b4":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/huang.png" alt="" title="2016年度明星Quant">',
+                "43735a12db3380763d253ec2ffc4b16e":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/huang.png" alt="" title="2016年度明星Quant">',
+                "db948de33bc2e862b5f8f16443394c2b":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/huang.png" alt="" title="2016年度明星Quant">',
+                "e3bde20a826bc82d976f0d286b3b32be":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/huang.png" alt="" title="2016年度明星Quant">',
+                "86324720004bc022ef8b527c20151cbb":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/huang.png" alt="" title="2016年度明星Quant">',
+                "0d815da657403ee258f228a168c30489":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/huang.png" alt="" title="2016年度明星Quant">',
+                "7c94444a5f7e6513c2894f5766a027c6":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/huang.png" alt="" title="2016年度明星Quant">',
+                "67240f4041bc73f9461f83d8b1bdca58":'<img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/huang.png" alt="" title="2016年度明星Quant">',
+                //"00e28d92af2a53a2a4b98b775c8f6bb2":'<i class="icon icon-trophy icon-trophy-gold" title="2015年最受欢迎策略冠军"></i><img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/huang.png" alt="" title="2016年度明星Quant"><img style="position:relative;top:-1px" src="https://cdn.joinquant.com/common/img/fire.png" alt="" title="2016年度分享达人">',
+            }
+
+            $('.user-alias').each(function(){
+                /*
+                var alias =  $(this).html();
+                if(user[alias]){
+                    alias = alias+user[alias];
+                    $(this).html(alias);
+                }
+                */
+                var euid = $(this).attr('href').replace("/user/","");
+                if(user[euid]){
+                    var alias =  $(this).html();
+                    alias = alias+user[euid];
+                    $(this).html(alias);
+                }
+           });
+        }
+	</script>
+    <script type="text/javascript" charset="utf-8" src="{{ url_for('static', filename='js/jquery-ui-jq.js') }}"></script>
+	<script type="text/javascript" charset="utf-8" src="{{ url_for('static', filename='js/stockcode.js') }}"></script>
+	<script type="text/javascript" charset="utf-8" src="{{ url_for('static', filename='js/wizard-edit.js') }}"></script>
+	<script type="text/javascript" charset="utf-8" src="{{ url_for('static', filename='js/wizard.js') }}"></script><div id="ui-datepicker-div" class="ui-datepicker ui-widget ui-widget-content ui-helper-clearfix ui-corner-all"></div>
+<script>
+$(function(){
+    restoreWizard({"basic":[{"val":"\u5411\u5bfc\u5f0f\u7b56\u7565-111","name":"name"},{"startTime":"2007-01-01","endTime":"2016-12-01","name":"Algorithm_cycle"},{"val":"100000","name":"starting_cash"},{"select":"000300.XSHG","name":"set_benchmark"},{"val":"5","name":"max_hold_stocknum"},{"val":"20","name":"check_stocks_refresh_rate"}],"xuangu":[{"name":"security_universe","select":"000002.XSHG+399106.XSHE"},{"name":"filter_st","select":"True"},{"name":"filter_delisted","select":"True"},{"name":"filter_paused","select":"True"},{"val":"20","name":"check_stocks_refresh_rate"}],"xuangu_sort":[{"check_out_lists_ascending":"desc"},{"val":"1","name":"valuation.market_cap","select":"asc"}],"ruchang":[{"name":"filter_holded","select":"False"},{"name":"order_style_str","select":"by_cap_mean"}],"chuchang":[{"name":"sell_will_buy","select":"False"}],"fengxiankongzhi":[{"val":"10000","name":"max_buy_style","select":"amount"}]});
+})
+</script>
+
+	            <!--div style="display:none">
+	    <script src="quant/z_stat.php" language="JavaScript"></script><script src="quant/core.php" charset="utf-8" type="text/javascript"></script><a href="http://www.cnzz.com/stat/website.php?web_id=1256107754" target="_blank" title="站长统计">站长统计</a-->
+        <!-- 返回顶部 -->
+        <script>
+        function toTop(){
+            var scrollT=$(window).scrollTop();
+            if (scrollT>=200) {
+                $('#leftsead').removeClass('hidden');
+            }else{
+                $('#leftsead').addClass('hidden');
+            }
+        }
+        if (!g_isMobile) {
+            toTop();
+        }
+
+        $(window).scroll(function(){
+            if (!g_isMobile) {
+                toTop();
+            }
+        })
+        $("#top_btn").click(function(){if(scroll=="off") return;$("html,body").animate({scrollTop: 0}, 300);});
+        /* var g_isBackToTop = true;
+        if(g_isBackToTop){
+            $('#leftsead').removeClass('hidden');
+            $("#leftsead a").hover(function(){
+                if($(this).prop("className")=="youhui"){
+                    $(this).children("img.hides").show();
+                }else{
+                    $(this).children("div.hides").show();
+                    $(this).children("img.shows").hide();
+                    $(this).children("div.hides").animate({marginRight:'0px'},'0');
+                }
+            },function(){
+                if($(this).prop("className")=="youhui"){
+                    $(this).children("img.hides").hide();
+                }else{
+                    $(this).children("div.hides").animate({marginRight:'-163px'},0,function(){$(this).hide();$(this).next("img.shows").show();});
+                }
+            });
+            $("#top_btn").click(function(){if(scroll=="off") return;$("html,body").animate({scrollTop: 0}, 300);});
+
+            //右侧导航 - 二维码
+            $(".youhui").mouseover(function(){
+                    $(this).children(".2wm").show();
+            })
+            $(".youhui").mouseout(function(){
+                    $(this).children(".2wm").hide();
+            });
+        }*/
+        </script>
+        <script>
+             var img = new Image();
+             var referer = "https%3A%2F%2Fwww.joinquant.com%2Falgorithm%2Findex%2Flist";
+             var euid = "44d7bc3e1ab1d9776cd6796dceebd452";
+             var urd = "2016_05_15";
+             var logHost = '';
+             var timestamp=new Date().getTime();
+             img.src = logHost+'/log/p.gif?euid='+euid+"&referer="+referer+'&urd='+urd+'&_t='+timestamp;
+        </script>
+        <script>
+        /*cnzz点击事件统计*/
+        $('.track_event_click').click(function(){
+            var cate = $(this).attr('_cate');
+            var name = $(this).attr('_name');
+             _czc.push(['_trackEvent', cate, '点击', name]);
+        });
+        </script>
+        </div>
+
+
+</body></html>
