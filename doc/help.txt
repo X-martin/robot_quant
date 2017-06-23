@@ -1,0 +1,8 @@
+doc:文档、数据库脚本
+common:公共模块、工具
+frame:策略运行框架
+static:web前端页面样式、脚本
+templates:web前端页面
+user：用户生成的策略代码
+config.py:系统配置文件
+strategy_main.py：系统入口,web控制层
