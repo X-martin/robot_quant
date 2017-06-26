@@ -23,8 +23,8 @@ CREATE TABLE `r_order` (
   `strategy_id` int(8) NOT NULL,
   `stockcode` varchar(9) NOT NULL,
   `tradedate` date NOT NULL,
-  `money` decimal(32,16) DEFAULT NULL,
-  `num` decimal(8,0) DEFAULT NULL,
+  `price` decimal(32,16) DEFAULT NULL,
+  `volume` decimal(8,0) DEFAULT NULL,
   PRIMARY KEY (`strategy_id`,`stockcode`,`tradedate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -36,8 +36,8 @@ CREATE TABLE `r_position` (
   `strategy_id` int(8) NOT NULL,
   `stockcode` varchar(9) NOT NULL,
   `tradedate` date NOT NULL,
-  `money` decimal(32,16) DEFAULT NULL,
-  `num` decimal(8,0) DEFAULT NULL,
+  `price` decimal(32,16) DEFAULT NULL,
+  `volume` decimal(8,0) DEFAULT NULL,
   PRIMARY KEY (`strategy_id`,`tradedate`,`stockcode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
