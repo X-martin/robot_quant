@@ -30,11 +30,11 @@ class TushareBasedata(Basedata):
         dfNew = df1.set_index('date')
         df = None
         if fq == 'N':
-            df = ts.get_h_data(code, start=start_date_str, end=end_date_str, autype=None)
+            df = ts.get_k_data(code, start=start_date_str, end=end_date_str, autype=None)
         elif fq == 'B':
-            df = ts.get_h_data(code, start=start_date_str, end=end_date_str, autype='hfq')
+            df = ts.get_k_data(code, start=start_date_str, end=end_date_str, autype='hfq')
         elif fq == 'F':
-            df = ts.get_h_data(code, start=start_date_str, end=end_date_str)
+            df = ts.get_k_data(code, start=start_date_str, end=end_date_str)
         #df = df2.copy()
         df['pct_chg'] = dfNew['p_change']
         # del df['amount']
@@ -116,8 +116,8 @@ class TushareBasedata(Basedata):
         pass
 
 t = TushareBasedata()
-#df = t.get_history_data_by_date('000001.SZ', '2016-01-01', '2017-01-01', 'D', 'N')
-#print df
+df = t.get_history_data_by_date('000001.SZ', '2016-01-01', '2017-01-01', 'D', 'N')
+print df
 
 #df2 = t.get_stock_data_by_industryname('2016-01-01', '综合行业'.decode("utf-8"))
 #print df2
