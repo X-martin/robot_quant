@@ -20,6 +20,18 @@ class Basedata(object):
         pass
 
     '''
+        通过时间段指数行情数据接口
+    '''
+    def get_history_index_data_by_date(self, code, start_date_str, end_date_str, frequency):
+        pass
+
+    '''
+        通过指数代码列表查询指数行情数据接口
+    '''
+    def get_history_index_data_by_stocklist(self, trade_date, codelist, frequency):
+        pass
+
+    '''
         通过股票列表查询因子值数据
     '''
     def get_factor_data_by_stocklist(self, trade_date, codelist, tracetype):
