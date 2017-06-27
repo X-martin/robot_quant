@@ -5,6 +5,7 @@ from  Basedata import Basedata
 import tushare as ts
 from datetime import datetime
 import os
+import pandas as pd
 
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
 
@@ -36,7 +37,7 @@ class TushareBasedata(Basedata):
             df = ts.get_h_data(code, start=start_date_str, end=end_date_str)
         #df = df2.copy()
         df['pct_chg'] = dfNew['p_change']
-        del df['amount']
+        # del df['amount']
         #print df
 
         return df
@@ -44,7 +45,41 @@ class TushareBasedata(Basedata):
     '''
         通过股票列表查询行情数据接口
     '''
-    def get_history_data_by_stocklist(self, trade_date, codelist, frequency, fq):
+    def get_history_data_by_stocklist(self, trade_date_str, codelist, frequency, fq):
+        df = None
+        dfChg = None
+
+        for code in codelist:
+            if len(code) != 9:
+                continue
+            code = code[0:6]
+            if fq == 'N':
+                df1 = ts.get_k_data(code, start=trade_date_str, end=trade_date_str, autype=None)
+            elif fq == 'B':
+                df1 = ts.get_k_data(code, start=trade_date_str, end=trade_date_str, autype='hfq')
+            elif fq == 'F':
+                df1 = ts.get_k_data(code, start=trade_date_str, end=trade_date_str)
+            df = pd.concat([df, df1])
+            df2 = ts.get_hist_data(code, start=trade_date_str, end=trade_date_str, ktype=frequency)
+            dfChg = pd.concat([dfChg, df2])
+        #print df
+        #print dfChg
+        df = df.reset_index(drop=True)
+        dfChg = dfChg.reset_index(drop=True)
+        df['pct_chg'] = dfChg['p_change']
+        del df['date']
+        return df
+
+    '''
+        通过时间段指数行情数据接口
+    '''
+    def get_history_index_data_by_date(self, code, start_date_str, end_date_str, frequency):
+        pass
+
+    '''
+        通过指数代码列表查询指数行情数据接口
+    '''
+    def get_history_index_data_by_stocklist(self, trade_date, codelist, frequency):
         pass
 
     '''
@@ -81,9 +116,11 @@ class TushareBasedata(Basedata):
         pass
 
 t = TushareBasedata()
-df = t.get_history_data_by_date('000001.SZ', '2016-01-01', '2017-01-01', 'D', 'N')
-print df
+#df = t.get_history_data_by_date('000001.SZ', '2016-01-01', '2017-01-01', 'D', 'N')
+#print df
 
-df2 = t.get_stock_data_by_industryname('2016-01-01', '综合行业'.decode("utf-8"))
-print df2
+#df2 = t.get_stock_data_by_industryname('2016-01-01', '综合行业'.decode("utf-8"))
+#print df2
 
+df3 = t.get_history_data_by_stocklist('2017-06-26', ['000001.SZ', '000002.SZ', '000003.SZ'], 'D', 'N')
+print df3
