@@ -34,13 +34,13 @@ class Basedata(object):
     '''
         通过股票列表查询因子值数据
     '''
-    def get_factor_data_by_stocklist(self, trade_date, codelist, tracetype):
+    def get_factor_data_by_stocklist(self, trade_date, codelist, factorenname, tracetype):
         pass
 
     '''
         通过时间段因子值接口
     '''
-    def get_factor_data_by_date(self, code, start_date_str, end_date_str, tracetype):
+    def get_factor_data_by_date(self, code, start_date_str, end_date_str, factorenname, tracetype):
         pass
 
     '''
