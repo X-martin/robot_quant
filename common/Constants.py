@@ -5,6 +5,8 @@
 全局变量
 
 '''
+# 策略ID
+strategyId = ""
 # 开始日期
 startDateStr = ''
 # 截至日期
