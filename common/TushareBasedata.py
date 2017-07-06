@@ -7,6 +7,8 @@ import tushare as ts
 from datetime import datetime
 import os
 import pandas as pd
+import numpy as np
+import traceback
 
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
 
@@ -122,13 +124,23 @@ class TushareBasedata(Basedata):
     '''
     def get_factor_data_by_stocklist(self, trade_date_str, codelist, factorenname, tracetype):
         factorDf = None
+        codelistNew = []
+        if len(codelist)>0:
+            for code in codelist:
+                codelistNew.append(code[0:6])
         # 通过时间得到查询的年份、季度，往前顺延两个季度
         # 通过因子名称找出调用的api---业绩报告（主表）、如：偿债能力
         # 分别查询获取财务因子，年份、季度、接口
 
+        df = pd.DataFrame({'code' : pd.Series(codelist)})
+        df['fv'] = np.NaN
+        df['reportdate'] = np.NaN
+        #print df
+
         # 通过trade_date与ann_date比较，小于trade_date，返回因子值
         trade_date = datetime.strptime(trade_date_str, '%Y-%m-%d')
         quarterlist = bt.getLastestQuarterlistByDate(trade_date)
+        #print quarterlist
 
         for q in quarterlist:
             try:
@@ -137,7 +149,8 @@ class TushareBasedata(Basedata):
                 # 盈利能力--因子值数据
                 df2 = ts.get_profit_data(q[0], q[1])
 
-                df1 = df1.sort(["code", "report_date"], ascending=False)
+                # 去重
+                df1 = df1.sort_values(by=["code", "report_date"], ascending=False)
                 #print df1
                 df1 = df1.drop_duplicates(['code'])
                 #print df1
@@ -146,17 +159,44 @@ class TushareBasedata(Basedata):
                 df2 = df2.reset_index(drop=True)
                 df1New = df1.set_index('code')
                 df2New = df2.set_index('code')
-                # print df1New
-                # print df2New
-                #print df1New.index
-                #print df2New.index
+
                 df2New['ann_date'] = df1New['report_date']
-                print df2New
+                #print len(df2New)
+                df2New = df2New[df2New.ann_date==df2New.ann_date]
+                df2New = df2New[df2New[factorenname]==df2New[factorenname]]
+                df2New['ann_date'] = df2New['ann_date'].map(lambda x:str(q[0])+'-'+x)
+                df2New['ann_date_new'] = df2New['ann_date'].map(lambda x:datetime.strptime(x, '%Y-%m-%d'))
+                #print len(df2New)
+                df2New['code'] = df2New.index
+                df2New = df2New[df2New.index.isin(codelistNew)]
+                if q[1] == 1:
+                    df2New['reportdate'] = datetime.strptime(str(q[0])+'-'+'3-31', '%Y-%m-%d')
+                elif q[1] == 2:
+                    df2New['reportdate'] = datetime.strptime(str(q[0])+'-'+'6-30', '%Y-%m-%d')
+                elif q[1] == 3:
+                    df2New['reportdate'] = datetime.strptime(str(q[0])+'-'+'9-30', '%Y-%m-%d')
+                elif q[1] == 4:
+                    df2New['reportdate'] = datetime.strptime(str(q[0])+'-'+'12-30', '%Y-%m-%d')
+                factorDfTemp = df2New.reset_index(drop=True)
+                factorDf = pd.concat([factorDf, factorDfTemp])
+                #print factorDf
                 #break
             except Exception, e:
-                # traceback.print_exc()
-                pass
+                traceback.print_exc()
                 continue
+        factorDf = factorDf.sort_values(by=["ann_date_new"], ascending=False)
+        #print factorDf
+        factorDf = factorDf.drop_duplicates(['code'], keep='first')
+
+        factorDf['fv'] = factorDf[factorenname]
+        factorDf = factorDf.set_index('code')
+        df = df.apply(___update_get_factor_data_by_stocklist_row___, args=(factorDf, ), axis=1)
+
+        return df
+
+
+
+
 
 
 
@@ -164,7 +204,76 @@ class TushareBasedata(Basedata):
         通过时间段因子值接口
     '''
     def get_factor_data_by_date(self, code, start_date_str, end_date_str, factorenname, tracetype):
-        pass
+        factorDf = None
+        conn = bt.getConnection()
+        code = code[0:6]
+        df = bt.getTradeDay(conn, start_date_str, end_date_str, type=1)
+
+        #df = pd.DataFrame({'date': pd.Series(datelist)})
+        df['fv'] = np.NaN
+        df['reportdate'] = np.NaN
+        #print df
+
+        # 通过trade_date与ann_date比较，小于trade_date，返回因子值
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+        quarterlist = bt.getQuarterlistByDate(start_date, end_date)
+        #print quarterlist
+
+        for q in quarterlist:
+            try:
+                # 业绩报告（主表）
+                df1 = ts.get_report_data(q[0], q[1])
+                # 盈利能力--因子值数据
+                df2 = ts.get_profit_data(q[0], q[1])
+                df1 = df1[df1.code==code]
+                df2 = df2[df2.code==code]
+
+                # 去重
+                df1 = df1.sort_values(by=["code", "report_date"], ascending=False)
+                df1 = df1.drop_duplicates(['code'])
+                # print df1
+                df1 = df1.reset_index(drop=True)
+                df2 = df2.drop_duplicates(['code'])
+                df2 = df2.reset_index(drop=True)
+                df1New = df1.set_index('code')
+                df2New = df2.set_index('code')
+
+                df2New['ann_date'] = df1New['report_date']
+                #print len(df2New)
+                df2New = df2New[df2New.ann_date == df2New.ann_date]
+                df2New = df2New[df2New[factorenname] == df2New[factorenname]]
+                df2New['ann_date'] = df2New['ann_date'].map(lambda x: str(q[0]) + '-' + x)
+                df2New['ann_date_new'] = df2New['ann_date'].map(lambda x: datetime.strptime(x, '%Y-%m-%d'))
+                #print len(df2New)
+                # df2New['date'] = df2New.index
+                # df2New = df2New[df2New.index.isin(codelistNew)]
+                if q[1] == 1:
+                    df2New['reportdate'] = datetime.strptime(str(q[0]) + '-' + '3-31', '%Y-%m-%d')
+                elif q[1] == 2:
+                    df2New['reportdate'] = datetime.strptime(str(q[0]) + '-' + '6-30', '%Y-%m-%d')
+                elif q[1] == 3:
+                    df2New['reportdate'] = datetime.strptime(str(q[0]) + '-' + '9-30', '%Y-%m-%d')
+                elif q[1] == 4:
+                    df2New['reportdate'] = datetime.strptime(str(q[0]) + '-' + '12-30', '%Y-%m-%d')
+                factorDfTemp = df2New.reset_index(drop=True)
+                factorDf = pd.concat([factorDf, factorDfTemp])
+            except Exception, e:
+                traceback.print_exc()
+                continue
+        factorDf = factorDf.sort_values(by=["ann_date_new"], ascending=False)
+        #print factorDf
+
+        factorDf['fv'] = factorDf[factorenname]
+        factorDf['ann_date_new'] = factorDf['ann_date_new'].map(lambda x:x.date())
+        factorDf['ann_date_new2'] = factorDf['ann_date_new']
+        factorDf = factorDf.set_index('ann_date_new')
+        factorDfNew = pd.DataFrame(factorDf, columns=['fv', 'reportdate', 'ann_date_new2'])
+        #print factorDfNew
+        df = df.apply(___update_get_factor_data_by_date_row___, args=(factorDfNew,), axis=1)
+
+        return df
+
 
     '''
         通过行业名称查询股票代码数据
@@ -195,6 +304,31 @@ class TushareBasedata(Basedata):
         df = df[df.c_name==areaname]
         del df['area']
         return df
+
+
+def ___update_get_factor_data_by_stocklist_row___(row, df):
+    code = row['code']
+    code = code[0:6]
+    dfnew = df[df.index == code]
+    if len(dfnew) == 0:
+        return row
+    fv = df.loc[code, 'fv']
+    reportdate = df.loc[code, 'reportdate']
+    row['fv'] = fv
+    row['reportdate'] = reportdate
+    return row
+
+def ___update_get_factor_data_by_date_row___(row, df):
+    d = row['tradedate']
+    dfnew = df[df.index <= d]
+    if len(dfnew) == 0:
+        return row
+
+    fv = df.iloc[0, 0]
+    reportdate = df.iloc[0, 1]
+    row['fv'] = fv
+    row['reportdate'] = reportdate
+    return row
 
 '''
 t = TushareBasedata()
@@ -229,6 +363,7 @@ print df2New
 '''
 t = TushareBasedata()
 # 净资产收益率(%)
-#print t.get_factor_data_by_stocklist('2017-5-8', ['000001.SZ','000002.SZ','000004.SZ','000005.SZ'], 'roe', 1)
+# print t.get_factor_data_by_stocklist('2017-5-8', ['000001.SZ','000002.SZ','000004.SZ','000005.SZ'], 'roe', 1)
+print t.get_factor_data_by_date('000001.SZ', '2016-8-3', '2017-2-3', 'roe', 0)
 
-print t.get_history_index_data_by_date('000001.SZ', '2017-01-05', '2017-02-08', 'D')
+#print t.get_history_index_data_by_date('000001.SZ', '2017-01-05', '2017-02-08', 'D')
