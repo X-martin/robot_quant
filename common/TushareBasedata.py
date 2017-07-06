@@ -195,11 +195,6 @@ class TushareBasedata(Basedata):
         return df
 
 
-
-
-
-
-
     '''
         通过时间段因子值接口
     '''
