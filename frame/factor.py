@@ -41,8 +41,9 @@ class Factor(object):
         elif method == "between":
             pass
 
-    def filter(self, stocks):
+    def filter(self, stocks, date):
         self.stocks["stock_id"] = stocks
+        self.date = date
         self.get_values()
         self.apply_method()
         return list(self.stocks["stock_id"])
