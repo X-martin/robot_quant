@@ -325,6 +325,12 @@ def ___update_get_factor_data_by_date_row___(row, df):
     row['reportdate'] = reportdate
     return row
 
+    '''
+        通过日期、类型查询权重股；如：创业板、沪深300、中小板等
+    '''
+    def get_stocklist_by_type(self, trade_date, type):
+        pass
+
 '''
 t = TushareBasedata()
 df = t.get_history_data_by_date('000001.SZ', '2016-01-01', '2017-01-01', 'D', 'N')
@@ -359,6 +365,7 @@ print df2New
 t = TushareBasedata()
 # 净资产收益率(%)
 # print t.get_factor_data_by_stocklist('2017-5-8', ['000001.SZ','000002.SZ','000004.SZ','000005.SZ'], 'roe', 1)
-print t.get_factor_data_by_date('000001.SZ', '2016-8-3', '2017-2-3', 'roe', 0)
+#print t.get_factor_data_by_date('000001.SZ', '2016-8-3', '2017-2-3', 'roe', 0)
 
 #print t.get_history_index_data_by_date('000001.SZ', '2017-01-05', '2017-02-08', 'D')
+print ts.get_hs300s()
