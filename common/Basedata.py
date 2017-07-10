@@ -60,3 +60,9 @@ class Basedata(object):
     '''
     def get_stock_data_by_areaname(self, trade_date, areaname):
         pass
+
+    '''
+        通过日期、类型查询权重股；如：创业板、沪深300、中小板等
+    '''
+    def get_stocklist_by_type(self, trade_date, type):
+        pass
