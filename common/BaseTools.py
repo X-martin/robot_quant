@@ -109,6 +109,24 @@ def getQuarterlistByDate(start_date, end_date):
         quarterlist.append(d)
     return quarterlist
 
+'''
+交集
+'''
+def intersection(list1, list2):
+    pass
+
+'''
+并集
+'''
+def union(list1, list2):
+    pass
+
+'''
+差集
+'''
+def difference(list1, list2):
+    pass
+
 if __name__ == '__main__':
     print dateRange("2016-01-01", "2016-02-01")
     conn = getConnection()
