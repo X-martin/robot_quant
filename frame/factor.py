@@ -5,51 +5,88 @@ class Factor(object):
 
     def __init__(self, name):
         self.name = name
-        self.method = None
-        self.value = None
-        self.date = None
-        self.stocks = pd.DataFrame(columns=["stock_id", "factor_value"])
 
-    def get_factor_values(self):
-        # pass args self.date, self.name, self.stocks
+    def get_factor_values(self, stocks, date):
+        df_stocks = pd.DataFrame([stocks], columns=["stock_id"])
+        # pass args self.date, self.name, df_factor
         # call Tushare Api
-        # rewrite self.values
-        pass
+        # rewrite values
+        return df_stocks
 
-    def apply_method(self):
+    @staticmethod
+    def apply_method(df_factor, method, value):
         if method in ["asc top", "asc bottom", "desc top", "desc bottom"]:
-            if self.value > 0:
-                if self.value < 1:
-                    self.value = int(self.value * len(self.stocks))
-                self.value = min([self.value, len(self.stocks)])
+            if value > 0:
+                if value < 1:
+                    value = int(value * len(df_factor))
+                value = min([value, len(df_factor)])
                 if method in ["asc top", "desc bottom"]:
-                    self.stocks = self.stocks.sort_values(["factor_value"], ascending=True)
+                    df_factor = df_factor.sort_values(["factor_value"], ascending=True)
                 else:
-                    self.stocks = self.stocks.sort_values(["factor_value"], ascending=False)
-                self.stocks = self.stocks.iloc[:self.value, :]
+                    df_factor = df_factor.sort_values(["factor_value"], ascending=False)
+                df_factor = df_factor.iloc[:value, :]
         elif method == "is":
-            self.stocks = self.stocks.loc[self.stocks["factor_value"] == self.value]
+            df_factor = df_factor.loc[df_factor["factor_value"] == value]
         elif method == "not":
-            self.stocks = self.stocks.loc[self.stocks["factor_value"] != self.value]
+            df_factor = df_factor.loc[df_factor["factor_value"] != value]
         elif method == "in":
-            self.stocks = self.stocks.loc[self.stocks["factor_value"].apply(
-                lambda x: x in self.value)]
+            df_factor = df_factor.loc[df_factor["factor_value"].apply(
+                lambda x: x in value)]
         elif method == "not in":
-            self.stocks = self.stocks.loc[self.stocks["factor_value"].apply(
-                lambda x: x not in self.value)]
+            df_factor = df_factor.loc[df_factor["factor_value"].apply(
+                lambda x: x not in value)]
         elif method == "greater":
-            self.stocks = self.stocks.loc[self.stocks["factor_value"] > self.value]
+            df_factor = df_factor.loc[df_factor["factor_value"] > value]
         elif method == "less":
-            self.stocks = self.stocks.loc[self.stocks["factor_value"] < self.value]
+            df_factor = df_factor.loc[df_factor["factor_value"] < value]
         elif method == "between":
-            self.stocks = self.stocks.loc[self.stocks["factor_value"] > self.value[0]]
-            self.stocks = self.stocks.loc[self.stocks["factor_value"] < self.value[1]]
+            df_factor = df_factor.loc[df_factor["factor_value"] > value[0]]
+            df_factor = df_factor.loc[df_factor["factor_value"] < value[1]]
+        return df_factor
 
     def filter(self, stocks, date, method, value):
-        self.stocks["stock_id"] = stocks
-        self.date = date
-        self.method = method
-        self.value = value
-        self.get_factor_values()
-        self.apply_method()
-        return list(self.stocks["stock_id"])
+        df_factor = self.get_factor_values(stocks, date)
+        df_factor = self.apply_method(df_factor, method, value)
+        return list(df_factor["stock_id"])
+
+
+class CustomFactor(Factor):
+    def __init__(self, name, supfactor_names, supfactor_method, supfactor_value):
+        super(CustomFactor, self).__init__(name)
+        self.supfactor_names = supfactor_names
+        self.supfactor_method = supfactor_method
+        self.supfactor_value = supfactor_value
+        self.supfactors = []
+        for name in supfactor_names:
+            factor = Factor(name)
+            self.supfactors += [factor]
+
+    def get_supfactor_values(self, stocks, date):
+        dfs = []
+        for factor in self.supfactors:
+            df = factor.get_factor_values(stocks, date)
+            dfs += [df]
+        return dfs
+
+    def get_factor_values(self, stocks, date):
+        df_stocks = pd.DataFrame([stocks], columns=["stock_id"])
+        method = self.supfactor_method
+        value = self.supfactor_value
+        if method == "greater":
+            dfs = self.get_supfactor_values(stocks, date)
+            factor_values = dfs[0]["factor_value"] > dfs[1]["factor_value"]
+        elif method == "less":
+            dfs = self.get_supfactor_values(stocks, date)
+            factor_values = dfs[0]["factor_value"] < dfs[1]["factor_value"]
+        elif method == "lag":
+            date = date - value
+            dfs = self.get_supfactor_values(stocks, date)
+            factor_values = dfs[0]["factor_value"]
+        elif method == "avg":
+            dfs = self.get_supfactor_values(stocks, date)
+            factor_values = dfs[0]["factor_value"]
+            for i in range(1, len(dfs)):
+                factor_values += dfs[i]["factor_value"]/float(len(dfs))
+
+        df_stocks.join(factor_values)
+        return df_stocks
