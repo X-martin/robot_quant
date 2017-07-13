@@ -50,6 +50,6 @@ class Factor(object):
         self.date = date
         self.method = method
         self.value = value
-        self.get_values()
+        self.get_factor_values()
         self.apply_method()
         return list(self.stocks["stock_id"])
