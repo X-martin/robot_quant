@@ -22,11 +22,11 @@ def getConnection():
 def getTradeDay(conn, start_date_str=None, end_date_str=None, type=1):
     tradedaySql = "select tradedate from sys_tradeday where type = "+str(type)
     if start_date_str:
-        tradedaySql += " and tradedate>=date_format('" + start_date_str + "', '%Y%m%d')"
+        tradedaySql += " and tradedate>=date_format('" + start_date_str + "', '%Y-%m-%d')"
     if end_date_str:
-        tradedaySql += " and tradedate<=date_format('" + end_date_str + "', '%Y%m%d')"
+        tradedaySql += " and tradedate<=date_format('" + end_date_str + "', '%Y-%m-%d')"
     else:
-        tradedaySql += " and tradedate<=sysdate"
+        tradedaySql += " and tradedate<=now()"
 
     tradedaySql += " order by tradedate desc"
     #print tradedaySql
