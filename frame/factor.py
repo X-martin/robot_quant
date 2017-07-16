@@ -10,7 +10,8 @@ class Factor(object):
         df_stocks = pd.DataFrame([stocks], columns=["stock_id"])
         # pass args self.date, self.name, df_factor
         # call Tushare Api
-        # rewrite values
+        # df_stocks["factor_value"] = Tushare.get_value(stocks, date)
+        #
         return df_stocks
 
     @staticmethod
