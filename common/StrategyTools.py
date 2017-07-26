@@ -58,7 +58,7 @@ def savePosition(strategyId, orderList):
         print positionList
         positionMap = {}
         for p in positionList:
-            positionMap[p.stockcode] = p
+            positionMap[p[1]] = p
 
         positionList = []
         delPositionIds=[]
@@ -68,7 +68,7 @@ def savePosition(strategyId, orderList):
             positionList.append(v)
             p = positionMap[order.stockcode]
             if order.volume>0:
-                order.volume=p.volume+order.volume
+                order.volume=p[4]+order.volume
             elif order.volume==0:
                 # 清空仓位
                 pass
@@ -83,6 +83,7 @@ def savePosition(strategyId, orderList):
         cur.executemany(
             'insert into r_position(strategy_id, stockcode, tradedate, price, volume) values(%s, %s, %s, %s, %s)',
             positionList)
+
         conn.commit()
     except Exception,e:
         traceback.print_exc()
@@ -149,7 +150,7 @@ positionList=[]
 #positionList.append(p)
 #updatePosition(positionList)
 
-savePosition(1, orderList)
+#savePosition(1, orderList)
 
 '''
 买入、卖出下单

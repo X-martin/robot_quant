@@ -33,6 +33,7 @@ class Basedata(object):
 
     '''
         通过股票列表查询因子值数据
+        tracetype:追溯期  0、半年 1、追溯到底 2、不追溯
     '''
     def get_factor_data_by_stocklist(self, trade_date, codelist, factorenname, tracetype):
         pass

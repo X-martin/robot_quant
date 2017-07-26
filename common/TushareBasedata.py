@@ -15,11 +15,14 @@ os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
 '''
 基础数据接口---Tushare数据
 
+
 '''
 class TushareBasedata(Basedata):
 
     '''
         通过时间段行情数据接口
+        frequency:D=日k线 W=周 M=月 5=5分钟 15=15分钟 30=30分钟 60=60分钟，默认为D
+        fq:N、没有复权 B、后复权 F、前复权
     '''
     def get_history_data_by_date(self, code, start_date_str, end_date_str, frequency, fq):
         print 'tushare get_history_data_by_date start'
@@ -300,6 +303,25 @@ class TushareBasedata(Basedata):
         del df['area']
         return df
 
+    '''
+        通过日期、类型查询权重股；如：创业板、沪深300、中小板等
+        000016.SH：上证50   沪深300：000300.SH 创业板：399006.SZ 中证500：000905.SH
+    '''
+    def get_stocklist_by_type(self, trade_date, type):
+        # print 'get_stocklist_by_type-------'
+        df = None
+        if type=='000016.SH':
+            df = ts.get_sz50s()
+        elif type=='000300.SH':
+            df = ts.get_hs300s()
+        elif type=='399006.SZ':
+            df = ts.get_gem_classified()
+        elif type=='000905.SH':
+            df = ts.get_zz500s()
+        # print df
+        stocklist = df.code.tolist()
+        return stocklist
+
 
 def ___update_get_factor_data_by_stocklist_row___(row, df):
     code = row['code']
@@ -324,12 +346,6 @@ def ___update_get_factor_data_by_date_row___(row, df):
     row['fv'] = fv
     row['reportdate'] = reportdate
     return row
-
-    '''
-        通过日期、类型查询权重股；如：创业板、沪深300、中小板等
-    '''
-    def get_stocklist_by_type(self, trade_date, type):
-        pass
 
 '''
 t = TushareBasedata()
@@ -364,8 +380,9 @@ print df2New
 '''
 t = TushareBasedata()
 # 净资产收益率(%)
-# print t.get_factor_data_by_stocklist('2017-5-8', ['000001.SZ','000002.SZ','000004.SZ','000005.SZ'], 'roe', 1)
+print t.get_factor_data_by_stocklist('2017-5-8', ['000001.SZ','000002.SZ','000004.SZ','000005.SZ'], 'roe', 1)
 #print t.get_factor_data_by_date('000001.SZ', '2016-8-3', '2017-2-3', 'roe', 0)
 
 #print t.get_history_index_data_by_date('000001.SZ', '2017-01-05', '2017-02-08', 'D')
-print ts.get_hs300s()
+#print ts.get_hs300s()
+print t.get_stocklist_by_type('', '000016.SH')

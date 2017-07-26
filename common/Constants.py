@@ -26,6 +26,7 @@ changePeriod=20
 
 currentPeriod = 1
 
+
 # 设置手续费
 # 买入时万分之三
 buyCost=0.0003
