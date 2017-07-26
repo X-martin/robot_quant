@@ -67,3 +67,5 @@ class Basedata(object):
     '''
     def get_stocklist_by_type(self, trade_date, type):
         pass
+
+

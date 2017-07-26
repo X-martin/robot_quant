@@ -11,6 +11,7 @@ import common.Basedata as cb
 import common.BaseTools as cbt
 import common.StrategyTools as cst
 import common.TushareBasedata as TushareBasedata
+import common.TechFactorService as TechFactorService
 
 '''
 ## 初始化函数，设定要操作的股票、基准等等
@@ -78,8 +79,9 @@ def trade(tradedate):
     '''
     通过买入条件获取买入股票,取并集或者交集
     '''
+    techFactor = TechFactorService.TechFactorService()
     # 传入股票池、收盘价标识、交易日期、5日、10日、金叉参数
-    stocklist1 = cbt.ma(stocklist, 'close', tradedate, 5, 10, 1)
+    stocklist1 = techFactor.ma(stocklist, 'close', tradedate, 5, 10, 1)
     t = TushareBasedata()
     df = t.get_factor_data_by_stocklist(tradedate, stocklist, 'mv', 0)
     # 按因子排序，计算得到前10%的股票代码
