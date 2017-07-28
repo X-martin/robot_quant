@@ -168,7 +168,8 @@ class TushareBasedata(Basedata):
                 df2New = df2New[df2New.ann_date==df2New.ann_date]
                 df2New = df2New[df2New[factorenname]==df2New[factorenname]]
                 df2New['ann_date'] = df2New['ann_date'].map(lambda x:str(q[0])+'-'+x)
-                df2New['ann_date_new'] = df2New['ann_date'].map(lambda x:datetime.strptime(x, '%Y-%m-%d'))
+                print df2New['ann_date']
+                df2New['ann_date_new'] = df2New['ann_date'].map(lambda x:transfer(x))
                 #print len(df2New)
                 df2New['code'] = df2New.index
                 df2New = df2New[df2New.index.isin(codelistNew)]
@@ -351,6 +352,14 @@ def ___update_get_factor_data_by_date_row___(row, df):
     row['fv'] = fv
     row['reportdate'] = reportdate
     return row
+
+def transfer(dstr):
+    # print dstr
+    try:
+        d = datetime.strptime(dstr, '%Y-%m-%d')
+    except Exception,e:
+        return None
+    return d
 
 '''
 t = TushareBasedata()

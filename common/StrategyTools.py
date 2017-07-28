@@ -33,6 +33,7 @@ def order(orderList):
 
         conn = bt.getConnection()
         cur = conn.cursor()
+
         cur.executemany(
             'insert into r_order(strategy_id, stockcode, tradedate, price, volume) values(%s, %s, %s, %s, %s)',
             orderListNew)

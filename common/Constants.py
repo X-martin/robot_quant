@@ -6,7 +6,7 @@
 
 '''
 # 策略ID
-strategyId = ""
+strategyId = "1"
 # 开始日期
 startDateStr = ''
 # 截至日期
