@@ -308,7 +308,7 @@ class TushareBasedata(Basedata):
         000016.SH：上证50   沪深300：000300.SH 创业板：399006.SZ 中证500：000905.SH
     '''
     def get_stocklist_by_type(self, trade_date, type):
-        # print 'get_stocklist_by_type-------'
+        print 'get_stocklist_by_type-------'+type
         df = None
         if type=='000016.SH':
             df = ts.get_sz50s()
@@ -318,8 +318,13 @@ class TushareBasedata(Basedata):
             df = ts.get_gem_classified()
         elif type=='000905.SH':
             df = ts.get_zz500s()
-        # print df
-        stocklist = df.code.tolist()
+        print '----------------------------------------------------------'
+        print df
+        print '----------------------------------------------------------'
+        if not df is None:
+            stocklist = df.code.tolist()
+        else:
+            stocklist=[]
         return stocklist
 
 
@@ -378,11 +383,11 @@ print df2New.index
 df2New['ann_date'] = df1New['report_date']
 print df2New
 '''
-t = TushareBasedata()
+#t = TushareBasedata()
 # 净资产收益率(%)
-print t.get_factor_data_by_stocklist('2017-5-8', ['000001.SZ','000002.SZ','000004.SZ','000005.SZ'], 'roe', 1)
+#print t.get_factor_data_by_stocklist('2017-5-8', ['000001.SZ','000002.SZ','000004.SZ','000005.SZ'], 'roe', 1)
 #print t.get_factor_data_by_date('000001.SZ', '2016-8-3', '2017-2-3', 'roe', 0)
 
 #print t.get_history_index_data_by_date('000001.SZ', '2017-01-05', '2017-02-08', 'D')
 #print ts.get_hs300s()
-print t.get_stocklist_by_type('', '000016.SH')
+#print t.get_stocklist_by_type('', '000016.SH')

@@ -12,6 +12,10 @@ import common.BaseTools as cbt
 import common.StrategyTools as cst
 import common.TushareBasedata as TushareBasedata
 import common.TechFactorService as TechFactorService
+import common.StockOrder as StockOrder
+
+
+from datetime import datetime
 
 '''
 ## 初始化函数，设定要操作的股票、基准等等
@@ -82,10 +86,11 @@ def trade(tradedate):
     techFactor = TechFactorService.TechFactorService()
     # 传入股票池、收盘价标识、交易日期、5日、10日、金叉参数
     stocklist1 = techFactor.ma(stocklist, 'close', tradedate, 5, 10, 1)
-    t = TushareBasedata()
-    df = t.get_factor_data_by_stocklist(tradedate, stocklist, 'mv', 0)
+    t = TushareBasedata.TushareBasedata()
+    trade_date_str = datetime.strftime(tradedate, '%Y-%m-%d')
+    df = t.get_factor_data_by_stocklist(trade_date_str, stocklist, 'roe', 0)
     # 按因子排序，计算得到前10%的股票代码
-    df = df.sort_values()
+    df = df.sort_values(by='fv')
     stocklist2 = df.code.tolist()
     # 取并集
     stocklist = stocklist1+stocklist2
@@ -104,9 +109,12 @@ def trade(tradedate):
     '''
     调整仓位：买入符合条件的股票
     '''
+    orderlist = []
     # 买入
     for code in stocklist:
-        cst.order(tradedate, code, price, 100)
+        o = StockOrder.StockOrder(cc.strategyId, code, tradedate, price, 100)
+        orderlist.append(o)
+    cst.order(orderlist)
 
 
     '''

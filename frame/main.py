@@ -19,9 +19,11 @@ import user.strategy_diy as sd
 def run():
     # 初始化
     sd.init()
-
+    conn = bt.getConnection()
+    df = bt.getTradeDay(conn, start_date_str=c.startDateStr, end_date_str=c.endDateStr, type=1)
     # 按日期执行策略
     datelist = bt.dateRange(c.startDateStr, c.endDateStr)
+    datelist = df['tradedate'].tolist()
 
     for d in range(len(datelist)):
         # print d
