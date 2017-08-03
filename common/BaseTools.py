@@ -113,19 +113,25 @@ def getQuarterlistByDate(start_date, end_date):
 交集
 '''
 def intersection(list1, list2):
-    pass
+    ret_list = list((set(list1).union(set(list2))) ^ (set(list1) ^ set(list2)))
+    return ret_list
 
 '''
 并集
 '''
 def union(list1, list2):
-    pass
+    ret_list = list(set(list1).union(set(list2)))
+    return ret_list
 
 '''
 差集
 '''
 def difference(list1, list2):
-    pass
+    ret_list = []
+    for item in list1:
+        if item not in list2:
+            ret_list.append(item)
+    return ret_list
 
 if __name__ == '__main__':
     print dateRange("2016-01-01", "2016-02-01")
