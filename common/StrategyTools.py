@@ -165,3 +165,9 @@ positionList=[]
    2)比较
 
 '''
+
+import math
+m = 1
+for i in range(10):
+    m = m*1.1
+print m*32.5
