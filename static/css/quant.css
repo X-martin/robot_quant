@@ -1,0 +1,23 @@
+*{margin:0 auto; padding:0px;list-style:none;}
+.e{width:500px; border-top:solid #f00 1px; border-left:1px solid #f00; display:table; margin-top:50px;}
+li{float:left;}
+.id,.name,.x,.z,.d{color:#999;font-size:12px; text-align:center; border-right:1px solid #f00; border-bottom:1px solid #f00; height:22px; line-height:22px;}
+.id{width:20px;}
+.name{width:50px;}
+.x{width:30px;}
+.z{width:30px;}
+.d{width:365px;}
+
+.quantForm{width:880px; display:table; margin-top:30px;margin-left:20px;margin-right:20px;margin-bottom:10px;}
+li{float:left;}
+.col1,.col2,.col3,.col4,.col5,.col6 {color:#999;font-size:12px; text-align:center; height:22px; line-height:22px;}
+.col1{width:120px;}
+.col2{width:120px;}
+.col3{width:150px;}
+.col4{width:150px;}
+.col5{width:150px;}
+.col6{width:150px;}
+.col7{width:150px;}
+
+
+.select150 {width:150px;}
