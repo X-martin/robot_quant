@@ -21,10 +21,25 @@ imageurl_prefix = app.config['IMAGEURL_PREFIX']
 '''
 选项界面
 '''
+@app.route('/quant_index')
+def quant_index():
+    return render_template('quant_form.html')
+
+
+'''
+选项界面
+'''
 @app.route('/choice_index')
 def choice_index():
     #return redirect(url_for('strategy_choice'))
+    stocktype_list = ['hs300', 'zz500']
+    start_date_list = ['2016-1-1', '2017-1-1']
+    end_date_list = ['2017-1-1', '2017-8-1']
+    stocklist = [('hs300', '2016-1-1', '2017-1-1'), ('zz500', '2017-1-1', '2017-8-1')]
+
     return render_template('strategy_choice.html')
+
+
 
 '''
 编码界面
@@ -43,5 +58,5 @@ def result_index():
 
 if __name__ == "__main__":
     app.debug = app.config["DEBUG"]
-    #app.run('192.168.1.104')
-    app.run()
+    app.run('192.168.1.104')
+    #app.run()
