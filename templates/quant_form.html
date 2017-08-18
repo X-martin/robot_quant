@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>自定义策略</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quant.css') }}">
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+</head>
+<body>
+    <div class="quantForm">
+        <ul>
+            <li class="col1">开始日期</li>
+            <li class="col2">结束日期</li>
+            <li class="col3">间隔</li>
+            <li class="col4">周期</li>
+            <li class="col5">初始资金</li>
+            <li class="col6">手续费</li>
+        </ul>
+        <ul>
+            <li class="col1"><input class="Wdate" type="text" style="width:100px;" id="startDate_1", name="startDate" value="{{startDate}}" onClick="WdatePicker({startDate:'2000-01-01',minDate:'2000-1-1',maxDate:'%y-%M-%d'})"></li>
+            <li class="col2"><input class="Wdate" type="text" style="width:100px;" id="endDate_1", name="endDate" value="{{endDate}}" onClick="WdatePicker({startDate:'2000-01-01',minDate:'2000-1-1',maxDate:'%y-%M-%d'})"></li>
+            <li class="col3"><input type="text" id="interval" name="interval" /></li>
+            <li class="col4"><input type="text" id="period" name="period" /></li>
+            <li class="col5"><input type="text" id="initMoney" name="initMoney" value="0.0" /></li>
+            <li class="col6"><input type="text" id="fee" name="fee" /></li>
+        </ul>
+    </div>
+    <div>
+        <div>
+            <div>
+                票池列表 <input type="button" value="添加" onclick="addConditionRow();">
+            </div>
+            <table style="margin-left:20px;">
+                <tr>
+                    <th class="col7">票池</th>
+                    <th class="col7">成分股</th>
+                    <th class="col7">地域</th>
+                    <th class="col7">概念</th>
+                    <th class="col7">行业</th>
+                </tr>
+                <tr>
+                    <td>票池1</td>
+                    <td>
+                        <select name="constituentStock">
+                            <option value="0">请选择</option>
+                            <option value="hs300">沪深300</option>
+                            <option value="zz500">中证500</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="area">
+                            <option value="0">请选择</option>
+                            <option value="1">北京</option>
+                            <option value="2">上海</option>
+                            <option value="3">天津</option>
+                            <option value="4">重庆</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="concept">
+                            <option value="0">请选择</option>
+                            <option value="1">新零售</option>
+                            <option value="2">区块链</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="industry">
+                            <option value="0">请选择</option>
+                            <option value="1">银行</option>
+                            <option value="2">券商</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>票池2</td>
+                    <td>
+                        <select name="constituentStock">
+                            <option value="0">请选择</option>
+                            <option value="hs300">沪深300</option>
+                            <option value="zz500">中证500</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="area">
+                            <option value="0">请选择</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="concept">
+                            <option value="0">请选择</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="industry">
+                            <option value="0">请选择</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            </div>
+        </div>
+        <div>
+            回测票池表达式:
+            <textarea id="testExpression" cols="40" rows="8"></textarea>
+        </div>
+        <div>
+            定义变量表达式:
+            <textarea id="variableExpression" cols="40" rows="8"></textarea>
+        </div>
+        <div>买入卖出条件 <input type="button" value="添加" onclick="addConditionRow();"></div>
+        <div>
+            <div>
+                买入条件：
+            </div>
+            <div>
+                <select name="buyCondition" class="select150">
+                    <option value="0">请选择</option>
+                    <option value="1">MA</option>
+                    <option value="2">FREE_MV</option>
+                </select>
+                <input type="text" name="buyFundPercent" value="0.0" />%
+                加权方式：
+                <select name="buyWeightType">
+                    <option value="0">请选择</option>
+                    <option value="1">平分可用资金</option>
+                    <option value="2">按固定数量</option>
+                </select>
+            </div>
+            <div>
+                <select name="buyCondition" class="select150">
+                    <option value="0">请选择</option>
+                    <option value="1">MA</option>
+                    <option value="2">FREE_MV</option>
+                </select>
+                <input type="text" name="buyFundPercent" value="0.0" />%
+                加权方式：
+                <select name="buyWeightType">
+                    <option value="0">请选择</option>
+                    <option value="1">平分可用资金</option>
+                    <option value="2">按固定数量</option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <div>
+                卖出条件：
+            </div>
+            <div>
+                <select id="sellCondition" class="select150">
+                    <option value="0">请选择</option>
+                </select>
+                <input type="text" id="sellFundPercent" value="0.0" />%
+            </div>
+        </div>
+        <div>
+            <input type="button" value="回测" onclick="backtesting();">
+            <input type="button" value="重置" onclick="cancel();">
+        </div>
+    </div>
+
+    <script language="javascript" type="text/javascript" src="{{ url_for('static', filename='js/My97DatePicker/WdatePicker.js') }}"></script>
+    <script type="text/javascript">
+        function addStockListRow() {
+
+        }
+
+        function addConditionRow() {
+            alert("新增");
+        }
+
+        function backtesting(){
+            alert("回测");
+        }
+
+        function cancel(){
+            alert("取消回测");
+        }
+    </script>
+</body>
+</html>
