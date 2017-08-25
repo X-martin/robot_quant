@@ -8,6 +8,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js') }}"></script>
 </head>
 <body>
+    <form id="quantForm" name="quantForm" action="{{ url_for('quant_post') }}" method="POST">
     <div class="quantForm">
         <ul>
             <li class="col1">开始日期</li>
@@ -18,8 +19,8 @@
             <li class="col6">手续费</li>
         </ul>
         <ul>
-            <li class="col1"><input class="Wdate" type="text" style="width:100px;" id="startDate_1", name="startDate" value="{{startDate}}" onClick="WdatePicker({startDate:'2000-01-01',minDate:'2000-1-1',maxDate:'%y-%M-%d'})"></li>
-            <li class="col2"><input class="Wdate" type="text" style="width:100px;" id="endDate_1", name="endDate" value="{{endDate}}" onClick="WdatePicker({startDate:'2000-01-01',minDate:'2000-1-1',maxDate:'%y-%M-%d'})"></li>
+            <li class="col1"><input class="Wdate" type="text" style="width:100px;" id="startDate", name="startDate" value="{{startDate}}" onClick="WdatePicker({startDate:'2000-01-01',minDate:'2000-1-1',maxDate:'%y-%M-%d'})"></li>
+            <li class="col2"><input class="Wdate" type="text" style="width:100px;" id="endDate", name="endDate" value="{{endDate}}" onClick="WdatePicker({startDate:'2000-01-01',minDate:'2000-1-1',maxDate:'%y-%M-%d'})"></li>
             <li class="col3"><input type="text" id="interval" name="interval" /></li>
             <li class="col4"><input type="text" id="period" name="period" /></li>
             <li class="col5"><input type="text" id="initMoney" name="initMoney" value="0.0" /></li>
@@ -29,9 +30,9 @@
     <div>
         <div>
             <div>
-                票池列表 <input type="button" value="添加" onclick="addConditionRow();">
+                票池列表 <input type="button" value="添加" onclick="addStockListRow();">
             </div>
-            <table style="margin-left:20px;">
+            <table id="stockTable" style="margin-left:20px;">
                 <tr>
                     <th class="col7">票池</th>
                     <th class="col7">成分股</th>
@@ -42,6 +43,7 @@
                 <tr>
                     <td>票池1</td>
                     <td>
+                        <input type="hidden" id="constituentStockStr" name="constituentStockStr" />
                         <select name="constituentStock">
                             <option value="0">请选择</option>
                             <option value="hs300">沪深300</option>
@@ -49,6 +51,7 @@
                         </select>
                     </td>
                     <td>
+                        <input type="hidden" id="areaStr" name="areaStr" />
                         <select name="area">
                             <option value="0">请选择</option>
                             <option value="1">北京</option>
@@ -58,6 +61,7 @@
                         </select>
                     </td>
                     <td>
+                        <input type="hidden" id="conceptStr" name="conceptStr" />
                         <select name="concept">
                             <option value="0">请选择</option>
                             <option value="1">新零售</option>
@@ -65,35 +69,11 @@
                         </select>
                     </td>
                     <td>
+                        <input type="hidden" id="industryStr" name="industryStr" />
                         <select name="industry">
                             <option value="0">请选择</option>
                             <option value="1">银行</option>
                             <option value="2">券商</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>票池2</td>
-                    <td>
-                        <select name="constituentStock">
-                            <option value="0">请选择</option>
-                            <option value="hs300">沪深300</option>
-                            <option value="zz500">中证500</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select name="area">
-                            <option value="0">请选择</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select name="concept">
-                            <option value="0">请选择</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select name="industry">
-                            <option value="0">请选择</option>
                         </select>
                     </td>
                 </tr>
@@ -157,20 +137,57 @@
             <input type="button" value="回测" onclick="backtesting();">
             <input type="button" value="重置" onclick="cancel();">
         </div>
-    </div>
+    </div></form>
 
     <script language="javascript" type="text/javascript" src="{{ url_for('static', filename='js/My97DatePicker/WdatePicker.js') }}"></script>
     <script type="text/javascript">
+        i = 1
+        // 增加票池行
         function addStockListRow() {
+            i = i + 1;
+            stocklistHtml = '<tr id="stockTableTr_'+i+'"><td>票池'+i+'</td><td><select name="constituentStock"><option value="0">请选择</option><option value="hs300">沪深300</option><option value="zz500">中证500</option></select></td><td><select name="area"><option value="0">请选择</option><option value="1">北京</option><option value="2">上海</option><option value="3">天津</option><option value="4">重庆</option></select></td><td><select name="concept"><option value="0">请选择</option><option value="1">新零售</option><option value="2">区块链</option></select></td><td><select name="industry"><option value="0">请选择</option><option value="1">银行</option><option value="2">券商</option></select></td><td><input type="button" value="删除" onclick="delStockListRow(\''+i+'\')" /></td></tr>';
 
+            // alert(stocklistHtml);
+            $("#stockTable").append(stocklistHtml);
+        }
+        // 删除票池行
+        function delStockListRow(index) {
+            alert("删除行");
+            $("#stockTableTr_"+index).remove();
         }
 
         function addConditionRow() {
             alert("新增");
+
         }
 
         function backtesting(){
             alert("回测");
+
+            $("#loading").show();
+            $('input').attr("readonly","readonly")
+            // 票池来源
+            constituentStockStr = "";
+            areaStr = "";
+            conceptStr = "";
+            industryStr = "";
+
+            constituentStocks = document.getElementsByName("constituentStock");
+            areas = document.getElementsByName("area");
+            concepts = document.getElementsByName("concept");
+            industrys = document.getElementsByName("industry");
+
+            for (i=0;i<constituentStocks.length;i++){
+                constituentStockStr=constituentStockStr+constituentStocks[i].value;
+                if (i!=constituentStocks.length-1){
+                    constituentStockStr = constituentStockStr+',';
+                }
+            }
+            $("#constituentStockStr").val(constituentStockStr);
+            $("#areaStr").val(areaStr);
+            $("#conceptStr").val(conceptStr);
+            $("#industryStr").val(industryStr);
+            document.getElementById("quantForm").submit();
         }
 
         function cancel(){
