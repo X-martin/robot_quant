@@ -82,36 +82,25 @@
         </div>
         <div>
             回测票池表达式:
-            <textarea id="testExpression" cols="40" rows="8"></textarea>
+            <textarea id="stockExpression" cols="40" rows="8"></textarea>
         </div>
         <div>
             定义变量表达式:
-            <textarea id="variableExpression" cols="40" rows="8"></textarea>
+            <textarea id="variableExpression" cols="40" rows="8" onblur="changefactorlist();"></textarea>
         </div>
         <div>买入卖出条件 <input type="button" value="添加" onclick="addConditionRow();"></div>
-        <div>
+        <div id="buyConditionDiv_1">
             <div>
-                买入条件：
+                买入条件：<input type="button" value="添加买入条件" onclick="addBuyConditionRow('1');" />
+                        <input type="hidden" id="buyConditionStr" name="buyConditionStr" />
+                        <input type="hidden" id="buyFundPercentStr" name="buyFundPercentStr" />
+                        <input type="hidden" id="buyWeightTypeStr" name="buyWeightTypeStr" />
+                        <input type="hidden" id="sellConditionStr" name="sellConditionStr" />
+                        <input type="hidden" id="sellFundPercentStr" name="sellFundPercentStr" />
             </div>
             <div>
                 <select name="buyCondition" class="select150">
                     <option value="0">请选择</option>
-                    <option value="1">MA</option>
-                    <option value="2">FREE_MV</option>
-                </select>
-                <input type="text" name="buyFundPercent" value="0.0" />%
-                加权方式：
-                <select name="buyWeightType">
-                    <option value="0">请选择</option>
-                    <option value="1">平分可用资金</option>
-                    <option value="2">按固定数量</option>
-                </select>
-            </div>
-            <div>
-                <select name="buyCondition" class="select150">
-                    <option value="0">请选择</option>
-                    <option value="1">MA</option>
-                    <option value="2">FREE_MV</option>
                 </select>
                 <input type="text" name="buyFundPercent" value="0.0" />%
                 加权方式：
@@ -124,7 +113,7 @@
         </div>
         <div>
             <div>
-                卖出条件：
+                卖出条件：<input type="button" value="添加卖出条件" onclick="addSellConditionRow('1');" />
             </div>
             <div>
                 <select id="sellCondition" class="select150">
@@ -160,6 +149,40 @@
             alert("新增");
 
         }
+        var conditionList=[];
+        function addBuyConditionRow(i) {
+            alert("新增买入条件");
+            html ='<div><select name="buyCondition" class="select150"><option value="0">请选择</option>';
+            if (conditionList.length>0) {
+                for (j=0;j<conditionList.length;j++) {
+                    html+='<option value="'+conditionList[j]+'">'+conditionList[j]+'</option>'
+                }
+            }
+            html+='</select><input type="text" name="buyFundPercent" value="0.0" />%加权方式：<select name="buyWeightType"><option value="0">请选择</option><option value="1">平分可用资金</option><option value="2">按固定数量</option></select></div>';
+            $("#buyConditionDiv_"+i).append(html);
+        }
+
+
+        function changefactorlist() {
+            // getfactorlist
+            var str = $("#variableExpression").val();
+            //alert(str);
+            $.getJSON("{{ url_for('getfactorlist') }}", {
+            formula: str
+            }, function(data) {
+                //alert(data.result);
+                //$("#result").text(data.result);
+                conditionList = data.result;
+                $("select[name='buyCondition']").empty();
+                $("select[name='buyCondition']").append("<option value='0'>请选择</option>");
+                for (i = 0; i < data.result.length; i++) {
+                    r = data.result[i];
+                    //alert(r);
+                    $("select[name='buyCondition']").append("<option value='"+r+"'>"+r+"</option>");
+                }
+            });
+
+        }
 
         function backtesting(){
             alert("回测");
@@ -187,6 +210,18 @@
             $("#areaStr").val(areaStr);
             $("#conceptStr").val(conceptStr);
             $("#industryStr").val(industryStr);
+
+            // 买入卖出条件
+            buyConditionStr = "";
+            buyFundPercentStr = "";
+            buyWeightTypeStr = "";
+            sellConditionStr = "";
+            sellFundPercentStr = "";
+
+
+            buyCondition = document.getElementsByName("buyCondition");
+
+
             document.getElementById("quantForm").submit();
         }
 

@@ -15,6 +15,9 @@ endDateStr = ''
 # 初始化资金
 initMoney = 0.0
 
+# 初始化返还金额  （卖出股票为正，买入股票为负）
+tradeMoney = 0
+
 orderList = {}
 positionList = {}
 
