@@ -82,11 +82,11 @@
         </div>
         <div>
             回测票池表达式:
-            <textarea id="stockExpression" cols="40" rows="8"></textarea>
+            <textarea id="stockExpression" name="stockExpression" cols="40" rows="8"></textarea>
         </div>
         <div>
             定义变量表达式:
-            <textarea id="variableExpression" cols="40" rows="8" onblur="changefactorlist();"></textarea>
+            <textarea id="variableExpression" name="variableExpression" cols="40" rows="8" onblur="changefactorlist();"></textarea>
         </div>
         <div>买入卖出条件 <input type="button" value="添加" onclick="addConditionRow();"></div>
         <div id="buyConditionDiv_1">
@@ -116,10 +116,10 @@
                 卖出条件：<input type="button" value="添加卖出条件" onclick="addSellConditionRow('1');" />
             </div>
             <div>
-                <select id="sellCondition" class="select150">
+                <select name="sellCondition" class="select150">
                     <option value="0">请选择</option>
                 </select>
-                <input type="text" id="sellFundPercent" value="0.0" />%
+                <input type="text" name="sellFundPercent" value="0.0" />%
             </div>
         </div>
         <div>
@@ -180,6 +180,15 @@
                     //alert(r);
                     $("select[name='buyCondition']").append("<option value='"+r+"'>"+r+"</option>");
                 }
+
+
+                $("select[name='sellCondition']").empty();
+                $("select[name='sellCondition']").append("<option value='0'>请选择</option>");
+                for (i = 0; i < data.result.length; i++) {
+                    r = data.result[i];
+                    //alert(r);
+                    $("select[name='sellCondition']").append("<option value='"+r+"'>"+r+"</option>");
+                }
             });
 
         }
@@ -206,9 +215,28 @@
                     constituentStockStr = constituentStockStr+',';
                 }
             }
+            alert(constituentStockStr);
             $("#constituentStockStr").val(constituentStockStr);
+            for (i=0;i<areas.length;i++){
+                areaStr=areaStr+areas[i].value;
+                if (i!=areas.length-1){
+                    areaStr = areaStr+',';
+                }
+            }
             $("#areaStr").val(areaStr);
+            for (i=0;i<concepts.length;i++){
+                conceptStr=conceptStr+concepts[i].value;
+                if (i!=concepts.length-1){
+                    conceptStr = conceptStr+',';
+                }
+            }
             $("#conceptStr").val(conceptStr);
+            for (i=0;i<industrys.length;i++){
+                industryStr=industryStr+industrys[i].value;
+                if (i!=industrys.length-1){
+                    industryStr = industryStr+',';
+                }
+            }
             $("#industryStr").val(industryStr);
 
             // 买入卖出条件
@@ -219,7 +247,48 @@
             sellFundPercentStr = "";
 
 
-            buyCondition = document.getElementsByName("buyCondition");
+            buyConditions = document.getElementsByName("buyCondition");
+            buyFundPercents = document.getElementsByName("buyFundPercent");
+            buyWeightTypes = document.getElementsByName("buyWeightType");
+            sellConditions = document.getElementsByName("sellCondition");
+            sellFundPercents = document.getElementsByName("sellFundPercent");
+
+
+            for (i=0;i<buyConditions.length;i++){
+                buyConditionStr=buyConditionStr+buyConditions[i].value;
+                if (i!=buyConditions.length-1){
+                    buyConditionStr = buyConditionStr+',';
+                }
+            }
+            $("#buyConditionStr").val(buyConditionStr);
+            for (i=0;i<buyFundPercents.length;i++){
+                buyFundPercentStr=buyFundPercentStr+buyFundPercents[i].value;
+                if (i!=buyFundPercents.length-1){
+                    buyFundPercentStr = buyFundPercentStr+',';
+                }
+            }
+            $("#buyFundPercentStr").val(buyFundPercentStr);
+            for (i=0;i<buyWeightTypes.length;i++){
+                buyWeightTypeStr=buyWeightTypeStr+buyWeightTypes[i].value;
+                if (i!=buyWeightTypes.length-1){
+                    buyWeightTypeStr = buyWeightTypeStr+',';
+                }
+            }
+            $("#buyWeightTypeStr").val(buyWeightTypeStr);
+            for (i=0;i<sellConditions.length;i++){
+                sellConditionStr=sellConditionStr+sellConditions[i].value;
+                if (i!=sellConditions.length-1){
+                    sellConditionStr = sellConditionStr+',';
+                }
+            }
+            $("#sellConditionStr").val(sellConditionStr);
+            for (i=0;i<sellFundPercents.length;i++){
+                sellFundPercentStr=sellFundPercentStr+sellFundPercents[i].value;
+                if (i!=sellFundPercents.length-1){
+                    sellFundPercentStr = sellFundPercentStr+',';
+                }
+            }
+            $("#sellFundPercentStr").val(sellFundPercentStr);
 
 
             document.getElementById("quantForm").submit();

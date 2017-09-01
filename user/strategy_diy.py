@@ -57,9 +57,9 @@ def getStockList():
 '''
 风控
 卖出股票......
-'''
 def riskcontrol():
     pass
+'''
 
 ## 股票筛选
 
@@ -69,6 +69,7 @@ def trade(tradedate):
     '''
     调仓周期
     '''
+    conn = cbt.getConnection()
     # 如果当前没有到调仓周期,跳过
     if cc.currentPeriod!=cc.changePeriod:
         cc.currentPeriod = cc.currentPeriod+1
@@ -88,12 +89,15 @@ def trade(tradedate):
     stocklist1 = techFactor.ma(stocklist, 'close', tradedate, 5, 10, 1)
     t = TushareBasedata.TushareBasedata()
     trade_date_str = datetime.strftime(tradedate, '%Y-%m-%d')
+    # 穿入股票，查询股票的市值因子列表，mv
     df = t.get_factor_data_by_stocklist(trade_date_str, stocklist, 'roe', 0)
     # 按因子排序，计算得到前10%的股票代码
     df = df.sort_values(by='fv')
     stocklist2 = df.code.tolist()
     # 取并集
     stocklist = stocklist1+stocklist2
+    # 订单列表
+    orderlist = []
 
     '''
     调整仓位：卖出不在票池的股票
@@ -104,32 +108,24 @@ def trade(tradedate):
         if code in stocklist:
             stocklist.remove(code)
             continue
-        cst.order(tradedate, code, price, 0)
+        # cst.order(tradedate, code, price, 0)
+        o = StockOrder.StockOrder(cc.strategyId, code, tradedate, price, 0)
+        orderlist.append(o)
 
     '''
     调整仓位：买入符合条件的股票
     '''
-    orderlist = []
     # 买入
     for code in stocklist:
         o = StockOrder.StockOrder(cc.strategyId, code, tradedate, price, 100)
         orderlist.append(o)
-    cst.order(orderlist)
+    # 订单入库，并更新仓位
+    cst.order(orderlist, conn)
 
+    if len(orderlist) == 0:
+        return 0
+    return 1
 
-    '''
-    风控条件
-    '''
-
-    # 增加仓位
-    # 计算买入的成交价格 （股票仓位中的价格*股票仓位中的数量+股票现价*股票现在购买的数量）/（股票仓位中的数量 + 股票现在购买的数量）
-    # 计算佣金、印花税等
-
-
-    # 计算卖出的成交价（股票价格*100）
-    # 如果有1000股，卖掉300股，价格从10元跌倒8元，（10*1000-8*300）/700；价格从10元涨到12元，（12*1000-10*1000）/（1000-300）
-    # 计算佣金、印花税等
-    # 买空后计算盈亏
 
 
 ##################################  选股函数群 ##################################
@@ -174,10 +170,45 @@ def st_filter(context, security_list):
 def high_limit_filter(context, security_list):
     pass
 
+'''
+交易前
+'''
+def startTrade(d):
+    pass
+
+
+'''
+交易后
+1、初始化或记录当日资金账户信息
+2、如果没有订单，查询最新的仓位交易日, 如果仓位交易日为空，初始化资金账户,
+   如果仓位交易日不为空，查询仓位信息，复制仓位信息到新的交易日
+
+'''
+def endTrade(d, flag):
+    conn = cbt.getConnection()
+    # 查询最新的交易日
+    lastAccountDateStr = cst.getLastAccountDate(cc.strategyId, conn)
+    # 记录资金账户信息
+    money = cc.initMoney + cc.tradeMoney
+    cst.saveAccount(cc.strategyId, d, money, conn)
+    cc.tradeMoney=0
+    # 如果没有订单，查询最新的仓位交易日
+    if flag == 0:
+        # 如果仓位交易日不为空，查询仓位信息，复制仓位信息到新的交易日
+        if lastAccountDateStr != None:
+            lastPositionDf = cst.getPositionList(cc.strategyId, lastAccountDateStr, conn)
+            if len(lastPositionDf) > 0:
+                positionDf = lastPositionDf.copy()
+                # 更新仓位日期
+                positionDf['TRADEDATE'] = d
+                positionList = [tuple(x) for x in positionDf.values]
+                cst.savePosition(positionList, conn)
 
 '''
 日交易
 '''
 def handle_data(d):
     print d
-    trade(d)
+    startTrade(d)
+    i = trade(d)
+    endTrade(d, i)
