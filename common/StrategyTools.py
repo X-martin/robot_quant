@@ -219,6 +219,8 @@ def getLastAccountDate(strategyId, conn):
     lastAccountDateSql = 'select max(tradedate) from r_position where strategy_id=' + strategyId
     cur.execute(lastAccountDateSql)
     lastAccountDate = cur.fetchone()
+    if lastAccountDate[0] == None:
+        return None
     lastAccountDateStr = datetime.strftime(lastAccountDate[0], '%Y-%m-%d')
     return lastAccountDateStr
 
@@ -331,6 +333,7 @@ def getPositionList(strategyId, tradedate, conn):
 
 '''
 def getOrderList(strategyId, conn):
+
     sql = "select * from r_order where strategy_id="+str(strategyId)
     #print sql
     orderDf = pd.read_sql(sql, conn)
@@ -339,7 +342,8 @@ def getOrderList(strategyId, conn):
 conn = bt.getConnection()
 #print getPositionList(1, conn)
 #print getOrderList(1, conn)
-
+#getLastAccountDate(None, conn)
+'''
 orderList = []
 d = datetime.strptime('2017-4-8', '%Y-%m-%d')
 o = StockOrder.StockOrder(1, '000001.SZ', d, 10.2, 100)
@@ -351,22 +355,4 @@ positionList=[]
 #updatePosition(positionList)
 
 #savePosition(1, orderList)
-
 '''
-买入、卖出下单
-
-1、查询当前仓位信息，接收卖出的股票列表（包括数量）
-   1)查询仓位信息
-   2）比较仓位和卖出列表，生成更新的sql
-
-2、查询当前仓位信息，接收买入的股票列表
-   1)查询当前仓位信息
-   2)比较
-
-'''
-
-import math
-m = 1
-for i in range(10):
-    m = m*1.1
-print m*32.5

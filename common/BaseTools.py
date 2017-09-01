@@ -147,3 +147,6 @@ if __name__ == '__main__':
     print getDateByQuarter(2017, 3)
 
     print getQuarterlistByDate(datetime.date(2016, 1, 15), datetime.date(2017, 8, 27))
+
+    dict = {"a": ("apple",), "bo": {"b": "banana", "o": "orange"}, "g": ["grape", "grapefruit"]}
+    print dict.values()
