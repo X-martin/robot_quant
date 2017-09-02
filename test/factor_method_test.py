@@ -9,8 +9,8 @@ def base(base_factor_name, stock_list, date):
     dbst.get_base_factor_val(base_factor_name, time_list, stock_list)
 
 
-def ma(base_factor_name, stock_list, date, n):
-    dt = timedelta(days=n)
+def ma(base_factor_name, stock_list, date, args):
+    dt = timedelta(days=args[0])
     time_list = [date - dt, date]
     df = dbst.get_base_factor_val(base_factor_name, time_list, stock_list)
     df = df.groupby('stock_id').mean()
@@ -18,13 +18,27 @@ def ma(base_factor_name, stock_list, date, n):
     return df
 
 
-def ref(base_factor_name, stock_list, date, n):
-    dt = timedelta(days=n)
+def ref(base_factor_name, stock_list, date, args):
+    dt = timedelta(days=args[0])
     time_list = [date - dt]
     df = dbst.get_base_factor_val(base_factor_name, time_list, stock_list)
     return df
 
+
+def test(base_factor_name, stock_list, date, args):
+    return 'This is test:', base_factor_name, stock_list, date, args
+
+
 d = {'MA': ma,
      'REF': ref,
-     'CLOSE': base}
+     'CLOSE': base,
+     'test': test}
+
+
+def apply_factor_method(method_name, base_factor_name, stock_list, date, args):
+    df = d[method_name](base_factor_name, stock_list, date, args)
+    return df
+
+if __name__ == '__main__':
+    apply_factor_method('test', 'over', 'HX', '2017-01-01', ['hah'])
 
