@@ -13,7 +13,7 @@ def resolve_factor(line):
         method = [l[0]]
         l = l[1].split(',')
         base_factor_name = l[0]
-        method += l[1:]
+        method += [l[1:]]
     return factor_name, base_factor_name, method
 
 
@@ -34,10 +34,10 @@ if __name__ == '__main__':
 
     input_factors_lines = input_factors.split('\n')
     for line in input_factors_lines:
-        if len(line)>1:
+        if len(line) > 1:
             print resolve_factor(line)
 
     input_condition_lines = input_condition.split('\n')
     for line in input_condition_lines:
-        if len(line)>1:
+        if len(line) > 1:
             print resolve_condition(line)

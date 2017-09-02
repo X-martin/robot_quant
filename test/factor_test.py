@@ -11,7 +11,7 @@ class FactorT(object):
 
     def get_val(self, stock_list, date):
         df_stocks = pd.DataFrame(stock_list, columns=["stock_id"])
-        df = fmt.d[self.method[0]](self.name, stock_list, date, self.method[1])
+        df = fmt.apply_factor_method(self.method[0], self.name, stock_list, date, self.method[1])
         df_stocks = pd.merge(df_stocks, df, how='left', left_on='stock_id', right_on='stock_id')
         return df_stocks
 
@@ -84,7 +84,7 @@ if __name__ == '__main__':
         factor_name = l[0]
         l_right = l[1].split()
         name = l_right[0]
-        method = [l_right[2], float(l_right[1])]
+        method = [l_right[2], [float(l_right[1])]]
         d_factors[factor_name] = FactorT(name, method)
 
     # ----create filters------
