@@ -1,4 +1,4 @@
-import db_stocks_test as dbst
+import factor_method_test as fmt
 import pandas as pd
 from datetime import datetime
 from datetime import timedelta
@@ -11,25 +11,8 @@ class FactorT(object):
 
     def get_val(self, stock_list, date):
         df_stocks = pd.DataFrame(stock_list, columns=["stock_id"])
-
-        if self.method is None:
-            time_list = [date]
-            df_temp = dbst.get_base_factor_val(self.name, time_list, stock_list)
-        elif self.method[0] == 'daily_avg':
-            dt = timedelta(days=self.method[1])
-            time_list = [date - dt, date]
-            df_temp = dbst.get_base_factor_val(self.name, time_list, stock_list)
-            df_temp = df_temp.groupby('stock_id').mean()
-            df_temp = df_temp.reset_index()
-        elif self.method[0] == 'lag':
-            dt = timedelta(days=self.method[1])
-            time_list = [date - dt]
-            df_temp = dbst.get_base_factor_val(self.name, time_list, stock_list)
-        else:
-            df_temp = pd.DataFrame([stock_list], columns=["stock_id"])
-            df_temp['val'] = [float('nan')] * len(stock_list)
-
-        df_stocks = pd.merge(df_stocks, df_temp, how='left', left_on='stock_id', right_on='stock_id')
+        df = fmt.d[self.method[0]](self.name, stock_list, date, self.method[1])
+        df_stocks = pd.merge(df_stocks, df, how='left', left_on='stock_id', right_on='stock_id')
         return df_stocks
 
 
@@ -81,7 +64,7 @@ class FilterT(object):
             df1 = df1[df1['val'] < df2['val']]
         return list(df1['stock_id'])
 
-if __name__=='__main__':
+if __name__ == '__main__':
     d_factors = {}
     d_filters = {}
 
@@ -89,8 +72,8 @@ if __name__=='__main__':
     t1 = datetime.strptime('2017/08/03', '%Y/%m/%d')
     stock_list = ['GOOG', 'C', 'IBM', 'F', 'AAPL', 'KO', 'LEN', 'MO', 'AMZN', 'FLS', 'APD']
 
-    input_factors = ['ma5 is close 5 daily_avg',
-                     'ma10 is close 10 daily_avg']
+    input_factors = ['ma5 is close 5 MA',
+                     'ma10 is close 10 MA']
 
     input_filters = ['golden_cross is ma5 cross_up ma10',
                      'ma5gma10 is ma5 greater_than ma10']
