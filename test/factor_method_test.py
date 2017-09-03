@@ -4,7 +4,7 @@ from datetime import timedelta
 import pandas as pd
 
 
-def base(base_factor_name, stock_list, date):
+def base(base_factor_name, stock_list, date, args):
     time_list = [date]
     dbst.get_base_factor_val(base_factor_name, time_list, stock_list)
 
@@ -29,14 +29,14 @@ def test(base_factor_name, stock_list, date, args):
     return 'This is test:', base_factor_name, stock_list, date, args
 
 
-d = {'MA': ma,
-     'REF': ref,
-     'CLOSE': base,
-     'test': test}
+__d_factor_method = {'MA': ma,
+                     'REF': ref,
+                     'CLOSE': base,
+                     'test': test}
 
 
 def apply_factor_method(method_name, base_factor_name, stock_list, date, args):
-    df = d[method_name](base_factor_name, stock_list, date, args)
+    df = __d_factor_method[method_name](base_factor_name, stock_list, date, args)
     return df
 
 if __name__ == '__main__':
