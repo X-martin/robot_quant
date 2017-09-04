@@ -38,6 +38,15 @@ def get_basic_factor_val(factorname, date_list, stock_list):
                 factorDf = df
             else:
                 factorDf = pd.concat([factorDf, df])
+    else:
+        start_date_str = datetime.strftime(date_list[0], '%Y-%m-%d')
+        df = t.get_factor_data_by_stocklist(start_date_str, stock_list, factorname, [1])
+
+        # df['STOCKCODE']=df.index
+        df['date'] = date_list[0]
+        factorDf = df.reset_index(drop=True)
+
+    del factorDf['reportdate']
 
     return factorDf
 
@@ -45,3 +54,4 @@ if __name__ == "__main__":
     startdate = datetime.strptime('2017-3-1', '%Y-%m-%d')
     enddate = datetime.strptime('2017-3-2', '%Y-%m-%d')
     print get_basic_factor_val('roe', [startdate, enddate], ['600725.SZ', '600306.SZ'])
+    print get_basic_factor_val('roe', [startdate], ['600725.SZ', '600306.SZ'])
