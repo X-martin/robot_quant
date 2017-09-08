@@ -78,8 +78,14 @@ def trade(tradedate):
     '''
     techFactor = TechFactorService.TechFactorService()
     t = TushareBasedata.TushareBasedata()
-{{ buylistStr }}
 
+    # 查询股票行情接口
+    stockDf = t.get_history_data_by_stocklist(trade_date_str, None, 'D', 'B')
+    stockDfNew = stockDf.set_index('code')
+    # 股票代码、后复权的价格
+    stockDict = stockDfNew.to_dict()['close']
+
+{{ buylistStr }}
 
     # 订单列表
     orderlist = []
@@ -105,11 +111,24 @@ def trade(tradedate):
         o = StockOrder.StockOrder(cc.strategyId, code, tradedate, price, 100)
         orderlist.append(o)
     # 订单入库，并更新仓位
-    cst.order(orderlist, conn)
+    cst.order(orderlist, stockDict, conn)
 
+    # 如果没有订单，查询最新的仓位交易日
     if len(orderlist) == 0:
-        return 0
-    return 1
+        # 查询最新的交易日
+        lastAccountDateStr = cst.getLastAccountDate(cc.strategyId, conn)
+        # 如果仓位交易日不为空，查询仓位信息，复制仓位信息到新的交易日
+        if lastAccountDateStr != None:
+            lastPositionDf = cst.getPositionList(cc.strategyId, lastAccountDateStr, conn)
+            if len(lastPositionDf) > 0:
+                positionDf = lastPositionDf.copy()
+                # 更新仓位日期
+                positionDf['TRADEDATE'] = tradedate
+                positionList = [tuple(x) for x in positionDf.values]
+                # 更新当前实时价格
+                for p in positionList:
+                    p[3] = stockDict[p[1]]
+                cst.savePosition(positionList, conn)
 
 
 ##################################  选股函数群 ##################################
@@ -169,25 +188,12 @@ def startTrade(d):
    如果仓位交易日不为空，查询仓位信息，复制仓位信息到新的交易日
 
 '''
-def endTrade(d, flag):
+def endTrade(d):
     conn = cbt.getConnection()
-    # 查询最新的交易日
-    lastAccountDateStr = cst.getLastAccountDate(cc.strategyId, conn)
     # 记录资金账户信息
     money = cc.initMoney + cc.tradeMoney
     cst.saveAccount(cc.strategyId, d, money, conn)
     cc.tradeMoney=0
-    # 如果没有订单，查询最新的仓位交易日
-    if flag == 0:
-        # 如果仓位交易日不为空，查询仓位信息，复制仓位信息到新的交易日
-        if lastAccountDateStr != None:
-            lastPositionDf = cst.getPositionList(cc.strategyId, lastAccountDateStr, conn)
-            if len(lastPositionDf) > 0:
-                positionDf = lastPositionDf.copy()
-                # 更新仓位日期
-                positionDf['TRADEDATE'] = d
-                positionList = [tuple(x) for x in positionDf.values]
-                cst.savePosition(positionList, conn)
 
 '''
 日交易
@@ -195,5 +201,5 @@ def endTrade(d, flag):
 def handle_data(d):
     print d
     startTrade(d)
-    i = trade(d)
-    endTrade(d, i)
+    trade(d)
+    endTrade(d)
