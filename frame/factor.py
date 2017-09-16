@@ -28,8 +28,8 @@ class FilterT(object):
 
 
 if __name__ == '__main__':
-    factor1 = FactorT('close', ['MA',[5]])
-    factor2 = FactorT('close', ['MA', [10]])
+    factor1 = FactorT('close', ['MA',[2]])
+    factor2 = FactorT('close', ['MA', [3]])
     d_factors = {'ma5': factor1, 'ma10': factor2}
 
     filter1 = FilterT([factor1, factor2], ['CROSS', []])
@@ -38,7 +38,9 @@ if __name__ == '__main__':
 
     # ----user's input-------
     t1 = datetime.strptime('2017/08/03', '%Y/%m/%d')
-    stock_list = ['GOOG', 'C', 'IBM', 'F', 'AAPL', 'KO', 'LEN', 'MO', 'AMZN', 'FLS', 'APD']
+    stock_list = ['600725.SZ', '600306.SZ', '600000.SH', '600004.SH', '600006.SH',
+                  '600007.SH', '600008.SH', '600009.SH', '600010.SH', '600011.SH',
+                  '600012.SH', '600015.SH', '600016.SH']
 
     input_factors = ['ma5 is close 5 MA',
                      'ma10 is close 10 MA']
