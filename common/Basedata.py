@@ -45,6 +45,12 @@ class Basedata(object):
         pass
 
     '''
+        通过时间段因子值接口
+    '''
+    def get_factor_data_by_datecode(self, codelist, start_date_str, end_date_str, factorenname, tracetype):
+        pass
+
+    '''
         通过行业名称查询股票代码数据
     '''
     def get_stock_data_by_industryname(self, trade_date, industryname):

@@ -18,6 +18,11 @@ os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
 
 '''
 class TushareBasedata(Basedata):
+    factorlist = {'main':['industry','area','pe','outstanding','totals','totalAssets','liquidAssets','fixedAssets','reserved','reservedPerShare','esp','bvps','pb','timeToMarket','undp','perundp','rev','profit','gpr','npr','holders'],
+                  'get_profit_data':['roe', 'net_profit_ratio', 'gross_profit_rate', 'net_profits', 'esp', 'business_income', 'bips'],
+                  'get_operation_data':['arturnover', 'arturndays', 'inventory_turnover', 'inventory_days', 'currentasset_turnover', 'currentasset_days'],
+                  'get_growth_data': ['mbrg', 'nprg', 'nav', 'targ', 'epsg', 'seg']
+                  }
 
     '''
         通过时间段行情数据接口
@@ -164,11 +169,17 @@ class TushareBasedata(Basedata):
                 df2New = df2.set_index('code')
 
                 df2New['ann_date'] = df1New['report_date']
+                #print df2New
                 #print len(df2New)
                 df2New = df2New[df2New.ann_date==df2New.ann_date]
+                #print df2New
                 df2New = df2New[df2New[factorenname]==df2New[factorenname]]
-                df2New['ann_date'] = df2New['ann_date'].map(lambda x:str(q[0])+'-'+x)
-                print df2New['ann_date']
+                #print df2New
+                #print df2New
+                if len(df2New)==0:
+                    continue
+                df2New['ann_date'] = df2New['ann_date'].map(lambda x:str(q[0])+'-'+str(x))
+                #print df2New['ann_date']
                 df2New['ann_date_new'] = df2New['ann_date'].map(lambda x:transfer(x))
                 #print len(df2New)
                 df2New['code'] = df2New.index
@@ -188,6 +199,7 @@ class TushareBasedata(Basedata):
             except Exception, e:
                 traceback.print_exc()
                 continue
+        # print factorDf
         factorDf = factorDf.sort_values(by=["ann_date_new"], ascending=False)
         #print factorDf
         factorDf = factorDf.drop_duplicates(['code'], keep='first')
@@ -273,6 +285,11 @@ class TushareBasedata(Basedata):
 
         return df
 
+    '''
+        通过时间段因子值接口
+    '''
+    def get_factor_data_by_datecode(self, codelist, start_date_str, end_date_str, factorenname, tracetype):
+        pass
 
     '''
         通过行业名称查询股票代码数据
@@ -329,6 +346,26 @@ class TushareBasedata(Basedata):
         return stocklist
 
 
+def getfactor(code, start_date_str, end_date_str, factorenname, tracetype):
+    #df = ts.get_report_data(2014, 3)
+    df = ts.get_stock_basics()
+    print df
+    df = df[df.index==code]
+
+    print df[factorenname]
+    dfNew = pd.DataFrame(df, columns=[factorenname])
+    dfNew = dfNew.rename(columns={factorenname: 'fv'})
+    print dfNew
+
+def getfactor2(trade_date_str, codelist, factorenname, tracetype):
+    df = ts.get_stock_basics()
+    df = df[df.index.isin(codelist)]
+    dfNew = pd.DataFrame(df, columns=[factorenname])
+    dfNew = dfNew.rename(columns={factorenname: 'fv'})
+    print dfNew
+
+
+
 def ___update_get_factor_data_by_stocklist_row___(row, df):
     code = row['code']
     code = code[0:6]
@@ -361,8 +398,13 @@ def transfer(dstr):
         return None
     return d
 
-'''
+
+#t = TushareBasedata()
+#getfactor('000001', None, None, 'totalAssets', None)
+#getfactor2(None, ['000001','000002','000004'], 'totalAssets', None)
+#t.getfactor('totalAssets')
 t = TushareBasedata()
+'''
 df = t.get_history_data_by_date('000001.SZ', '2016-01-01', '2017-01-01', 'D', 'N')
 print df
 
@@ -371,6 +413,10 @@ print df
 
 df3 = t.get_history_data_by_stocklist('2017-06-26', ['000001.SZ', '000002.SZ', '000003.SZ'], 'D', 'N')
 print df3'''
+df3 = t.get_history_data_by_stocklist('2017-06-26', ['000001.SZ', '000002.SZ', '000003.SZ'], 'D', 'N')
+print df3
+df3 = df3.set_index('code')
+print df3.to_dict()['close']
 
 '''
 df1 = ts.get_report_data(2014,3)
