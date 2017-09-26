@@ -6,7 +6,8 @@
 
 '''
 
-import common.TushareBasedata as TushareBasedata
+# import common.TushareBasedata as TushareBasedata
+import common.MysqlBasedata as MysqlBasedata
 import common.BaseTools as bt
 
 from datetime import datetime
@@ -16,42 +17,22 @@ import pandas as pd
 获取基本因子的值
 '''
 def get_basic_factor_val(factorname, date_list, stock_list):
-    t = TushareBasedata.TushareBasedata()
-    factorDf = pd.DataFrame()
+    #t = TushareBasedata.TushareBasedata()
+    t = MysqlBasedata.MysqlBasedata()
+    factorDf = None
     conn = bt.getConnection()
     if len(date_list) > 1:
         start_date_str = datetime.strftime(date_list[0], '%Y-%m-%d')
         end_date_str = datetime.strftime(date_list[1], '%Y-%m-%d')
-        datetimeDf = bt.getTradeDay(conn, start_date_str, end_date_str, type=1)
-        # print datetimeDf
-        datetimelist = datetimeDf.tradedate.tolist()
-        for d in datetimelist:
-            trade_date_str = datetime.strftime(d, '%Y-%m-%d')
-            #for factorname in factorname_list:
-            df = t.get_factor_data_by_stocklist(trade_date_str, stock_list, factorname, [1])
-
-            # df['STOCKCODE']=df.index
-            df['date'] = d
-            df = df.reset_index(drop = True)
-            #print df
-            if len(factorDf)==0:
-                factorDf = df
-            else:
-                factorDf = pd.concat([factorDf, df])
+        factorDf = t.get_factor_data_by_datecode(stock_list, start_date_str, end_date_str, factorname, 1)
     else:
         start_date_str = datetime.strftime(date_list[0], '%Y-%m-%d')
-        df = t.get_factor_data_by_stocklist(start_date_str, stock_list, factorname, [1])
-
-        # df['STOCKCODE']=df.index
-        df['date'] = date_list[0]
-        factorDf = df.reset_index(drop=True)
-
-    del factorDf['reportdate']
+        factorDf = t.get_factor_data_by_datecode(stock_list, start_date_str, start_date_str, factorname, 1)
 
     return factorDf
 
 if __name__ == "__main__":
     startdate = datetime.strptime('2017-3-1', '%Y-%m-%d')
     enddate = datetime.strptime('2017-3-2', '%Y-%m-%d')
-    print get_basic_factor_val('roe', [startdate, enddate], ['600725.SZ', '600306.SZ'])
-    print get_basic_factor_val('roe', [startdate], ['600725.SZ', '600306.SZ'])
+    print get_basic_factor_val('free_share_hold_num', [startdate, enddate], ['600725.SZ', '600306.SZ'])
+    print get_basic_factor_val('trade_closeprice', [startdate], ['600725.SZ', '600306.SZ'])
