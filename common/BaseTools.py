@@ -16,7 +16,7 @@ import pandas as pd
 '''
 def getConnection():
     # conn = MySQLdb.connect(host='192.168.2.31', user='root', passwd='1qaz@WSX+!', db='strategy', port=3306)
-    conn = MySQLdb.connect(host='115.28.128.166', user='invicme', passwd='invicme', db='test', port=3306)
+    conn = MySQLdb.connect(host='115.28.128.166', user='invicme', passwd='invicme', db='test', port=3306, charset="utf8")
     return conn
 
 def getTradeDay(conn, start_date_str=None, end_date_str=None, type=1):

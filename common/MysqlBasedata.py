@@ -10,6 +10,7 @@ import os
 import pandas as pd
 import numpy as np
 import traceback
+import time
 
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
 
@@ -64,7 +65,7 @@ class MysqlBasedata(Basedata):
         factorIdDf = pd.read_sql(factorIdSql, conn)
 
         factorIdList = factorIdDf.factor_id.tolist()
-        print factorIdDf
+        # print factorIdDf
         factorIdStr = ''
         for index in range(len(factorIdList)):
             id = factorIdList[index]
@@ -85,11 +86,11 @@ class MysqlBasedata(Basedata):
             stockDf = stockDf[stockDf.STOCKCODE.isin(codelist)]
             if len(codelist) < 50:
                 stockSql = ___getSecuritySql___(codelist)
-        print stockDf
-        print stockSql
+        #print stockDf
+        #print stockSql
         factorSql += stockSql
         factorDf = pd.read_sql(factorSql, conn)
-        print factorDf
+        #print factorDf
 
 
     '''
@@ -107,8 +108,11 @@ class MysqlBasedata(Basedata):
 
     '''
         通过时间段因子值接口
+        tracetype : 0、不追溯 -1、追溯到底 0~n之间、追溯n年
     '''
     def get_factor_data_by_datecode(self, codelist, start_date_str, end_date_str, factorenname, tracetype):
+        start = time.time()
+
         startdate = None
         end_date = None
         start_date_str_new = None
@@ -123,11 +127,17 @@ class MysqlBasedata(Basedata):
         c.execute(factorIdSql)
         factorIdResult = c.fetchone()
         factorId=factorIdResult[0]
+        tradeDayDf = bt.getTradeDay(conn, start_date_str, end_date_str)
+        # tradeDayDfNew = tradeDayDf.set_index('TRADEDATE')
+        tradeDayDf['FACTOR_ID'] = factorId
+        tradeDayDf['STOCKCODE'] = np.NaN
+        tradeDayDf['FACTOR_VALUE'] = np.NaN
 
         # 获取股票代码Sql
         if codelist and len(codelist) > 0 and len(codelist) < 50:
             stockSql = ___getSecuritySql___(codelist)
-        print stockSql
+        #print stockSql
+        df = pd.DataFrame()
 
         if tracetype == 0: # 不追溯
             if start_date_str!=None and end_date_str!=None:
@@ -148,7 +158,7 @@ class MysqlBasedata(Basedata):
                         + factorDateSql + " and FACTOR_ID = " + str(factorId) + stockSql
             factorSql = factorSql + " union all " + " SELECT FACTOR_ID, STOCKCODE, FACTOR_DATE, FACTOR_VALUE, REPORT_DATE from (SELECT FACTOR_ID, STOCKCODE, FACTOR_DATE, FACTOR_VALUE, REPORT_DATE from ST_FACTOR_VALUE where \
                         FACTOR_ID = " + str(factorId) + stockSql+" order by FACTOR_DATE desc) new group by STOCKCODE, FACTOR_DATE"
-            print factorSql
+            #print factorSql
             factorDf = pd.read_sql(factorSql, conn)
         elif tracetype > 0: # 追溯某段时长
             if start_date_str!=None and end_date_str!=None:
@@ -159,10 +169,29 @@ class MysqlBasedata(Basedata):
             factorSql = "SELECT FACTOR_ID, STOCKCODE, FACTOR_DATE, FACTOR_VALUE, REPORT_DATE from ST_FACTOR_VALUE where " \
                         + factorDateSql + " and FACTOR_ID = " + str(factorId) + stockSql
             factorDf = pd.read_sql(factorSql, conn)
+        factorDf = factorDf.sort_values(by='FACTOR_DATE')
+        factorDfGroup = factorDf.groupby('STOCKCODE')
+        for (key, value) in factorDfGroup:
+            # print key
+            #print value
+            tradeDayDfCopy = tradeDayDf.copy()
+            tradeDayDfCopy['STOCKCODE'] = key
+            # 排序
+            # 按日期分别追溯查询因子值
+            tradeDayDfCopy = tradeDayDfCopy.apply(___updateTradeDayDfRow___, args=(value, ), axis=1)
+
+            if len(df) == 0:
+                df = tradeDayDfCopy
+            else:
+                df = pd.concat([df, tradeDayDfCopy])
+            #print df
+
         # 过滤获取股票
         if codelist and len(codelist) >= 50:
-            factorDf = factorDf[factorDf.STOCKCODE.isin(codelist)]
-        return factorDf
+            df = df[df.STOCKCODE.isin(codelist)]
+        finish = time.time()
+        print (finish-start)
+        return df
 
     '''
         通过行业名称查询股票代码数据
@@ -226,9 +255,47 @@ def ___getSecuritySql___(security) :
         stockSql += ")"
     return stockSql
 
+
+'''
+通过Sql查询交易日
+
+start_date---时间段-开始日期，如：'1990-1-1'
+end_date----时间段-截至日期,如：'2016-1-1'
+
+'''
+def ___getTradeDay___(conn, start_date=None, end_date=None, type=1):
+    tradedaySql = "select tradedate from SYS_TRADEDAY where type = "+str(type)
+    if start_date:
+        tradedaySql += " and tradedate>=to_date('" + start_date + "', 'yyyy-MM-dd')"
+    if end_date:
+        tradedaySql += " and tradedate<=to_date('" + end_date + "', 'yyyy-MM-dd')"
+    else:
+        tradedaySql += " and tradedate<=sysdate"
+
+    tradedaySql += " order by tradedate desc"
+    #print tradedaySql
+    tradedayDf = pd.read_sql(tradedaySql, conn)
+    return tradedayDf
+
+def ___updateTradeDayDfRow___(row, df):
+    d = row['tradedate']
+    #print row
+    dfNew = df[df.FACTOR_DATE<=d]
+    #print dfNew
+    if len(dfNew)==0:
+        return row
+    dfNew = dfNew.tail(1)
+    row['FACTOR_VALUE'] = dfNew.iloc[0, 3]
+    # print dfNew
+    # print row
+    return row
+
 t = MysqlBasedata()
 # print t.get_factor_data_by_stocklist('2017-05-16', None, ['free_share_hold_num', 'trade_closeprice', 'trade_closeprice_after'], 0)
 # print t.get_factor_data_by_stocklist('2017-05-16', ['000563.SZ', '002765.SZ', '002607.SZ'], ['free_share_hold_num', 'trade_closeprice', 'trade_closeprice_after'], 0)
 
-# print t.get_factor_data_by_datecode(None, '1989-01-16', '2017-05-15', 'free_share_hold_num', 0)
-print t.get_factor_data_by_datecode(None, '2017-01-16', '2017-05-15', 'free_share_hold_num', -1)
+# print t.get_factor_data_by_datecode(None, '2017-01-16', '2017-05-15', 'free_share_hold_num', 1)
+# print t.get_factor_data_by_datecode(['000001.SZ', '000002.SZ', '000005.SZ', '000006.SZ', '000007.SZ', '000008.SZ'], '2017-01-16', '2017-05-15', 'grossprofitmargin', 1)
+# print t.get_factor_data_by_datecode(None, '2017-05-10', '2017-05-10', 'trade_closeprice', -1)
+# print t.get_factor_data_by_datecode(['000001.SZ', '000002.SZ', '000005.SZ', '000006.SZ', '000007.SZ', '000008.SZ'], '2017-01-16', '2017-05-15', 'free_share_hold_num', -1)
+#print t.get_factor_data_by_datecode(['000001.SZ', '000002.SZ', '000005.SZ', '000006.SZ', '000007.SZ', '000008.SZ'], '2017-01-16', '2017-05-15', 'free_share_hold_num', -1)

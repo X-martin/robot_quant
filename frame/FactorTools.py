@@ -24,15 +24,15 @@ def get_basic_factor_val(factorname, date_list, stock_list):
     if len(date_list) > 1:
         start_date_str = datetime.strftime(date_list[0], '%Y-%m-%d')
         end_date_str = datetime.strftime(date_list[1], '%Y-%m-%d')
-        factorDf = t.get_factor_data_by_datecode(stock_list, start_date_str, end_date_str, factorname, 1)
+        factorDf = t.get_factor_data_by_datecode(stock_list, start_date_str, end_date_str, factorname, -1)
     else:
         start_date_str = datetime.strftime(date_list[0], '%Y-%m-%d')
-        factorDf = t.get_factor_data_by_datecode(stock_list, start_date_str, start_date_str, factorname, 1)
+        factorDf = t.get_factor_data_by_datecode(stock_list, start_date_str, start_date_str, factorname, -1)
 
     return factorDf
 
 if __name__ == "__main__":
     startdate = datetime.strptime('2017-3-1', '%Y-%m-%d')
     enddate = datetime.strptime('2017-3-2', '%Y-%m-%d')
-    print get_basic_factor_val('free_share_hold_num', [startdate, enddate], ['600725.SZ', '600306.SZ'])
-    print get_basic_factor_val('trade_closeprice', [startdate], ['600725.SZ', '600306.SZ'])
+    print get_basic_factor_val('trade_closeprice', [startdate, enddate], ['000001.SZ', '000002.SZ'])
+    print get_basic_factor_val('free_share_hold_num', [startdate], ['000001.SZ', '600306.SZ'])
