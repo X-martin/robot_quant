@@ -9,7 +9,7 @@ def cross(factor_list, stock_list, date, args):
     df2 = factor_list[1].get_val(stock_list, date)
     df1_0 = factor_list[0].get_val(stock_list, date - dt)
     df2_0 = factor_list[1].get_val(stock_list, date - dt)
-    id = (df1_0['val'] < df2_0['val']) & (df1['val'] > df2['val'])
+    id = (df1_0['FACTOR_VALUE'] < df2_0['FACTOR_VALUE']) & (df1['FACTOR_VALUE'] > df2['FACTOR_VALUE'])
     df1 = df1[id]
     return df1
 
@@ -18,24 +18,24 @@ def greater(factor_list, stock_list, date, args):
     nf = len(factor_list)
     if nf == 1:
         df = factor_list[0].get_val(stock_list, date)
-        df = df[df['val'] > args[0]]
+        df = df[df['FACTOR_VALUE'] > args[0]]
     else:
         df1 = factor_list[0].get_val(stock_list, date)
         df2 = factor_list[1].get_val(stock_list, date)
-        df = df1[df1['val'] > df2['val']]
+        df = df1[df1['FACTOR_VALUE'] > df2['FACTOR_VALUE']]
     return df
 
 
 def sort(factor_list, stock_list, date, args):
     df = factor_list[0].get_val(stock_list, date)
     if args[0] == 'asc':
-        df = df.sort_values(["val"], ascending=True)
+        df = df.sort_values(['FACTOR_VALUE'], ascending=True)
         nn = args[1]
         if nn < 1:
             nn = int(len(df) * nn)
         df = df.iloc[:nn, :]
     else:
-        df = df.sort_values(["val"], ascending=False)
+        df = df.sort_values(['FACTOR_VALUE'], ascending=False)
         nn = args[1]
         if nn < 1:
             nn = int(len(df) * nn)

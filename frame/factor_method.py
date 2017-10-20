@@ -1,7 +1,7 @@
 import FactorTools as fTool
-from datetime import datetime
+# from datetime import datetime
 from datetime import timedelta
-import pandas as pd
+# import pandas as pd
 
 
 def base(base_factor_name, stock_list, date, args):
@@ -10,10 +10,10 @@ def base(base_factor_name, stock_list, date, args):
 
 
 def ma(base_factor_name, stock_list, date, args):
-    dt = timedelta(days=args[0])
+    dt = timedelta(days=int(args[0][0]))
     time_list = [date - dt, date]
     df = fTool.get_basic_factor_val(base_factor_name, time_list, stock_list)
-    df = df.groupby('stock_id').mean()
+    df = df.groupby('STOCKCODE').mean()
     df = df.reset_index()
     return df
 
@@ -31,7 +31,7 @@ def test(base_factor_name, stock_list, date, args):
 
 __d_factor_method = {'MA': ma,
                      'REF': ref,
-                     'CLOSE': base,
+                     'trade_closeprice': base,
                      'test': test}
 
 
