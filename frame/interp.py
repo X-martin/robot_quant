@@ -17,7 +17,7 @@ def interp_factor(line):
     return factor_name, base_factor_name, method
 
 
-def interp_filter(line, factor_dict_keys):
+def interp_filter(line, factor_dict):
     factor_list = []
     method = []
 
@@ -27,11 +27,13 @@ def interp_filter(line, factor_dict_keys):
     l = l[1][:-1].split('(')
     method += [l[0]]
     l = l[1].split(',')
+    l_copy = l[:]
     for a in l:
-        if a in factor_dict_keys:
-            factor_list += [a]
-            l.remove(a)
-    method += [l]
+        if a in factor_dict.keys():
+            factor_list += [factor_dict[a]]
+            l_copy.remove(a)
+    if len(l_copy) > 0:
+        method += [l_copy]
     return filter_name, factor_list, method
 
 
@@ -47,7 +49,7 @@ def interp(factor_txt, filter_txt):
             factor_dict[factor_name] = f
     for line in filter_lines:
         if len(line)>1:
-            filter_name, factor_list, method = interp_filter(line, factor_dict.keys())
+            filter_name, factor_list, method = interp_filter(line, factor_dict)
             f = fnf.FilterT(factor_list, method)
             filter_dict[filter_name] = f
     return factor_dict, filter_dict

@@ -11,9 +11,10 @@ class FactorT(object):
         self.method = method
 
     def get_val(self, stock_list, date):
-        df_stocks = pd.DataFrame(stock_list, columns=["stock_id"])
-        df = faMethod.apply_factor_method(self.method[0], self.bfname, stock_list, date, self.method[1])
-        df_stocks = pd.merge(df_stocks, df, how='left', left_on='stock_id', right_on='stock_id')
+        df_stocks = pd.DataFrame(stock_list, columns=["STOCKCODE"])
+        df = faMethod.apply_factor_method(self.method[0], self.bfname, stock_list, date, self.method[1:])
+        df_stocks = pd.merge(df_stocks, df, how='left', left_on='STOCKCODE', right_on='STOCKCODE')
+        print df_stocks
         return df_stocks
 
 
@@ -23,8 +24,8 @@ class FilterT(object):
         self.method = method
 
     def filter(self, stock_list, date):
-        df = fiMethod.apply_filter_method(self.method[0], self.factor_list, stock_list, date, self.method[1])
-        return list(df['stock_id'])
+        df = fiMethod.apply_filter_method(self.method[0], self.factor_list, stock_list, date, self.method[1:])
+        return list(df['STOCKCODE'])
 
 
 if __name__ == '__main__':
