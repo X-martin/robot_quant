@@ -29,7 +29,7 @@ def get_basic_factor_val(factorname, date_list, stock_list):
         start_date_str = datetime.strftime(date_list[0], '%Y-%m-%d')
         factorDf = t.get_factor_data_by_datecode(stock_list, start_date_str, start_date_str, factorname, -1)
 
-    factorDf['FACTOR_VALUE'] = factorDf['FACTOR_VALUE'].map(lambda x: float(x))
+    factorDf['FACTOR_VALUE'] = factorDf['FACTOR_VALUE'].map(lambda x: float(x)) 
     return factorDf
 
 if __name__ == "__main__":
