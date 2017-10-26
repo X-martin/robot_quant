@@ -14,7 +14,7 @@ class FactorT(object):
         df_stocks = pd.DataFrame(stock_list, columns=["STOCKCODE"])
         df = faMethod.apply_factor_method(self.method[0], self.bfname, stock_list, date, self.method[1:])
         df_stocks = pd.merge(df_stocks, df, how='left', left_on='STOCKCODE', right_on='STOCKCODE')
-        print df_stocks
+        # print df_stocks
         return df_stocks
 
 

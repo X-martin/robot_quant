@@ -27,18 +27,21 @@ def greater(factor_list, stock_list, date, args):
 
 
 def sort(factor_list, stock_list, date, args):
+    args = args[0]
     df = factor_list[0].get_val(stock_list, date)
     if args[0] == 'asc':
         df = df.sort_values(['FACTOR_VALUE'], ascending=True)
-        nn = args[1]
+        nn = float(args[1])
         if nn < 1:
             nn = int(len(df) * nn)
+        nn = int(nn)
         df = df.iloc[:nn, :]
     else:
         df = df.sort_values(['FACTOR_VALUE'], ascending=False)
-        nn = args[1]
+        nn = float(args[1])
         if nn < 1:
             nn = int(len(df) * nn)
+        nn = int(nn)
         df = df.iloc[:nn, :]
     return df
 
