@@ -1,7 +1,14 @@
+#!/usr/bin/python
+#coding=utf-8
+
 import pandas as pd
 import numpy as np
 from datetime import datetime
+import sys
 
+import common.BaseTools as cbt
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 class ReturnSummary(object):
     def __init__(self, df_position, df_bench):
@@ -84,4 +91,8 @@ class ReturnSummary(object):
         return df_summary
 
 if __name__ == "__main__":
-    pass
+    # 连接池初始化
+    conn = cbt.getConnection()
+    sql = "SELECT * from r_position where strategy_id='2' ORDER BY tradedate"
+    df = pd.read_sql(sql, conn)
+    print df
