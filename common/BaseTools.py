@@ -28,7 +28,7 @@ def getTradeDay(conn, start_date_str=None, end_date_str=None, type=1):
     else:
         tradedaySql += " and tradedate<=now()"
 
-    tradedaySql += " order by tradedate desc"
+    tradedaySql += " order by tradedate asc"
     #print tradedaySql
     tradedayDf = pd.read_sql(tradedaySql, conn)
     return tradedayDf
@@ -40,7 +40,7 @@ def dateRange(beginDate, endDate):
     while date <= endDate:
         dates.append(date)
         dt = dt + datetime.timedelta(1)
-        print dt.weekday()
+        #print dt.weekday()
         date = dt.strftime("%Y-%m-%d")
     return dates
 
