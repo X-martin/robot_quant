@@ -9,10 +9,12 @@
 import common.Constants as cc
 import common.BaseTools as cbt
 import common.StrategyTools as cst
-import common.TushareBasedata as TushareBasedata
-import common.TechFactorService as TechFactorService
+import common.MysqlBasedata as MysqlBasedata
 import common.StockOrder as StockOrder
+import common.FormulaUtil as FormulaUtil
 
+import factor_filter as ff
+import interp as intp
 
 from datetime import datetime
 
@@ -22,170 +24,103 @@ from datetime import datetime
 def init():
     # 周期类型 ：D、天 W、周 M、月
     cc.periodType = 'D'
-    cc.changePeriod = 1
-    cc.startDateStr='2016-1-1'
+    cc.changePeriod = 50
+    cc.startDateStr='2010-1-1'
     cc.endDateStr='2017-1-1'
     cc.initMoney=1000000
 
 
 ## 股票筛选初始化函数
 def getStockList(tradedate):
-    tbd = TushareBasedata.TushareBasedata()
+    tbd = MysqlBasedata.MysqlBasedata()
     # 000016.SH：上证50   沪深300：000300.SH 创业板：399006.SZ 中证500：000905.SH
+    S1=tbd.get_stocklist_by_type(tradedate, '300')
+    S2=tbd.get_stocklist_by_type(tradedate, '50')
+    S3=tbd.get_stocklist_by_type(tradedate, '500')
 
-
-## 股票筛选排序初始化函数
-
-## 出场初始化函数
-
-## 入场初始化函数
-
-## 风控初始化函数
-
-## 卖出未卖出成功的股票
-
-'''
-风控
-卖出股票......
-def riskcontrol():
-    pass
-'''
-
-## 股票筛选
-
-
-## 交易函数
-def trade(tradedate):
-    '''
-    调仓周期
-    '''
-    # 如果当前没有到调仓周期,跳过
-    if cc.currentPeriod!=cc.changePeriod:
-        cc.currentPeriod = cc.currentPeriod+1
-        return
-    cc.currentPeriod = 1
+    # todo 待修改
+    s = '('+str(S1)+'U'+str(S2)+')U'+str(S3)
+    # s = {{stocklistS}}
+    s = s.replace(' ', '')
+    stocklistStr = FormulaUtil.l1_analysis(s)
+    stocklist = stocklistStr.replace('\'', '').replace('u', '').split(",")
+    return stocklist
+# todo 修改资金账户中的金额
+# todo 过滤掉已经退市的股票
+def tradeNew(tradedate):
+    # 数据库操作类初始化
+    t = MysqlBasedata.MysqlBasedata()
+    # 连接池初始化
     conn = cbt.getConnection()
+    # 日期格式转换
+    trade_date_str = datetime.strftime(tradedate, '%Y-%m-%d')
+    # 查询股票行情接口
+    stockPriceDf = t.get_history_data_by_stocklist(trade_date_str, None, 'D', 'B')
+    print cc.currentPeriod
+    # 验证调仓日期：验证是否到达调仓日期
+    # 如果当前不是到调仓日期，新增资金账户信息
+    # 查询前一天是否存在仓位，如果存在，拷贝前一天仓位信息
+    if cc.currentPeriod % cc.changePeriod != 1:
+        print '------------------------------------------------return'
+        # 如果是第一天，记录账户资金信息
+        # todo 否则，判断是否
+        # 拷贝前一天的仓位信息，更新仓位中的股票价格
+        updatePosition(tradedate, stockPriceDf, conn)
+        #updatePositionAccount(tradedate)
+        cc.currentPeriod = cc.currentPeriod + 1
+        return
+    cc.currentPeriod = cc.currentPeriod + 1
+    # 如果是调仓日期，进入策略逻辑
     # 获取票池
     stocklist = getStockList(tradedate)
+    # 如果股票池为0
     if len(stocklist) == 0:
+        print '------------------------------------------------return222'
+        # 新增资金账户信息，拷贝前一天仓位信息
+        updatePosition(tradedate, stockPriceDf, conn)
+        #updatePositionAccount(tradedate)
         return
-    price = 0
-    positionList = cc.positionList
+    print '------------------------------------------------start'
+    # 定义买入股票列表、卖出股票列表
+    buystocklist = stocklist
+    # sellstocklist = stocklist
+    # 计算得出中间条件、筛选股票的条件
+    factor_txt = 'MA5 = MA(trade_closeprice,5)\nMA10 = MA(trade_closeprice, 10)'
+    filter_txt = 'gx = CROSS(MA5, MA10)\nasc5 = SORT(MA5, asc, 5)'
+    d1, d2 = intp.interp(factor_txt, filter_txt)
+    # 通过买入条件得出买入股票列表
+    for key in ['asc5']:
+        # print key, d2[key].factor_list, d2[key].method
+        buystocklist = d2[key].filter(buystocklist, tradedate)
+        print 'Stock list by applying filter', key, ':', buystocklist
+    # 当前订单列表
+    currentOrderlist = []
 
+    lastAccountDateStr = cst.getLastAccountDate(cc.strategyId, conn)
+    positionList = []
+    # 如果仓位交易日不为空，查询仓位信息，复制仓位信息到新的交易日
+    if lastAccountDateStr != None:
+        positionDf = cst.getPositionList(cc.strategyId, lastAccountDateStr, conn)
+        positionList = positionDf.values
 
-    trade_date_str = datetime.strftime(tradedate, '%Y-%m-%d')
-    '''
-    通过买入条件获取买入股票,取并集或者交集
-    '''
-    techFactor = TechFactorService.TechFactorService()
-    t = TushareBasedata.TushareBasedata()
-
-
-    stockDf = t.get_history_data_by_stocklist(trade_date_str, None, 'D', 'B')
-    stockDfNew = stockDf.set_index('code')
-    # 股票代码、后复权的价格
-    stockDict = stockDfNew.to_dict()['close']
-
-    # condition-0
-    df = t.get_factor_data_by_stocklist(trade_date_str, stocklist, 'mv', 0)
-    df = df.sort_values(by='fv', ascending=True)
-    df = df.head(int(len(df) * 10 / 100))
-    stocklist0 = df.code.tolist()
-
-    # condition-1
-    stocklist1 = techFactor.ma(stocklist, 'close', tradedate, 5, 10, 10)
-    stocklist1 = df.code.tolist()
-
-    # buy stocklist
-    stocklist = stocklist0+stocklist1
-
-
-    # 订单列表
-    orderlist = []
-
-    '''
-    调整仓位：卖出不在票池的股票
-    '''
-    # 卖出
+    # 通过卖出条件得出卖出股票列表,并将卖出股票列表放入订单
     for position in positionList:
-        code = position.code
-        if code in stocklist:
-            stocklist.remove(code)
+        code = position[1]
+        if code in buystocklist:
+            buystocklist.remove(code)
             continue
-        # cst.order(tradedate, code, price, 0)
-        o = StockOrder.StockOrder(cc.strategyId, code, tradedate, price, 0)
-        orderlist.append(o)
-
-    '''
-    调整仓位：买入符合条件的股票
-    '''
-    # 买入
-    for code in stocklist:
-        o = StockOrder.StockOrder(cc.strategyId, code, tradedate, price, 100)
-        orderlist.append(o)
+        print code
+        print stockPriceDf.loc[code, 'FACTOR_VALUE']
+        o = StockOrder.StockOrder(cc.strategyId, code, tradedate, stockPriceDf.loc[code, 'FACTOR_VALUE'], 0)
+        print o
+        currentOrderlist.append(o)
+    # 买入,并将买入股票列表放入订单
+    for code in buystocklist:
+        o = StockOrder.StockOrder(cc.strategyId, code, tradedate, stockPriceDf.loc[code, 'FACTOR_VALUE'], 100)
+        currentOrderlist.append(o)
+    print currentOrderlist
     # 订单入库，并更新仓位
-    cst.order(orderlist, stockDict, conn)
-
-    # 如果没有订单，查询最新的仓位交易日
-    if len(orderlist) == 0:
-        # 查询最新的交易日
-        lastAccountDateStr = cst.getLastAccountDate(cc.strategyId, conn)
-        # 如果仓位交易日不为空，查询仓位信息，复制仓位信息到新的交易日
-        if lastAccountDateStr != None:
-            lastPositionDf = cst.getPositionList(cc.strategyId, lastAccountDateStr, conn)
-            if len(lastPositionDf) > 0:
-                positionDf = lastPositionDf.copy()
-                # 更新仓位日期
-                positionDf['TRADEDATE'] = tradedate
-                positionList = [tuple(x) for x in positionDf.values]
-                # 更新当前实时价格
-                for p in positionList:
-                    p[3] = stockDict[p[1]]
-                cst.savePosition(positionList, conn)
-
-
-##################################  选股函数群 ##################################
-
-###################################  公用函数群 ##################################
-## 排序
-def check_stocks_sort(context, security_list, input_dick, ascending='desc'):
-    pass
-
-
-## 过滤同一标的继上次卖出N天不再买入
-def filter_n_tradeday_not_buy(security, n=0):
-    pass
-
-
-## 是否可重复买入
-def holded_filter(context, security_list):
-    pass
-
-
-## 卖出股票加入dict
-def selled_security_list_dict(context, security_list):
-    pass
-
-
-## 过滤停股票
-def paused_filter(context, security_list):
-    return security_list
-
-
-## 过滤退市股票
-def delisted_filter(context, security_list):
-    return security_list
-
-
-## 过滤ST股票
-def st_filter(context, security_list):
-    return security_list
-
-
-# 过滤涨停股票
-def high_limit_filter(context, security_list):
-    pass
-
+    cst.order(currentOrderlist, stockPriceDf, conn)
 
 '''
 交易前
@@ -202,11 +137,35 @@ def startTrade(d):
 
 '''
 def endTrade(d):
+    updatePositionAccount(d)
+
+def updatePosition(tradedate, stockPriceDf, conn):
+    lastAccountDateStr = cst.getLastAccountDate(cc.strategyId, conn)
+    # 如果仓位交易日不为空，查询仓位信息，复制仓位信息到新的交易日
+    if lastAccountDateStr != None:
+        lastPositionDf = cst.getPositionList(cc.strategyId, lastAccountDateStr, conn)
+        if len(lastPositionDf) > 0:
+            positionDf = lastPositionDf.copy()
+            # 更新仓位日期
+            positionDf['TRADEDATE'] = tradedate
+            positionList = [tuple(x) for x in positionDf.values]
+            print positionList
+            positionListNew = []
+            # 更新当前实时价格
+            for p in positionList:
+                pNew = (p[0], p[1], tradedate, stockPriceDf.loc[p[1], 'FACTOR_VALUE'], p[4], p[5])
+                positionListNew.append(pNew)
+            cst.savePosition(positionListNew, conn)
+
+def updatePositionAccount(tradedate):
     conn = cbt.getConnection()
+    print cc.initMoney
+    print cc.tradeMoney
     # 记录资金账户信息
     money = cc.initMoney + cc.tradeMoney
-    cst.saveAccount(cc.strategyId, d, money, conn)
+    cst.saveAccount(cc.strategyId, tradedate, money, conn)
     cc.tradeMoney=0
+    cc.initMoney = money
 
 '''
 日交易
@@ -214,5 +173,6 @@ def endTrade(d):
 def handle_data(d):
     print d
     startTrade(d)
-    trade(d)
+    # trade(d)
+    tradeNew(d)
     endTrade(d)
