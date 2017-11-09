@@ -35,14 +35,26 @@ class MysqlBasedata(Basedata):
     '''
     def get_history_data_by_stocklist(self, trade_date_str, codelist, frequency, fq):
         # todo 待完成
-        pass
+        sql = "SELECT STOCKCODE, FACTOR_VALUE from ST_FACTOR_VALUE where FACTOR_ID=6 and FACTOR_DATE = str_to_date('"+trade_date_str+"', '%Y-%m-%d')"
+
+        conn = bt.getConnection()
+        df = pd.read_sql(sql, conn)
+        dfNew = df.set_index('STOCKCODE')
+        if codelist != None:
+            dfNew = dfNew[dfNew.index.isin(codelist)]
+        dfNew['FACTOR_VALUE'] = dfNew['FACTOR_VALUE'].map(lambda x:float(x))
+        return dfNew
 
     '''
         通过时间段指数行情数据接口
     '''
     def get_history_index_data_by_date(self, code, start_date_str, end_date_str, frequency):
         # todo 待完成
-        pass
+        sql = "SELECT FACTOR_DATE, FACTOR_VALUE from ST_FACTOR_VALUE where FACTOR_ID=6 and STOCKCODE='"+code+"' and FACTOR_DATE >= str_to_date('"+start_date_str+"', '%Y-%m-%d') and FACTOR_DATE <= str_to_date('"+end_date_str+"', '%Y-%m-%d')"
+        conn = bt.getConnection()
+        df = pd.read_sql(sql, conn)
+        dfNew = df.set_index('FACTOR_DATE')
+        return dfNew
 
     '''
         通过指数代码列表查询指数行情数据接口
@@ -222,8 +234,20 @@ class MysqlBasedata(Basedata):
     '''
 
     def get_stocklist_by_type(self, trade_date, type):
+        trade_date_str = datetime.strftime(trade_date, '%Y-%m-%d')
         # todo 待完成
-        pass
+        stockcodeSql = ""
+        if type == '50':
+            stockcodeSql = "select STOCKCODE from W_CONSTITUTE_50 where tradedate = str_to_date('"+trade_date_str+"', '%Y-%m-%d')"
+        elif type == '300':
+            stockcodeSql = "select STOCKCODE from W_CONSTITUTE_300 where tradedate = str_to_date('"+trade_date_str+"', '%Y-%m-%d')"
+        elif type == '500':
+            stockcodeSql = "select STOCKCODE from W_CONSTITUTE_500 where tradedate = str_to_date('"+trade_date_str+"', '%Y-%m-%d')"
+
+        conn = bt.getConnection()
+        df = pd.read_sql(stockcodeSql, conn)
+        stockcodeList = df.STOCKCODE.tolist()
+        return stockcodeList
 
 
 
