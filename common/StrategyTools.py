@@ -7,14 +7,10 @@
 '''
 
 import common.Constants as c
-import common.BaseTools as bt
-import StockOrder as StockOrder
-import StockPosition as StockPosition
 
 import pandas as pd
 import BaseTools as bt
 from datetime import datetime
-from datetime import timedelta
 import traceback
 
 '''
@@ -39,6 +35,7 @@ import traceback
 
 '''
 def order(orderList, stockDict, conn):
+    # print orderList
     orderListNew = []
     try:
         if len(orderList) == 0:
@@ -56,29 +53,39 @@ def order(orderList, stockDict, conn):
         # 初始化返还金额  （卖出股票为正，买入股票为负）
         tradeMoney = 0
 
-        lastAccountDateStr = getLastAccountDate(c.strategyId, conn)
-        # 查询上一个交易日全部仓位
-        lastPositionDf = getPositionList(c.strategyId, lastAccountDateStr, conn)
-        positionDf = lastPositionDf.copy()
-        # 更新仓位日期
-        positionDf['TRADEDATE'] = tradedate
-        # 获取仓位中的股票代码
-        positionStocklist = positionDf.STOCKCODE.tolist()
+        positionStocklist = []
         # 初始化待新增仓位、待更新的仓位、待删除的仓位
         positionInsertList = []
         positionUpdateList = []
         positionDeleteList = []
-        positionList = [tuple(x) for x in positionDf.values]
+        positionList = []
         # 仓位查询
         positionMap = {}
-        for p in positionList:
-            key = p[0]+'_'+str(p[2])
-            positionMap[key] = p
+        lastAccountDateStr = getLastAccountDate(c.strategyId, conn)
+        if lastAccountDateStr != None:
+            # 查询上一个交易日全部仓位
+            lastPositionDf = getPositionList(c.strategyId, lastAccountDateStr, conn)
+            # print lastPositionDf
+            positionDf = lastPositionDf.copy()
 
+            # 更新仓位日期
+            positionDf['tradedate'] = tradedate
+            #print positionDf
+            # 获取仓位中的股票代码
+            positionStocklist = positionDf.stockcode.tolist()
+            positionList = [tuple(x) for x in positionDf.values]
+            for p in positionList:
+                #print p
+                key = str(p[0])+'_'+p[1]
+                positionMap[key] = p
+        #print positionMap
         # 遍历订单
         for order in orderList:
-            key = order.strategyId+'_'+str(order.tradedate)
+            key = order.strategyId+'_'+order.stockcode
             if order.volume > 0: # 如果订单中的量大于0，该订单为买入
+                #print type(order.price)
+                #print type(order.volume)
+                #print order.price
                 tradeMoney = tradeMoney - order.price * order.volume
                 if order.stockcode not in positionStocklist:
                     v = (order.strategyId, order.stockcode, order.tradedate, order.price, order.price, order.volume)
@@ -108,35 +115,35 @@ def order(orderList, stockDict, conn):
                 tradeMoney = tradeMoney - order.price * order.volume
             elif order.volume == 0: # 如果订单中的量等于0，该订单为卖出全部
                 p = positionMap[key]
-                d = (order.strategyId, order.stockcode, order.tradedate, p.price, p.price, p.volume)
+                d = (order.strategyId, order.stockcode, order.tradedate, stockDict.loc[p[1], 'FACTOR_VALUE'], p[4], p[5]*-1)
                 positionDeleteList.append(d)
                 # 如果订单的数量为0，全仓卖出，使用仓位数量，加钱
-                tradeMoney = tradeMoney + order.price * p.volume
+                tradeMoney = tradeMoney + order.price * p[5]
 
         # 新增
         for p in positionInsertList:
-            key = p[0]+'_'+str(p[2])
+            key = p[0]+'_'+p[1]
             positionMap[key] = p
 
         # 修改
         for p in positionUpdateList:
-            key = p[0]+'_'+str(p[2])
+            key = p[0]+'_'+p[1]
             positionMap[key] = p
 
         # 删除
         for p in positionDeleteList:
-            key = p[0]+'_'+str(p[2])
+            key = p[0]+'_'+p[1]
             del positionMap[key]
-
+        #print stockDict
         # 更新仓位中的股票实时价格
         for k, v in positionMap.items():
-            v[3] = stockDict[v[1]]
-            positionMap[k] = v
+            #print v
+            vNew = (v[0], v[1], tradedate, stockDict.loc[v[1], 'FACTOR_VALUE'], v[4], v[5])
+            positionMap[k] = vNew
 
         positionList = positionMap.values()
-
+        #print positionList
         savePosition(positionList, conn)
-
         # 更新全局返回金额
         c.tradeMoney = tradeMoney
 
@@ -190,9 +197,12 @@ def saveAccount(strategyId, tradedate, accountMoney, conn):
     cur = conn.cursor()
     p = (strategyId, '000000', tradedate, accountMoney, accountMoney, accountMoney)
     positionList = [p]
+    # print positionList
     cur.executemany(
         'insert into r_position(strategy_id, stockcode, tradedate, current_price, price, volume) values(%s, %s, %s, %s, %s, %s)',
         positionList)
+    conn.commit()
+
 
 
 '''
@@ -231,8 +241,7 @@ def getAccountInfo(strategyId, tradedate, conn):
 获取仓位列表
 '''
 def getPositionList(strategyId, tradedate, conn):
-    sql = "select * from r_position where strategy_id="+str(strategyId)+" and stockcode!='000000' and tradedate=DATE_FORMAT('"+tradedate+"', '%Y-%m-%d')"
-    #print sql
+    sql = "select strategy_id, stockcode, tradedate, current_price, price, volume from r_position where strategy_id="+str(strategyId)+" and stockcode!='000000' and tradedate=DATE_FORMAT('"+tradedate+"', '%Y-%m-%d')"
     positionDf = pd.read_sql(sql, conn)
     return positionDf
 
