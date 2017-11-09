@@ -35,11 +35,11 @@ def nomal_numerator_new(string):
     if string.count('U') + string.count('N')== 0:
         return string
     elif string.count('U') != 0 or string.count('N') != 0:
-        print "test:" + string
+        # print "test:" + string
         #print "test:"+l4_pattern.search(string)
         from_str = l4_pattern.search(string).group()
         #print '----start----'
-        print "from_str:"+from_str
+        # print "from_str:"+from_str
         #print min_cal_new(from_str)
         #print '----end----'
         string = string.replace(from_str, str(min_cal_new(from_str)))
@@ -100,13 +100,13 @@ def nomal_numerator(string):  # 定义计算不带括号的算式计算函数
 
 def l1_analysis(string):  # 定义括号式分解函数
     if string.find('(') == -1:
-        print "end:"+string
+        # print "end:"+string
         return nomal_numerator_new(string)
     else:
-        print 'start'+string
+        # print 'start'+string
         from_str = l1_pattern.search(string).group()
         string = string.replace(from_str, nomal_numerator_new(from_str[1:-1]))
-        print string
+        # print string
         return l1_analysis(string)
     '''
     此函数采用递归的方法，仅用于将不含子级括号的算式用其括号内容表达式的结果替换，结果由normal_
