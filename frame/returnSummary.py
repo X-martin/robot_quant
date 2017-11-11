@@ -112,3 +112,5 @@ if __name__ == "__main__":
     rsumm = ReturnSummary(df_position, df_bench)
     summ = rsumm.get_summary()
     print summ
+    # total asset data
+    print rsumm.df_assets
