@@ -15,7 +15,7 @@ class ReturnSummary(object):
         self.df_position = df_position
         self.df_bench = df_bench
 
-        self.dates = 0
+        self.dates = []
         self.df_assets = 0
         self.df_returns = 0
         self.df_bench_returns = 0
@@ -33,34 +33,43 @@ class ReturnSummary(object):
 
     def sort_date(self):
         dates = list(set(self.df_position["tradedate"]))
-        self.dates = dates.sort()
+        dates.sort()
+        self.dates = dates
 
     def get_assets(self):
         df_assets = pd.DataFrame(columns=["date", "asset"])
         for date in self.dates:
             df_date = self.df_position.loc[self.df_position["tradedate"] == date]
-            asset = int(df_date["price"]*df_date["volume"].sum())
-            df_temp = pd.DataFrame([[date, asset]], columns=["date", "asset"])
-            df_assets = df_assets.append(df_temp, ignore_index=True)
-        self.df_assets
+            asset = float((df_date["current_price"].astype('float') * df_date["volume"].astype('float')).sum())
+            # df_temp = pd.DataFrame([[date, asset]], columns=["date", "asset"])
+            # df_assets = df_assets.append(df_temp, ignore_index=True)
+            df_assets.loc[len(df_assets)] = [date, asset]
+        self.df_assets = df_assets
 
     def get_returns(self, df_assets):
+        df_returns = pd.DataFrame(columns=['date', 'return'])
         arr_returns = np.array(df_assets.iloc[:, 1])
         arr_returns = arr_returns[1:]/arr_returns[:-1] - 1
-        np.insert(arr_returns, 0, 0)
-        df_returns = df_assets["date"]
+        arr_returns = np.insert(arr_returns, 0, 0)
+        df_returns['date'] = list(df_assets.iloc[:, 0])
         df_returns["return"] = arr_returns
         return df_returns
 
     def summary(self):
-        df_merge = pd.merge(self.df_returns, self.df_bench_returns, how="inner")
+        df_merge = self.df_returns.merge(self.df_bench_returns, how="inner", left_on='date',
+                                         right_on='date')
         arr = np.array(df_merge.iloc[:, 1:])
         retrns = np.cumprod(arr,axis=0)
         mat_cov = np.cov(arr.transpose())
         vec_mean = arr.mean(axis=0)
-        day0 = datetime.strptime(df_merge["date"][0])
-        day1 = datetime.strptime(df_merge["date"][-1])
-        len_year = (day1 - day0)/365.0
+        dates = list(set(df_merge["date"]))
+        dates.sort()
+        day0 = dates[0]
+        day1 = dates[-1]
+        print day0, day1
+        difference = day1 - day0
+        len_year = (difference.days + difference.seconds / 86400) / 365.2425
+        print len_year
 
         self.vol = np.sqrt(mat_cov[0, 0])
         self.vol_bench = np.sqrt(mat_cov[1, 1])
@@ -80,19 +89,26 @@ class ReturnSummary(object):
         self.df_returns = self.get_returns(self.df_assets)
         self.df_bench_returns = self.get_returns(self.df_bench)
         self.summary()
+        df_summary = pd.DataFrame(columns=['FieldName', 'FieldValue'])
         names = ["Strategy Return", "Strategy Ann Return", "Bench Return", "Bench Ann Return",
                  "Alpha", "Beta", "Sharpe", "Strategy Vol", "Bench Vol",
                  "Win(Daily)", "Max Loss(Daily)"]
         values = [self.retrn, self.retrn_annual, self.retrn_bench, self.retrn_bench_annual,
                   self.alpha, self.beta, self.sharpe, self. vol, self.vol_bench,
                   self.win_daily, self.max_loss_daily]
-        df_summary = pd.DataFrame(names, volumns=["Name"])
-        df_summary["Value"] = values
+        df_summary['FieldName'] = names
+        df_summary["FieldValue"] = values
         return df_summary
 
 if __name__ == "__main__":
     # 连接池初始化
-    conn = cbt.getConnection()
-    sql = "SELECT * from r_position where strategy_id='2' ORDER BY tradedate"
-    df = pd.read_sql(sql, conn)
-    print df
+    # conn = cbt.getConnection()
+    # sql = "SELECT * from r_position where strategy_id='2' ORDER BY tradedate"
+    # df = pd.read_sql(sql, conn)
+    # print df
+
+    df_bench = pd.read_pickle('test_bench_returnSummary.pkl')
+    df_position = pd.read_pickle('test_data_returnSummary.pkl')
+    rsumm = ReturnSummary(df_position, df_bench)
+    summ = rsumm.get_summary()
+    print summ
