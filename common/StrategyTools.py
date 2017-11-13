@@ -195,7 +195,7 @@ def savePosition(positionList, conn):
 '''
 def saveAccount(strategyId, tradedate, accountMoney, conn):
     cur = conn.cursor()
-    p = (strategyId, '000000', tradedate, accountMoney, accountMoney, accountMoney)
+    p = (strategyId, '000000', tradedate, accountMoney, accountMoney, 1)
     positionList = [p]
     # print positionList
     cur.executemany(
