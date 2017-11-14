@@ -7,6 +7,7 @@ from datetime import datetime
 import sys
 
 import common.BaseTools as cbt
+import common.MysqlBasedata as MysqlBasedata
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -106,9 +107,13 @@ if __name__ == "__main__":
     # sql = "SELECT * from r_position where strategy_id='2' ORDER BY tradedate"
     # df = pd.read_sql(sql, conn)
     # print df
+    t = MysqlBasedata.MysqlBasedata()
+    df_bench_new = t.get_history_index_data_by_date('000300.SH', '2015-05-10', '2017-05-10', None)
 
     df_bench = pd.read_pickle('test_bench_returnSummary.pkl')
     df_position = pd.read_pickle('test_data_returnSummary.pkl')
+    print df_bench
+    print df_position
     rsumm = ReturnSummary(df_position, df_bench)
     summ = rsumm.get_summary()
     print summ
