@@ -49,12 +49,13 @@ class MysqlBasedata(Basedata):
         通过时间段指数行情数据接口
     '''
     def get_history_index_data_by_date(self, code, start_date_str, end_date_str, frequency):
-        # todo 待完成
-        sql = "SELECT FACTOR_DATE, FACTOR_VALUE from ST_FACTOR_VALUE where FACTOR_ID=6 and STOCKCODE='"+code+"' and FACTOR_DATE >= str_to_date('"+start_date_str+"', '%Y-%m-%d') and FACTOR_DATE <= str_to_date('"+end_date_str+"', '%Y-%m-%d')"
+        if code == None or start_date_str == None or end_date_str == None:
+            print 'param error'
+            return None
         conn = bt.getConnection()
+        sql = "SELECT tradedate, CLOSEPRICE current_price from ST_INDEXTRADE_DATA where INDEXCODE = '"+code+"' and TRADEDATE>=DATE_FORMAT('"+start_date_str+"', '%Y-%m-%d') and TRADEDATE<=DATE_FORMAT('"+end_date_str+"', '%Y-%m-%d') ORDER BY TRADEDATE DESC"
         df = pd.read_sql(sql, conn)
-        dfNew = df.set_index('FACTOR_DATE')
-        return dfNew
+        return df
 
     '''
         通过指数代码列表查询指数行情数据接口
@@ -323,3 +324,4 @@ t = MysqlBasedata()
 # print t.get_factor_data_by_datecode(None, '2017-05-10', '2017-05-10', 'trade_closeprice', -1)
 # print t.get_factor_data_by_datecode(['000001.SZ', '000002.SZ', '000005.SZ', '000006.SZ', '000007.SZ', '000008.SZ'], '2017-01-16', '2017-05-15', 'free_share_hold_num', -1)
 #print t.get_factor_data_by_datecode(['000001.SZ', '000002.SZ', '000005.SZ', '000006.SZ', '000007.SZ', '000008.SZ'], '2017-01-16', '2017-05-15', 'free_share_hold_num', -1)
+#print t.get_history_index_data_by_date('000016.SH', '2015-05-10', '2017-05-10', None)
