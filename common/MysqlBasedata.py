@@ -55,6 +55,8 @@ class MysqlBasedata(Basedata):
         conn = bt.getConnection()
         sql = "SELECT tradedate, CLOSEPRICE current_price from ST_INDEXTRADE_DATA where INDEXCODE = '"+code+"' and TRADEDATE>=DATE_FORMAT('"+start_date_str+"', '%Y-%m-%d') and TRADEDATE<=DATE_FORMAT('"+end_date_str+"', '%Y-%m-%d') ORDER BY TRADEDATE DESC"
         df = pd.read_sql(sql, conn)
+        df['tradedate'] = df['tradedate'].map(lambda x: x.date())
+
         return df
 
     '''
