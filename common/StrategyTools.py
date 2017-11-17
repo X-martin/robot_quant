@@ -250,11 +250,26 @@ def getPositionList(strategyId, tradedate, conn):
 
 '''
 def getOrderList(strategyId, conn):
-
-    sql = "select * from r_order where strategy_id="+str(strategyId)
+    sql = "select * from r_order where strategy_id="+str(strategyId)+" order by tradedate"
     #print sql
     orderDf = pd.read_sql(sql, conn)
     return orderDf
+
+'''
+获取仓位列表
+'''
+def getPositionListByStrategyId(strategyId, conn):
+    sql = "select strategy_id, stockcode, tradedate, current_price, price, volume from r_position where strategy_id="+str(strategyId)+" and stockcode!='000000' order by tradedate"
+    positionDf = pd.read_sql(sql, conn)
+    return positionDf
+
+'''
+获取资金列表
+'''
+def getAccountListByStrategyId(strategyId, conn):
+    sql = "select strategy_id, stockcode, tradedate, current_price, price, volume from r_position where strategy_id="+str(strategyId)+" and stockcode='000000' order by tradedate"
+    positionDf = pd.read_sql(sql, conn)
+    return positionDf
 
 conn = bt.getConnection()
 #print getPositionList(1, conn)
