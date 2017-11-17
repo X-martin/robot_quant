@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import sys
+import time
 
 import common.BaseTools as cbt
 import common.MysqlBasedata as MysqlBasedata
@@ -65,6 +66,7 @@ class ReturnSummary(object):
         vec_mean = arr.mean(axis=0)
         dates = list(set(df_merge["date"]))
         dates.sort()
+        print dates
         day0 = dates[0]
         day1 = dates[-1]
         print day0, day1
@@ -103,19 +105,25 @@ class ReturnSummary(object):
 
 if __name__ == "__main__":
     # 连接池初始化
-    # conn = cbt.getConnection()
-    # sql = "SELECT * from r_position where strategy_id='2' ORDER BY tradedate"
-    # df = pd.read_sql(sql, conn)
+    conn = cbt.getConnection()
+    sql = "SELECT * from r_position where strategy_id='2' ORDER BY tradedate"
+    df = pd.read_sql(sql, conn)
     # print df
     t = MysqlBasedata.MysqlBasedata()
     df_bench_new = t.get_history_index_data_by_date('000300.SH', '2015-05-10', '2017-05-10', None)
 
     df_bench = pd.read_pickle('test_bench_returnSummary.pkl')
     df_position = pd.read_pickle('test_data_returnSummary.pkl')
-    print df_bench
-    print df_position
     rsumm = ReturnSummary(df_position, df_bench)
     summ = rsumm.get_summary()
-    print summ
+    print summ.T
+    print type(summ)
     # total asset data
     print rsumm.df_assets
+    #df['tradedate'] = df['tradedate'].map(lambda x:time.mktime(x.timetuple()))
+    #print df
+    # print datetime.now().microsecond
+    # print time.mktime(t.timetuple())
+    assetsDf = rsumm.df_assets
+    assetsDf['date'] = assetsDf['date'].map(lambda x: time.mktime(x.timetuple()))
+    print [list(x) for x in assetsDf.values]

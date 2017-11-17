@@ -1,3 +1,6 @@
+#!/usr/bin/python
+#coding=utf-8
+
 import FactorTools as fTool
 # from datetime import datetime
 from datetime import timedelta

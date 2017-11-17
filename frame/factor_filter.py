@@ -1,3 +1,6 @@
+#!/usr/bin/python
+#coding=utf-8
+
 import factor_method as faMethod
 import filter_method as fiMethod
 import pandas as pd

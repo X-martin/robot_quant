@@ -13,8 +13,7 @@ import common.MysqlBasedata as MysqlBasedata
 import common.StockOrder as StockOrder
 import common.FormulaUtil as FormulaUtil
 
-import factor_filter as ff
-import interp as intp
+import frame.interp as intp
 
 from datetime import datetime
 
@@ -24,29 +23,23 @@ from datetime import datetime
 def init():
     # 周期类型 ：D、天 W、周 M、月
     cc.periodType = 'D'
-    cc.changePeriod = 50
+    cc.changePeriod = 20
     cc.startDateStr='2010-1-1'
-    cc.endDateStr='2017-1-1'
+    cc.endDateStr='2012-1-1'
     cc.initMoney=1000000
 
 
 ## 股票筛选初始化函数
 def getStockList(tradedate):
     tbd = MysqlBasedata.MysqlBasedata()
-    # 000016.SH：上证50   沪深300：000300.SH 创业板：399006.SZ 中证500：000905.SH
-    S1=tbd.get_stocklist_by_type(tradedate, '300')
-    S2=tbd.get_stocklist_by_type(tradedate, '50')
-    S3=tbd.get_stocklist_by_type(tradedate, '500')
+    s1 = str(tbd.get_stocklist_by_type(tradedate, '300'))
+    s2 = str(tbd.get_stocklist_by_type(tradedate, '500'))
+    s3 = str(tbd.get_stocklist_by_type(tradedate, '50'))
+    s = "(s1Ns2)Us3"
 
-    # todo 待修改
-    s = '('+str(S1)+'U'+str(S2)+')U'+str(S3)
-    # s = {{stocklistS}}
-    s = s.replace(' ', '')
-    stocklistStr = FormulaUtil.l1_analysis(s)
-    stocklist = stocklistStr.replace('\'', '').replace('u', '').split(",")
-    return stocklist
-# todo 修改资金账户中的金额
-# todo 过滤掉已经退市的股票
+    return tbd.get_stocklist_by_type(tradedate, '300')
+
+
 def tradeNew(tradedate):
     # 数据库操作类初始化
     t = MysqlBasedata.MysqlBasedata()
@@ -56,12 +49,10 @@ def tradeNew(tradedate):
     trade_date_str = datetime.strftime(tradedate, '%Y-%m-%d')
     # 查询股票行情接口
     stockPriceDf = t.get_history_data_by_stocklist(trade_date_str, None, 'D', 'B')
-    print cc.currentPeriod
     # 验证调仓日期：验证是否到达调仓日期
     # 如果当前不是到调仓日期，新增资金账户信息
     # 查询前一天是否存在仓位，如果存在，拷贝前一天仓位信息
     if cc.currentPeriod % cc.changePeriod != 1:
-        print '------------------------------------------------return'
         # 如果是第一天，记录账户资金信息
         # todo 否则，判断是否
         # 拷贝前一天的仓位信息，更新仓位中的股票价格
@@ -73,26 +64,22 @@ def tradeNew(tradedate):
     # 如果是调仓日期，进入策略逻辑
     # 获取票池
     stocklist = getStockList(tradedate)
+    print stocklist
     # 如果股票池为0
     if len(stocklist) == 0:
-        print '------------------------------------------------return222'
         # 新增资金账户信息，拷贝前一天仓位信息
         updatePosition(tradedate, stockPriceDf, conn)
-        #updatePositionAccount(tradedate)
         return
-    print '------------------------------------------------start'
     # 定义买入股票列表、卖出股票列表
     buystocklist = stocklist
-    # sellstocklist = stocklist
     # 计算得出中间条件、筛选股票的条件
     factor_txt = 'MA5 = MA(trade_closeprice,5)\nMA10 = MA(trade_closeprice, 10)'
     filter_txt = 'gx = CROSS(MA5, MA10)\nasc5 = SORT(MA5, asc, 5)'
     d1, d2 = intp.interp(factor_txt, filter_txt)
     # 通过买入条件得出买入股票列表
     for key in ['asc5']:
-        # print key, d2[key].factor_list, d2[key].method
         buystocklist = d2[key].filter(buystocklist, tradedate)
-        print 'Stock list by applying filter', key, ':', buystocklist
+        # print 'Stock list by applying filter', key, ':', buystocklist
     # 当前订单列表
     currentOrderlist = []
 
@@ -121,6 +108,7 @@ def tradeNew(tradedate):
     print currentOrderlist
     # 订单入库，并更新仓位
     cst.order(currentOrderlist, stockPriceDf, conn)
+
 
 '''
 交易前
