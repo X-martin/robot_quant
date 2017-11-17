@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>自定义策略</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quant.css') }}">
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/highstock.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/exporting.js') }}"></script>
+</head>
+<body>
+    <div>
+        <h3>收益基本信息</h3>
+        <table id="quantList1" border="1">
+            {% for item in summaryList %}
+            <tr>
+                {% for index in range(11) %}
+                <td class="col1">
+                    {{ item[index] }}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+       <div id="container" style="height: 400px; min-width: 310px"></div>
+        <script type="text/javascript">
+        $.getJSON('http://192.168.1.104:5000/json_index?filename=aapl-c.json&callback=?', function (data) {
+            // Create the chart
+            Highcharts.stockChart('container', {
+                rangeSelector: {
+                    selected: 1
+                },
+                title: {
+                    text: '历史收益'
+                },
+                series: [{
+                    name: '历史收益',
+                    data: data,
+                    type: 'areaspline',
+                    threshold: null,
+                    tooltip: {
+                        valueDecimals: 2
+                    },
+                    fillColor: {
+                        linearGradient: {
+                            x1: 0,
+                            y1: 0,
+                            x2: 0,
+                            y2: 1
+                        },
+                        stops: [
+                            [0, Highcharts.getOptions().colors[0]],
+                            [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                        ]
+                    }
+                }]
+            });
+        });
+        </script>
+
+        <h3>订单列表</h3>
+        <table id="quantList2" border="1">
+            <tr>
+                <td class="col1">交易日期</td>
+                <td class="col2">股票代码</td>
+                <td class="col3">价格</td>
+                <td class="col4">买卖类型</td>
+                <td class="col5">成交量</td>
+            </tr>
+            {% for item in orderList %}
+            <tr>
+                <td class="col1">
+                    {{ item[2] }}
+                </td>
+                <td class="col2">{{ item[1] }}</td>
+                <td class="col3">{{ item[3] }}</td>
+                <td class="col4">
+                    {{item[4]}}
+                </td>
+                <td class="col5">{{ item[4] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h3>仓位列表</h3>
+        <table id="quantList3" border="1">
+            <tr>
+                <td class="col1">交易日期</td>
+                <td class="col2">股票代码</td>
+                <td class="col3">当前价格</td>
+                <td class="col4">成本价格</td>
+                <td class="col5">数量</td>
+            </tr>
+            {% for item in positionList %}
+            <tr>
+                <td class="col1">
+                    {{ item[2] }}
+                </td>
+                <td class="col2">{{ item[1] }}</td>
+                <td class="col3">{{ item[3] }}</td>
+                <td class="col4">
+                    {{item[4]}}
+                </td>
+                <td class="col5">{{ item[5] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</body>
+</html>
