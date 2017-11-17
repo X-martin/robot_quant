@@ -89,7 +89,7 @@ def quant_post():
         periodType = 'D'
         changePeriod = '20'
         startDateStr = '2010-1-1'
-        endDateStr = '2012-1-1'
+        endDateStr = '2011-1-1'
         initMoney = '1000000'
         stocktype_list = ['300', '500', '50']
         stocklist = [('300', '2010-1-1', '2012-1-1'), ('500', '2017-1-1', '2017-8-1'), ('50', '2017-1-1', '2017-8-1')]
