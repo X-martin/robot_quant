@@ -31,7 +31,7 @@ lineBreak = app.config['LINE_BREAK']
 '''
 选项界面
 '''
-@app.route('/quant_index')
+@app.route('/')
 def quant_index():
     return render_template('quant_form.html')
 
@@ -209,5 +209,5 @@ def getfactorlist():
 
 if __name__ == "__main__":
     app.debug = app.config["DEBUG"]
-    app.run('192.168.1.104')
+    app.run('localhost')
     #app.run()
