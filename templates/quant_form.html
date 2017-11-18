@@ -4,10 +4,15 @@
     <meta charset="UTF-8">
     <title>自定义策略</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/quant.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/spinners.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/spinner/whirly.css') }}">
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.js') }}"></script>
 </head>
 <body>
+    <div id="loading" style="index:-10;width:100%;height:200px;margin: auto;position: absolute;top: 0; left: 0; bottom: 0; right: 0;text-align:center;display:none;">
+        <div class="whirly-loader"> Loading… </div></div>
+    <div>
     <form id="quantForm" name="quantForm" action="{{ url_for('quant_post') }}" method="POST">
     <div class="quantForm">
         <ul>
@@ -82,11 +87,15 @@
         </div>
         <div>
             回测票池表达式:
-            <textarea id="stockExpression" name="stockExpression" cols="40" rows="8"></textarea>
+            <textarea id="stockExpression" name="stockExpression" cols="40" rows="2"></textarea>
         </div>
         <div>
-            定义变量表达式:
-            <textarea id="variableExpression" name="variableExpression" cols="40" rows="8" onblur="changefactorlist();"></textarea>
+            基础变量表达式:
+            <textarea id="baseVariableExpression" name="baseVariableExpression" cols="40" rows="8"></textarea>
+        </div>
+        <div>
+            条件变量表达式:
+            <textarea id="conditionVariableExpression" name="conditionVariableExpression" cols="40" rows="8" onblur="changefactorlist();"></textarea>
         </div>
         <div>买入卖出条件 <!--input type="button" value="添加" onclick="addConditionRow();"--></div>
         <div id="buyConditionDiv_1">
@@ -165,7 +174,7 @@
 
         function changefactorlist() {
             // getfactorlist
-            var str = $("#variableExpression").val();
+            var str = $("#conditionVariableExpression").val();
             //alert(str);
             $.getJSON("{{ url_for('getfactorlist') }}", {
             formula: str
@@ -195,6 +204,7 @@
 
         function backtesting(){
             alert("回测");
+            $("#loading").show();
 
             $("#loading").show();
             $('input').attr("readonly","readonly")
@@ -215,7 +225,7 @@
                     constituentStockStr = constituentStockStr+',';
                 }
             }
-            alert(constituentStockStr);
+            // alert(constituentStockStr);
             $("#constituentStockStr").val(constituentStockStr);
             for (i=0;i<areas.length;i++){
                 areaStr=areaStr+areas[i].value;
