@@ -88,14 +88,14 @@ def quant_post():
         # todo 待完成
         periodType = 'D'
         changePeriod = '20'
-        startDateStr = '2010-1-1'
-        endDateStr = '2011-1-1'
+        startDateStr = '2012-1-1'
+        endDateStr = '2013-1-1'
         initMoney = '1000000'
         stocktype_list = ['300', '500', '50']
         stocklist = [('300', '2010-1-1', '2012-1-1'), ('500', '2017-1-1', '2017-8-1'), ('50', '2017-1-1', '2017-8-1')]
         stockExpression = "(s1Ns2)Us3"
         baseVariableExpression = r'MA5 = MA(trade_closeprice,5)\nMA10 = MA(trade_closeprice, 10)'
-        conditionVariableExpression = r'gx = CROSS(MA5, MA10)\nasc5 = SORT(MA5, asc, 5)'
+        conditionVariableExpression = r'gx = CROSS(MA5, MA10)\nasc5 = SORT(MA5, desc, 5)'
         buyConditionlist = ['asc5']
         sellConditionlist = ['gx', 'asc5']
 
@@ -104,7 +104,7 @@ def quant_post():
                                 stocklist, stockExpression,
                                 baseVariableExpression, conditionVariableExpression, buyConditionlist,
                                 sellConditionlist)
-        summ = result.get_summary()
+        #summ = result.get_summary()
         '''
         df_bench = pd.read_pickle('frame/test_bench_returnSummary.pkl')
         df_position = pd.read_pickle('frame/test_data_returnSummary.pkl')
@@ -112,8 +112,8 @@ def quant_post():
         summ = rsumm.get_summary()
         '''
 
-        print type(summ)
-        summaryDf = summ.T
+        print type(result)
+        summaryDf = result[1].T
 
         conn = bt.getConnection()
         # 查询订单信息
