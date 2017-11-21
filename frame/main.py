@@ -138,8 +138,6 @@ def execute(strategyId, periodType, changePeriod, startDateStr, endDateStr, init
             baseVariableExpression, conditionVariableExpression, buyConditionlist, sellConditionlist):
     benchCode = '000300.SH'
     stocklistStr = ''
-    # 卖出条件
-    sellcondition_list = None
     for index in range(len(stocklist)):
         i = index + 1
         stocktype = stocktype_list[index]
@@ -147,8 +145,7 @@ def execute(strategyId, periodType, changePeriod, startDateStr, endDateStr, init
     stocklistStr += "    s = \""+stockExpression+"\"\n"
 
     template = env.get_template('mytemplate.html')
-    codestr = template.render(periodType=periodType, changePeriod=changePeriod, startDateStr=startDateStr, endDateStr=endDateStr, initMoney=initMoney, \
-                              stockExpression='', stocklistStr=stocklistStr, baseVariableExpression=baseVariableExpression, \
+    codestr = template.render(stockExpression='', stocklistStr=stocklistStr, baseVariableExpression=baseVariableExpression, \
                               conditionVariableExpression=conditionVariableExpression ,buyConditionlist=buyConditionlist, sellConditionlist=sellConditionlist)
     print codestr
 
