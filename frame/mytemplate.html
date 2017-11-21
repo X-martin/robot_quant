@@ -6,7 +6,6 @@
 
 '''
 
-import common.Constants as cc
 import common.BaseTools as cbt
 import common.StrategyTools as cst
 import common.MysqlBasedata as MysqlBasedata
@@ -17,17 +16,6 @@ import frame.interp as intp
 
 from datetime import datetime
 
-'''
-## 初始化函数，设定要操作的股票、基准等等
-'''
-def init():
-    # 周期类型 ：D、天 W、周 M、月
-    cc.periodType = '{{ periodType }}'
-    cc.changePeriod = {{ changePeriod }}
-    cc.startDateStr='{{ startDateStr }}'
-    cc.endDateStr='{{ endDateStr }}'
-    cc.initMoney={{ initMoney }}
-
 
 ## 股票筛选初始化函数
 def getStockList(tradedate):
@@ -36,7 +24,7 @@ def getStockList(tradedate):
     return tbd.get_stocklist_by_type(tradedate, '300')
 
 
-def tradeNew(tradedate):
+def trade(tradedate, ip):
     # 数据库操作类初始化
     t = MysqlBasedata.MysqlBasedata()
     # 连接池初始化
@@ -48,15 +36,15 @@ def tradeNew(tradedate):
     # 验证调仓日期：验证是否到达调仓日期
     # 如果当前不是到调仓日期，新增资金账户信息
     # 查询前一天是否存在仓位，如果存在，拷贝前一天仓位信息
-    if cc.currentPeriod % cc.changePeriod != 1:
+    if ip.currentPeriod % ip.changePeriod != 1:
         # 如果是第一天，记录账户资金信息
         # todo 否则，判断是否
         # 拷贝前一天的仓位信息，更新仓位中的股票价格
-        updatePosition(tradedate, stockPriceDf, conn)
+        updatePosition(tradedate, stockPriceDf, ip, conn)
         #updatePositionAccount(tradedate)
-        cc.currentPeriod = cc.currentPeriod + 1
+        ip.currentPeriod = ip.currentPeriod + 1
         return
-    cc.currentPeriod = cc.currentPeriod + 1
+    ip.currentPeriod = ip.currentPeriod + 1
     # 如果是调仓日期，进入策略逻辑
     # 获取票池
     stocklist = getStockList(tradedate)
@@ -64,7 +52,7 @@ def tradeNew(tradedate):
     # 如果股票池为0
     if len(stocklist) == 0:
         # 新增资金账户信息，拷贝前一天仓位信息
-        updatePosition(tradedate, stockPriceDf, conn)
+        updatePosition(tradedate, stockPriceDf, ip, conn)
         return
     # 定义买入股票列表、卖出股票列表
     buystocklist = stocklist
@@ -79,11 +67,11 @@ def tradeNew(tradedate):
     # 当前订单列表
     currentOrderlist = []
 
-    lastAccountDateStr = cst.getLastAccountDate(cc.strategyId, conn)
+    lastAccountDateStr = cst.getLastAccountDate(ip.strategyId, conn)
     positionList = []
     # 如果仓位交易日不为空，查询仓位信息，复制仓位信息到新的交易日
     if lastAccountDateStr != None:
-        positionDf = cst.getPositionList(cc.strategyId, lastAccountDateStr, conn)
+        positionDf = cst.getPositionList(ip.strategyId, lastAccountDateStr, conn)
         positionList = positionDf.values
 
     # 通过卖出条件得出卖出股票列表,并将卖出股票列表放入订单
@@ -94,16 +82,16 @@ def tradeNew(tradedate):
             continue
         print code
         print stockPriceDf.loc[code, 'FACTOR_VALUE']
-        o = StockOrder.StockOrder(cc.strategyId, code, tradedate, stockPriceDf.loc[code, 'FACTOR_VALUE'], 0)
+        o = StockOrder.StockOrder(ip.strategyId, code, tradedate, stockPriceDf.loc[code, 'FACTOR_VALUE'], 0)
         print o
         currentOrderlist.append(o)
     # 买入,并将买入股票列表放入订单
     for code in buystocklist:
-        o = StockOrder.StockOrder(cc.strategyId, code, tradedate, stockPriceDf.loc[code, 'FACTOR_VALUE'], 100)
+        o = StockOrder.StockOrder(ip.strategyId, code, tradedate, stockPriceDf.loc[code, 'FACTOR_VALUE'], 100)
         currentOrderlist.append(o)
     print currentOrderlist
     # 订单入库，并更新仓位
-    cst.order(currentOrderlist, stockPriceDf, conn)
+    cst.order(currentOrderlist, stockPriceDf, ip, conn)
 
 
 '''
@@ -120,14 +108,14 @@ def startTrade(d):
    如果仓位交易日不为空，查询仓位信息，复制仓位信息到新的交易日
 
 '''
-def endTrade(d):
-    updatePositionAccount(d)
+def endTrade(d, ip):
+    updatePositionAccount(d, ip)
 
-def updatePosition(tradedate, stockPriceDf, conn):
-    lastAccountDateStr = cst.getLastAccountDate(cc.strategyId, conn)
+def updatePosition(tradedate, stockPriceDf, ip, conn):
+    lastAccountDateStr = cst.getLastAccountDate(ip.strategyId, conn)
     # 如果仓位交易日不为空，查询仓位信息，复制仓位信息到新的交易日
     if lastAccountDateStr != None:
-        lastPositionDf = cst.getPositionList(cc.strategyId, lastAccountDateStr, conn)
+        lastPositionDf = cst.getPositionList(ip.strategyId, lastAccountDateStr, conn)
         if len(lastPositionDf) > 0:
             positionDf = lastPositionDf.copy()
             # 更新仓位日期
@@ -141,22 +129,21 @@ def updatePosition(tradedate, stockPriceDf, conn):
                 positionListNew.append(pNew)
             cst.savePosition(positionListNew, conn)
 
-def updatePositionAccount(tradedate):
+def updatePositionAccount(tradedate, ip):
     conn = cbt.getConnection()
-    print cc.initMoney
-    print cc.tradeMoney
+    print ip.initMoney
+    print ip.tradeMoney
     # 记录资金账户信息
-    money = cc.initMoney + cc.tradeMoney
-    cst.saveAccount(cc.strategyId, tradedate, money, conn)
-    cc.tradeMoney=0
-    cc.initMoney = money
+    money = ip.initMoney + ip.tradeMoney
+    cst.saveAccount(ip.strategyId, tradedate, money, conn)
+    ip.tradeMoney=0
+    ip.initMoney = money
 
 '''
 日交易
 '''
-def handle_data(d):
+def handle_data(d, ip):
     print d
     startTrade(d)
-    # trade(d)
-    tradeNew(d)
-    endTrade(d)
+    trade(d, ip)
+    endTrade(d, ip)

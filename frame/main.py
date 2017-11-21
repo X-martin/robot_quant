@@ -11,13 +11,17 @@ import common.BaseTools as bt
 import common.BaseTools as cbt
 import common.MysqlBasedata as MysqlBasedata
 import returnSummary
+import common.InitParam as InitParam
+import common.StrategyTools as st
 
 from jinja2 import Environment, PackageLoader
 import pandas as pd
 env = Environment(loader=PackageLoader('frame', '.'))
 import sys
+import os
+import time
 
-import frame.my as my
+#import frame.my as my
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -45,7 +49,11 @@ class loader(object):
 '''
 def run():
     # 初始化
-    my.init()
+    load = loader()
+    m = load.load("my.py")
+    #my.init()
+    func_init = m["init"]
+    func_init()
     conn = bt.getConnection()
     print c.startDateStr
     print c.endDateStr
@@ -55,8 +63,8 @@ def run():
     datelist = df['tradedate'].tolist()
 
 
-    load = loader()
-    m = load.load("my.py")
+    #load = loader()
+    #m = load.load("my.py")
     func = m["handle_data"]
 
     for d in datelist:
@@ -126,7 +134,7 @@ def getSummary(benchCode, startDateStr, endDateStr):
     baseVariableExpression=r'MA5 = MA(trade_closeprice,5)\nMA10 = MA(trade_closeprice, 10)'
     conditionVariableExpression=r'gx = CROSS(MA5, MA10)\nasc5 = SORT(MA5, asc, 5)'
 '''
-def execute(periodType, changePeriod, startDateStr, endDateStr, initMoney, stocktype_list, stocklist, stockExpression,
+def execute(strategyId, periodType, changePeriod, startDateStr, endDateStr, initMoney, stocktype_list, stocklist, stockExpression,
             baseVariableExpression, conditionVariableExpression, buyConditionlist, sellConditionlist):
     benchCode = '000300.SH'
     stocklistStr = ''
@@ -143,24 +151,32 @@ def execute(periodType, changePeriod, startDateStr, endDateStr, initMoney, stock
                               stockExpression='', stocklistStr=stocklistStr, baseVariableExpression=baseVariableExpression, \
                               conditionVariableExpression=conditionVariableExpression ,buyConditionlist=buyConditionlist, sellConditionlist=sellConditionlist)
     print codestr
-    f = open('frame/my.py', 'w')
+
+    #filename = str(int(time.time()))+'.py'
+    filename = "my_"+strategyId+".py"
+    #os.mknod("test.txt")
+    print filename
+    f = file(filename, 'w')
     f.write(codestr)
     f.close()
     load = loader()
-    m = load.load("frame/my.py")
-    func_init = m["init"]
-    # 初始化
-    func_init()
+    m = load.load(filename)
     conn = bt.getConnection()
+    st.deleteByStrategyId(strategyId, conn)
     df = bt.getTradeDay(conn, start_date_str=c.startDateStr, end_date_str=c.endDateStr, type=1)
     # 按日期执行策略
+    ip = InitParam.InitParam(strategyId, periodType, changePeriod, startDateStr, endDateStr, initMoney)
+
     datelist = df['tradedate'].tolist()
     func = m["handle_data"]
     for d in datelist:
-        func(d)
+        print d
+        print ip
+        func(d, ip)
 
     summary = getSummary(benchCode, startDateStr, endDateStr)
     # print summary
+    os.remove(filename)
     return summary
 
 if __name__ == '__main__':
@@ -173,10 +189,10 @@ if __name__ == '__main__':
     #print my.getStockList()
     # print getSummary()
     periodType = 'D'
-    changePeriod = '20'
+    changePeriod = 20
     startDateStr = '2011-1-1'
     endDateStr = '2017-1-1'
-    initMoney = '1000000'
+    initMoney = 1000000
     stocktype_list = ['300', '500', '50']
     stocklist = [('300', '2016-1-1', '2017-1-1'), ('500', '2017-1-1', '2017-8-1'), ('50', '2017-1-1', '2017-8-1')]
     stockExpression = "(s1Ns2)Us3"
@@ -185,5 +201,5 @@ if __name__ == '__main__':
     buyConditionlist = ['asc5']
     sellConditionlist = ['gx', 'asc5']
 
-    execute(periodType, changePeriod, startDateStr, endDateStr, initMoney, stocktype_list, stocklist, stockExpression,
+    execute('3', periodType, changePeriod, startDateStr, endDateStr, initMoney, stocktype_list, stocklist, stockExpression,
             baseVariableExpression, conditionVariableExpression, buyConditionlist, sellConditionlist)

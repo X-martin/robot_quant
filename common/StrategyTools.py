@@ -6,8 +6,6 @@
 
 '''
 
-import common.Constants as c
-
 import pandas as pd
 import BaseTools as bt
 from datetime import datetime
@@ -34,7 +32,7 @@ import traceback
        （仓位价格*仓位数量+订单价格*订单数量）/（仓位数量+订单数量）
 
 '''
-def order(orderList, stockDict, conn):
+def order(orderList, stockDict, ip, conn):
     # print orderList
     orderListNew = []
     try:
@@ -61,10 +59,10 @@ def order(orderList, stockDict, conn):
         positionList = []
         # 仓位查询
         positionMap = {}
-        lastAccountDateStr = getLastAccountDate(c.strategyId, conn)
+        lastAccountDateStr = getLastAccountDate(ip.strategyId, conn)
         if lastAccountDateStr != None:
             # 查询上一个交易日全部仓位
-            lastPositionDf = getPositionList(c.strategyId, lastAccountDateStr, conn)
+            lastPositionDf = getPositionList(ip.strategyId, lastAccountDateStr, conn)
             # print lastPositionDf
             positionDf = lastPositionDf.copy()
 
@@ -145,7 +143,7 @@ def order(orderList, stockDict, conn):
         #print positionList
         savePosition(positionList, conn)
         # 更新全局返回金额
-        c.tradeMoney = tradeMoney
+        ip.tradeMoney = tradeMoney
 
         conn.commit()
     except Exception,e:
@@ -185,6 +183,22 @@ def savePosition(positionList, conn):
         cur.executemany(
             'insert into r_position(strategy_id, stockcode, tradedate, current_price, price, volume) values(%s, %s, %s, %s, %s, %s)',
             positionList)
+
+        conn.commit()
+    except Exception,e:
+        traceback.print_exc()
+
+
+'''
+保存仓位信息
+'''
+def deleteByStrategyId(strategyId, conn):
+    try:
+        deleteOrderSql = "DELETE from r_order where strategy_id='"+strategyId+"'"
+        deletePositionSql = "DELETE from r_position where strategy_id='"+strategyId+"'"
+        cur = conn.cursor()
+        cur.execute(deleteOrderSql)
+        cur.execute(deletePositionSql)
 
         conn.commit()
     except Exception,e:

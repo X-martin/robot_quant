@@ -42,15 +42,15 @@ def quant_post():
     positionList = []
     accountList = []
     # 策略参数
-    startDate = request.form['startDate'];
-    endDate = request.form['endDate'];
-    interval = request.form['interval'];
+    startDateStr = request.form['startDate'];
+    endDateStr = request.form['endDate'];
+    changePeriod = request.form['interval'];
     period = request.form['period'];
     initMoney = request.form['initMoney'];
     fee = request.form['fee'];
-    print startDate
-    print endDate
-    print interval
+    print startDateStr
+    print endDateStr
+    print changePeriod
     print period
     print initMoney
     print fee
@@ -58,9 +58,9 @@ def quant_post():
         # 股票筛选条件
         constituentStockStr = request.form['constituentStockStr'];
         print constituentStockStr
-        areaStr = request.form['areaStr'];
-        conceptStr = request.form['conceptStr'];
-        industryStr = request.form['industryStr'];
+        areaStr = request.form['areaStr']
+        conceptStr = request.form['conceptStr']
+        industryStr = request.form['industryStr']
         print constituentStockStr
         print areaStr
         print conceptStr
@@ -86,7 +86,7 @@ def quant_post():
         print sellFundPercentStr
 
         # todo 待完成
-        periodType = 'D'
+        periodType = 'D' # period
         changePeriod = '20'
         startDateStr = '2012-1-1'
         endDateStr = '2013-1-1'
@@ -100,7 +100,7 @@ def quant_post():
         sellConditionlist = ['gx', 'asc5']
 
         # todo 返回策略收益率结果，，策略曲线
-        result = frameM.execute(periodType, changePeriod, startDateStr, endDateStr, initMoney, stocktype_list,
+        result = frameM.execute('3', periodType, changePeriod, startDateStr, endDateStr, initMoney, stocktype_list,
                                 stocklist, stockExpression,
                                 baseVariableExpression, conditionVariableExpression, buyConditionlist,
                                 sellConditionlist)
@@ -155,7 +155,7 @@ def json_index():
     conn = bt.getConnection()
     # 查询资金信息
     accountDf = st.getAccountListByStrategyId(c.strategyId, conn)
-    accountDf['date'] = accountDf['tradedate'].map(lambda x: time.mktime(x.timetuple()))
+    accountDf['date'] = accountDf['tradedate'].map(lambda x: time.mktime(x.timetuple())*1000)
     assetsDf = accountDf[['date', 'price']]
     assetsList = [list(x) for x in assetsDf.values]
     print assetsList
