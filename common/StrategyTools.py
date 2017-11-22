@@ -32,7 +32,7 @@ import traceback
        （仓位价格*仓位数量+订单价格*订单数量）/（仓位数量+订单数量）
 
 '''
-def order(orderList, stockDict, ip, conn):
+def order(orderList, oldstocklist, stockDict, ip, conn):
     # print orderList
     orderListNew = []
     try:
@@ -43,6 +43,8 @@ def order(orderList, stockDict, ip, conn):
         tradedate = orderFirst.tradedate
         tradedateStr = datetime.strftime(tradedate, '%Y-%m-%d')
         for order in orderList:
+            if order.stockcode in oldstocklist:
+                continue
             v = (order.strategyId, order.stockcode, order.tradedate, order.price, order.volume)
             # print v
             orderListNew.append(v)
@@ -84,7 +86,8 @@ def order(orderList, stockDict, ip, conn):
                 #print type(order.price)
                 #print type(order.volume)
                 #print order.price
-                tradeMoney = tradeMoney - order.price * order.volume
+                if order.stockcode not in oldstocklist:
+                    tradeMoney = tradeMoney - order.price * order.volume
                 if order.stockcode not in positionStocklist:
                     v = (order.strategyId, order.stockcode, order.tradedate, order.price, order.price, order.volume)
                     positionInsertList.append(v)
@@ -115,8 +118,10 @@ def order(orderList, stockDict, ip, conn):
                 p = positionMap[key]
                 d = (order.strategyId, order.stockcode, order.tradedate, stockDict.loc[p[1], 'FACTOR_VALUE'], p[4], p[5]*-1)
                 positionDeleteList.append(d)
+                print "卖出前："+str(tradeMoney)+"--"+str(stockDict.loc[p[1], 'FACTOR_VALUE'])+"--"+str(p[4])
                 # 如果订单的数量为0，全仓卖出，使用仓位数量，加钱
                 tradeMoney = tradeMoney + order.price * p[5]
+                print "卖出后："+str(tradeMoney)
 
         # 新增
         for p in positionInsertList:
@@ -146,6 +151,7 @@ def order(orderList, stockDict, ip, conn):
         ip.tradeMoney = tradeMoney
 
         conn.commit()
+        print 'db end...........................................'
     except Exception,e:
         traceback.print_exc()
 
@@ -223,24 +229,25 @@ def saveAccount(strategyId, tradedate, accountMoney, conn):
 TODO 更新仓位
 1、通过昨日仓位、今日订单生成今日仓位
 2、如果今日没有订单，复制昨日仓位
+'''
 def updatePosition(positionList):
     positionListNew = []
     try:
         for position in positionList:
             # print order
-            v = (position.strategyId, position.stockcode, position.tradedate, position.price, position.volume)
+            v = (position.strategyId, position.stockcode, position.tradedate, position.current_price, position.price, position.volume)
             # print v
             positionListNew.append(v)
 
         conn = bt.getConnection()
         cur = conn.cursor()
         cur.executemany(
-            'insert into r_position(strategy_id, stockcode, tradedate, price, volume) values(%s, %s, %s, %s, %s)',
+            'insert into r_position(strategy_id, stockcode, tradedate, current_price, price, volume) values(%s, %s, %s, %s, %s, %s)',
             positionListNew)
         conn.commit()
     except Exception,e:
         traceback.print_exc()
-'''
+
 
 '''
 获取账户信息
@@ -282,6 +289,14 @@ def getPositionListByStrategyId(strategyId, conn):
 '''
 def getAccountListByStrategyId(strategyId, conn):
     sql = "select strategy_id, stockcode, tradedate, current_price, price, volume from r_position where strategy_id="+str(strategyId)+" and stockcode='000000' order by tradedate"
+    positionDf = pd.read_sql(sql, conn)
+    return positionDf
+
+'''
+获取仓位列表
+'''
+def getPositionListByTradedate(strategyId, startDateStr, endDateStr, conn):
+    sql = "select strategy_id, stockcode, tradedate, current_price, price, volume from r_position where strategy_id="+str(strategyId)+" and tradedate>=DATE_FORMAT('"+startDateStr+"', '%Y-%m-%d') and tradedate<=DATE_FORMAT('"+endDateStr+"', '%Y-%m-%d') ORDER BY tradedate"
     positionDf = pd.read_sql(sql, conn)
     return positionDf
 

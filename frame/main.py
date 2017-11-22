@@ -55,8 +55,8 @@ def run():
     func_init = m["init"]
     func_init()
     conn = bt.getConnection()
-    print c.startDateStr
-    print c.endDateStr
+    #print c.startDateStr
+    #print c.endDateStr
     df = bt.getTradeDay(conn, start_date_str=c.startDateStr, end_date_str=c.endDateStr, type=1)
     print df
     # 按日期执行策略
@@ -112,18 +112,22 @@ def generateCode():
     #c()
     # print c.getStockList()
 
-def getSummary(benchCode, startDateStr, endDateStr):
+def getSummary(strategyId, benchCode, startDateStr, endDateStr):
     conn = cbt.getConnection()
     t = MysqlBasedata.MysqlBasedata()
     df_bench = t.get_history_index_data_by_date(benchCode, startDateStr, endDateStr, None)
     df_bench = df_bench.sort_values(by='tradedate', ascending=True)
-    sql = "SELECT * from r_position where strategy_id='2' ORDER BY tradedate"
-    df_position = pd.read_sql(sql, conn)
+    #sql = "SELECT * from r_position where strategy_id='"+stategyId+"' and tradedate ORDER BY tradedate"
+    #df_position = pd.read_sql(sql, conn)
+    df_position = st.getPositionListByTradedate(strategyId, startDateStr, endDateStr, conn)
     rsumm = returnSummary.ReturnSummary(df_position, df_bench)
     summ = rsumm.get_summary()
     print summ
     # total asset data
     print rsumm.df_assets
+    # rsumm.df_assets = rsumm.df_assets[rsumm.df_assets]
+    rsumm.df_assets.to_csv('asserts_.csv', index=False, sep=',')
+    print pd.read_csv('asserts_.csv')
     return rsumm, summ
 
 '''
@@ -152,7 +156,7 @@ def execute(strategyId, periodType, changePeriod, startDateStr, endDateStr, init
     #filename = str(int(time.time()))+'.py'
     filename = "my_"+strategyId+".py"
     #os.mknod("test.txt")
-    print filename
+    # print filename
     f = file(filename, 'w')
     f.write(codestr)
     f.close()
@@ -160,18 +164,18 @@ def execute(strategyId, periodType, changePeriod, startDateStr, endDateStr, init
     m = load.load(filename)
     conn = bt.getConnection()
     st.deleteByStrategyId(strategyId, conn)
-    df = bt.getTradeDay(conn, start_date_str=c.startDateStr, end_date_str=c.endDateStr, type=1)
+    df = bt.getTradeDay(conn, start_date_str=startDateStr, end_date_str=endDateStr, type=1)
     # 按日期执行策略
     ip = InitParam.InitParam(strategyId, periodType, changePeriod, startDateStr, endDateStr, initMoney)
 
     datelist = df['tradedate'].tolist()
     func = m["handle_data"]
     for d in datelist:
-        print d
-        print ip
+        # print d
+        # print ip
         func(d, ip)
 
-    summary = getSummary(benchCode, startDateStr, endDateStr)
+    summary = getSummary(strategyId, benchCode, startDateStr, endDateStr)
     # print summary
     os.remove(filename)
     return summary
@@ -180,7 +184,7 @@ if __name__ == '__main__':
     #shutil.copyfile('D:\workspace\TestStrategy\common\BaseTools.py', 'D:\workspace\TestStrategy\common\BaseTools1.py')
     #execfile('D:\workspace\TestStrategy\common\BaseTools1.py')
     c.startDateStr='2010-1-1'
-    c.endDateStr='2017-1-1'
+    c.endDateStr='2010-6-1'
     # run()
     # generateCode()
     #print my.getStockList()
@@ -188,15 +192,18 @@ if __name__ == '__main__':
     periodType = 'D'
     changePeriod = 20
     startDateStr = '2011-1-1'
-    endDateStr = '2017-1-1'
+    endDateStr = '2011-6-1'
     initMoney = 1000000
     stocktype_list = ['300', '500', '50']
-    stocklist = [('300', '2016-1-1', '2017-1-1'), ('500', '2017-1-1', '2017-8-1'), ('50', '2017-1-1', '2017-8-1')]
+    stocklist = [('300', '2016-1-1', '2016-3-1'), ('500', '2017-1-1', '2017-8-1'), ('50', '2017-1-1', '2017-8-1')]
     stockExpression = "(s1Ns2)Us3"
     baseVariableExpression = r'MA5 = MA(trade_closeprice,5)\nMA10 = MA(trade_closeprice, 10)'
     conditionVariableExpression = r'gx = CROSS(MA5, MA10)\nasc5 = SORT(MA5, asc, 5)'
     buyConditionlist = ['asc5']
     sellConditionlist = ['gx', 'asc5']
 
-    execute('3', periodType, changePeriod, startDateStr, endDateStr, initMoney, stocktype_list, stocklist, stockExpression,
-            baseVariableExpression, conditionVariableExpression, buyConditionlist, sellConditionlist)
+    #execute('3', periodType, changePeriod, startDateStr, endDateStr, initMoney, stocktype_list, stocklist, stockExpression,
+    #        baseVariableExpression, conditionVariableExpression, buyConditionlist, sellConditionlist)
+    #everyStockCash = 10000
+    #print everyStockCash / 5.6
+    #print int(everyStockCash / (5.6 * 100))

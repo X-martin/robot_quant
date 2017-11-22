@@ -6,14 +6,14 @@
 
 '''
 # 策略ID
-strategyId = "3"
+# strategyId = "3"
 # 开始日期
-startDateStr = ''
+# startDateStr = ''
 # 截至日期
-endDateStr = ''
+# endDateStr = ''
 
 # 初始化资金
-initMoney = 0.0
+# initMoney = 0.0
 
 # 初始化返还金额  （卖出股票为正，买入股票为负）
 tradeMoney = 0
@@ -22,10 +22,10 @@ orderList = {}
 positionList = {}
 
 # 自定义参数词典
-diyParams = {}
+# diyParams = {}
 
-periodType='D'
-changePeriod=20
+# periodType='D'
+# changePeriod=20
 
 currentPeriod = 1
 

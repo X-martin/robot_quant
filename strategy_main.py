@@ -7,11 +7,9 @@
 
 '''
 
-import common.Constants as c
 import common.StrategyTools as st
 import common.BaseTools as bt
 import frame.main as frameM
-import frame.returnSummary as returnSummary
 
 import json
 import time
@@ -87,10 +85,10 @@ def quant_post():
 
         # todo 待完成
         periodType = 'D' # period
-        changePeriod = '20'
+        changePeriod = 20
         startDateStr = '2012-1-1'
         endDateStr = '2013-1-1'
-        initMoney = '1000000'
+        initMoney = 1000000
         stocktype_list = ['300', '500', '50']
         stocklist = [('300', '2010-1-1', '2012-1-1'), ('500', '2017-1-1', '2017-8-1'), ('50', '2017-1-1', '2017-8-1')]
         stockExpression = "(s1Ns2)Us3"
@@ -98,9 +96,11 @@ def quant_post():
         conditionVariableExpression = r'gx = CROSS(MA5, MA10)\nasc5 = SORT(MA5, desc, 5)'
         buyConditionlist = ['asc5']
         sellConditionlist = ['gx', 'asc5']
+        # todo 获取最大的策略id，加1
+        strategyId = '3'
 
         # todo 返回策略收益率结果，，策略曲线
-        result = frameM.execute('3', periodType, changePeriod, startDateStr, endDateStr, initMoney, stocktype_list,
+        result = frameM.execute(strategyId, periodType, changePeriod, startDateStr, endDateStr, initMoney, stocktype_list,
                                 stocklist, stockExpression,
                                 baseVariableExpression, conditionVariableExpression, buyConditionlist,
                                 sellConditionlist)
@@ -112,16 +112,20 @@ def quant_post():
         summ = rsumm.get_summary()
         '''
 
-        print type(result)
         summaryDf = result[1].T
+        asserts = result[0].df_assets
+        asserts['date_new'] = asserts['date'].map(lambda x: time.mktime(x.timetuple())*1000)
+        assetsDf = asserts[['date_new', 'asset']]
+        assetsDf.to_csv('asserts_'+strategyId+'.csv', index=False, sep=',')
+
 
         conn = bt.getConnection()
         # 查询订单信息
-        orderDf = st.getOrderList(c.strategyId, conn)
+        orderDf = st.getOrderList(strategyId, conn)
         # 查询仓位信息
-        positionDf = st.getPositionListByStrategyId(c.strategyId, conn)
+        positionDf = st.getPositionListByStrategyId(strategyId, conn)
         # 查询资金信息
-        # accountDf = st.getAccountListByStrategyId(c.strategyId, conn)
+        # accountDf = st.getAccountListByStrategyId(strategyId, conn)
         summaryList = [tuple(x) for x in summaryDf.values]
         orderList = [tuple(x) for x in orderDf.values]
         positionList = [tuple(x) for x in positionDf.values]
@@ -153,10 +157,16 @@ def support_jsonp(f):
 def json_index():
     # print 'start'
     conn = bt.getConnection()
+    strategyId = '3'
+    #asserts.to_csv('asserts_' + strategyId + '.txt', index=False, sep='')
+    assetsDf = pd.read_csv('asserts_' + strategyId + '.csv')
+    '''
     # 查询资金信息
     accountDf = st.getAccountListByStrategyId(c.strategyId, conn)
     accountDf['date'] = accountDf['tradedate'].map(lambda x: time.mktime(x.timetuple())*1000)
     assetsDf = accountDf[['date', 'price']]
+    '''
+    #df = assetsDf[['date', 'asset']]
     assetsList = [list(x) for x in assetsDf.values]
     print assetsList
     return Response(json.dumps(assetsList), mimetype='application/json')

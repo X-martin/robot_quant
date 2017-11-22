@@ -10,6 +10,7 @@ import common.BaseTools as cbt
 import common.StrategyTools as cst
 import common.MysqlBasedata as MysqlBasedata
 import common.StockOrder as StockOrder
+import common.StockPosition as StockPosition
 import common.FormulaUtil as FormulaUtil
 
 import frame.interp as intp
@@ -48,7 +49,7 @@ def trade(tradedate, ip):
     # 如果是调仓日期，进入策略逻辑
     # 获取票池
     stocklist = getStockList(tradedate)
-    print stocklist
+    # print stocklist
     # 如果股票池为0
     if len(stocklist) == 0:
         # 新增资金账户信息，拷贝前一天仓位信息
@@ -68,30 +69,49 @@ def trade(tradedate, ip):
     currentOrderlist = []
 
     lastAccountDateStr = cst.getLastAccountDate(ip.strategyId, conn)
+    print lastAccountDateStr
     positionList = []
     # 如果仓位交易日不为空，查询仓位信息，复制仓位信息到新的交易日
     if lastAccountDateStr != None:
         positionDf = cst.getPositionList(ip.strategyId, lastAccountDateStr, conn)
+        print positionDf
         positionList = positionDf.values
 
+    # ip.initMoney
+    oldstocklist = []
+    newPositionList = []
     # 通过卖出条件得出卖出股票列表,并将卖出股票列表放入订单
     for position in positionList:
         code = position[1]
-        if code in buystocklist:
-            buystocklist.remove(code)
-            continue
+        price = stockPriceDf.loc[code, 'FACTOR_VALUE']
+        p = StockPosition.StockPosition(ip.strategyId, code, tradedate, price, position[4], position[5]) # position.strategyId, position.stockcode, position.tradedate, position.price, position.volume
+        newPositionList.append(p)
         print code
-        print stockPriceDf.loc[code, 'FACTOR_VALUE']
-        o = StockOrder.StockOrder(ip.strategyId, code, tradedate, stockPriceDf.loc[code, 'FACTOR_VALUE'], 0)
-        print o
+        if code in buystocklist:
+            print '重复-------------------------------------------'
+            #buystocklist.remove(code)
+            oldstocklist.append(code)
+            continue
+        #print code
+        #print stockPriceDf.loc[code, 'FACTOR_VALUE']
+        ip.initMoney = ip.initMoney + position[5] * price
+        print 'sell-------------------------------------------'
+        o = StockOrder.StockOrder(ip.strategyId, code, tradedate, price, 0)
+        #print o
         currentOrderlist.append(o)
-    # 买入,并将买入股票列表放入订单
-    for code in buystocklist:
-        o = StockOrder.StockOrder(ip.strategyId, code, tradedate, stockPriceDf.loc[code, 'FACTOR_VALUE'], 100)
-        currentOrderlist.append(o)
-    print currentOrderlist
-    # 订单入库，并更新仓位
-    cst.order(currentOrderlist, stockPriceDf, ip, conn)
+    newstockNum = len(buystocklist) - len(oldstocklist)
+    if newstockNum > 0:
+        everyStockCash = ip.initMoney / newstockNum
+        # 买入,并将买入股票列表放入订单
+        for code in buystocklist:
+            price = stockPriceDf.loc[code, 'FACTOR_VALUE']
+            o = StockOrder.StockOrder(ip.strategyId, code, tradedate, price, int(everyStockCash / (price*100))*100)
+            currentOrderlist.append(o)
+        print currentOrderlist
+        # 订单入库，并更新仓位
+        cst.order(currentOrderlist, oldstocklist, stockPriceDf, ip, conn)
+    else:
+        cst.updatePosition(newPositionList)
 
 
 '''
@@ -121,7 +141,7 @@ def updatePosition(tradedate, stockPriceDf, ip, conn):
             # 更新仓位日期
             positionDf['TRADEDATE'] = tradedate
             positionList = [tuple(x) for x in positionDf.values]
-            print positionList
+            # print positionList
             positionListNew = []
             # 更新当前实时价格
             for p in positionList:
@@ -131,8 +151,9 @@ def updatePosition(tradedate, stockPriceDf, ip, conn):
 
 def updatePositionAccount(tradedate, ip):
     conn = cbt.getConnection()
-    print ip.initMoney
-    print ip.tradeMoney
+    if ip.currentPeriod % ip.changePeriod == 1:
+        print ip.initMoney
+        print ip.tradeMoney
     # 记录资金账户信息
     money = ip.initMoney + ip.tradeMoney
     cst.saveAccount(ip.strategyId, tradedate, money, conn)
