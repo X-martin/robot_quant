@@ -61,6 +61,8 @@ def trade(tradedate, ip):
     factor_txt = '{{baseVariableExpression}}'
     filter_txt = '{{conditionVariableExpression}}'
     d1, d2 = intp.interp(factor_txt, filter_txt)
+    print d1
+    print d2
     # 通过买入条件得出买入股票列表
     for key in {{buyConditionlist}}:
         buystocklist = d2[key].filter(buystocklist, tradedate)

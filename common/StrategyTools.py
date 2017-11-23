@@ -179,6 +179,19 @@ def getLastAccountDate(strategyId, conn):
     lastAccountDateStr = datetime.strftime(lastAccountDate[0], '%Y-%m-%d')
     return lastAccountDateStr
 
+'''
+strategyId
+'''
+
+def getMaxStrategyId(conn):
+    cur = conn.cursor()
+    # 查询最大日期
+    maxStrategyIdSql = 'select max(strategy_id) from r_position'
+    cur.execute(maxStrategyIdSql)
+    maxStrategyId = cur.fetchone()
+    if maxStrategyId[0] == None:
+        return 0
+    return maxStrategyId[0]
 
 '''
 保存仓位信息

@@ -11,6 +11,7 @@ import common.StrategyTools as st
 import common.BaseTools as bt
 import frame.main as frameM
 
+from datetime import *
 import json
 import time
 import pandas as pd
@@ -35,24 +36,27 @@ def quant_index():
 
 @app.route('/quant_post', methods=['POST', 'GET'])
 def quant_post():
+    print "start:",datetime.now()
+    start = datetime.now()
+
     summaryList = []
     orderList = []
     positionList = []
-    accountList = []
-    # 策略参数
-    startDateStr = request.form['startDate'];
-    endDateStr = request.form['endDate'];
-    changePeriod = request.form['interval'];
-    period = request.form['period'];
-    initMoney = request.form['initMoney'];
-    fee = request.form['fee'];
-    print startDateStr
-    print endDateStr
-    print changePeriod
-    print period
-    print initMoney
-    print fee
+    # accountList = []
     try:
+        # 策略参数
+        startDateStr = request.form['startDate']
+        endDateStr = request.form['endDate']
+        changePeriod = int(request.form['interval'])
+        period = request.form['period']
+        initMoney = float(request.form['initMoney'])
+        fee = request.form['fee']
+        print startDateStr
+        print endDateStr
+        print changePeriod
+        print period
+        print initMoney
+        print fee
         # 股票筛选条件
         constituentStockStr = request.form['constituentStockStr'];
         print constituentStockStr
@@ -70,47 +74,59 @@ def quant_post():
         print stockExpression
         print baseVariableExpression
         print conditionVariableExpression
+        formulastr = baseVariableExpression.split("\r\n")
+        print formulastr
+        factorlist = []
+        baseVariableExpressionStr = ''
+        for f in formulastr:
+            baseVariableExpressionStr +=f+r"\n"
+        baseVariableExpression = baseVariableExpressionStr[:-2]
+
+        conditionVariableExpressionStr = ''
+        formulastr = conditionVariableExpression.split("\r\n")
+        print formulastr
+        for f in formulastr:
+            conditionVariableExpressionStr +=f+r"\n"
+        conditionVariableExpression = conditionVariableExpressionStr[:-2]
+        print baseVariableExpression
+        print conditionVariableExpression
 
         # 买入条件、卖出条件
-        buyConditionStr = request.form['buyConditionStr'];
-        buyFundPercentStr = request.form['buyFundPercentStr'];
-        buyWeightTypeStr = request.form['buyWeightTypeStr'];
-        sellConditionStr = request.form['sellConditionStr'];
-        sellFundPercentStr = request.form['sellFundPercentStr'];
+        buyConditionStr = request.form['buyConditionStr']
+        buyFundPercentStr = request.form['buyFundPercentStr']
+        buyWeightTypeStr = request.form['buyWeightTypeStr']
+        sellConditionStr = request.form['sellConditionStr']
+        sellFundPercentStr = request.form['sellFundPercentStr']
         print buyConditionStr
         print buyFundPercentStr
         print buyWeightTypeStr
         print sellConditionStr
         print sellFundPercentStr
+        buyConditionlist = buyConditionStr.split(",")
+        sellConditionlist = sellConditionStr.split(",")
 
         # todo 待完成
         periodType = 'D' # period
-        changePeriod = 20
-        startDateStr = '2012-1-1'
-        endDateStr = '2013-1-1'
-        initMoney = 1000000
+        #changePeriod = 20
+        #startDateStr = '2011-1-1'
+        #endDateStr = '2013-1-1'
+        #initMoney = 1000000
         stocktype_list = ['300', '500', '50']
         stocklist = [('300', '2010-1-1', '2012-1-1'), ('500', '2017-1-1', '2017-8-1'), ('50', '2017-1-1', '2017-8-1')]
-        stockExpression = "(s1Ns2)Us3"
-        baseVariableExpression = r'MA5 = MA(trade_closeprice,5)\nMA10 = MA(trade_closeprice, 10)'
-        conditionVariableExpression = r'gx = CROSS(MA5, MA10)\nasc5 = SORT(MA5, desc, 5)'
-        buyConditionlist = ['asc5']
-        sellConditionlist = ['gx', 'asc5']
+        #stockExpression = "(s1Ns2)Us3"
+        #baseVariableExpression = r'MA5 = MA(trade_closeprice,5)\nMA10 = MA(trade_closeprice, 10)'
+        #conditionVariableExpression = r'gx = CROSS(MA5, MA10)\nasc5 = SORT(MA5, desc, 5)'
+        #buyConditionlist = ['asc5']
+        #sellConditionlist = ['gx', 'asc5']
+        conn = bt.getConnection()
         # todo 获取最大的策略id，加1
-        strategyId = '3'
+        strategyId = str(st.getMaxStrategyId(conn) + 1)
 
         # todo 返回策略收益率结果，，策略曲线
         result = frameM.execute(strategyId, periodType, changePeriod, startDateStr, endDateStr, initMoney, stocktype_list,
                                 stocklist, stockExpression,
                                 baseVariableExpression, conditionVariableExpression, buyConditionlist,
                                 sellConditionlist)
-        #summ = result.get_summary()
-        '''
-        df_bench = pd.read_pickle('frame/test_bench_returnSummary.pkl')
-        df_position = pd.read_pickle('frame/test_data_returnSummary.pkl')
-        rsumm = returnSummary.ReturnSummary(df_position, df_bench)
-        summ = rsumm.get_summary()
-        '''
 
         summaryDf = result[1].T
         asserts = result[0].df_assets
@@ -119,7 +135,6 @@ def quant_post():
         assetsDf.to_csv('asserts_'+strategyId+'.csv', index=False, sep=',')
 
 
-        conn = bt.getConnection()
         # 查询订单信息
         orderDf = st.getOrderList(strategyId, conn)
         # 查询仓位信息
@@ -129,11 +144,14 @@ def quant_post():
         summaryList = [tuple(x) for x in summaryDf.values]
         orderList = [tuple(x) for x in orderDf.values]
         positionList = [tuple(x) for x in positionDf.values]
+
         # accountList = [tuple(x) for x in accountDf.values]
     except Exception, e:
         traceback.print_exc()
+    finish = datetime.now()
+    print "耗时：" , finish - start
 
-    return render_template('quant_result.html', orderList=orderList, positionList=positionList, summaryList=summaryList)
+    return render_template('quant_result.html', orderList=orderList, positionList=positionList, summaryList=summaryList, strategyId=strategyId)
 
 '''
 jsonp修饰
@@ -160,12 +178,6 @@ def json_index():
     strategyId = '3'
     #asserts.to_csv('asserts_' + strategyId + '.txt', index=False, sep='')
     assetsDf = pd.read_csv('asserts_' + strategyId + '.csv')
-    '''
-    # 查询资金信息
-    accountDf = st.getAccountListByStrategyId(c.strategyId, conn)
-    accountDf['date'] = accountDf['tradedate'].map(lambda x: time.mktime(x.timetuple())*1000)
-    assetsDf = accountDf[['date', 'price']]
-    '''
     #df = assetsDf[['date', 'asset']]
     assetsList = [list(x) for x in assetsDf.values]
     print assetsList
@@ -203,17 +215,18 @@ def result_index():
 @app.route('/getfactorlist')
 def getfactorlist():
     formula = request.args.get('formula', 0, type=str)
-    print formula
+    #print formula
     formulastr = formula.split(lineBreak)
-    print formulastr
+    #print formulastr
     factorlist = []
     for f in formulastr:
+        #print f
         fArr = f.split("=")
         if len(fArr) == 2:
             factorlist.append(fArr[0])
     # factorlist.append(formula)
-    print factorlist
-    print jsonify(result=factorlist)
+    #print factorlist
+    #print jsonify(result=factorlist)
     return jsonify(result=factorlist)
 
 

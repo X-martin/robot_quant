@@ -151,7 +151,7 @@ def execute(strategyId, periodType, changePeriod, startDateStr, endDateStr, init
     template = env.get_template('mytemplate.html')
     codestr = template.render(stockExpression='', stocklistStr=stocklistStr, baseVariableExpression=baseVariableExpression, \
                               conditionVariableExpression=conditionVariableExpression ,buyConditionlist=buyConditionlist, sellConditionlist=sellConditionlist)
-    print codestr
+    # print codestr
 
     #filename = str(int(time.time()))+'.py'
     filename = "my_"+strategyId+".py"
@@ -207,3 +207,4 @@ if __name__ == '__main__':
     #everyStockCash = 10000
     #print everyStockCash / 5.6
     #print int(everyStockCash / (5.6 * 100))
+    print 'a,b,dccc,d'.split(",")
