@@ -59,7 +59,8 @@
         </script>
 
         <h3>订单列表</h3>
-        <table id="quantList2" border="1">
+        <div style="overflow-x: auto; overflow-y: auto; height: 200px; width:1000px;">
+        <table id="quantList2" border="1" width="1000px" height="200px">
             <tr>
                 <td class="col1">交易日期</td>
                 <td class="col2">股票代码</td>
@@ -81,8 +82,10 @@
             </tr>
             {% endfor %}
         </table>
+        </div>
         <h3>仓位列表</h3>
-        <table id="quantList3" border="1">
+        <div style="overflow-x: auto; overflow-y: auto; height: 200px; width:1000px;">
+        <table id="quantList3" border="1" width="1000px" height="200px">
             <tr>
                 <td class="col1">交易日期</td>
                 <td class="col2">股票代码</td>
@@ -104,6 +107,7 @@
             </tr>
             {% endfor %}
         </table>
+        </div>
     </div>
 
 </body>
