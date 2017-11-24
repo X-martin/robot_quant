@@ -18,17 +18,17 @@
         <ul>
             <li class="col1">开始日期</li>
             <li class="col2">结束日期</li>
-            <li class="col3">间隔</li>
-            <li class="col4">周期</li>
+            <li class="col3">调仓周期</li>
+            <li class="col4">周期类型</li>
             <li class="col5">初始资金</li>
             <li class="col6">手续费</li>
         </ul>
         <ul>
             <li class="col1"><input class="Wdate" type="text" style="width:100px;" id="startDate", name="startDate" value="{{startDate}}" onClick="WdatePicker({startDate:'2000-01-01',minDate:'2000-1-1',maxDate:'%y-%M-%d'})"></li>
             <li class="col2"><input class="Wdate" type="text" style="width:100px;" id="endDate", name="endDate" value="{{endDate}}" onClick="WdatePicker({startDate:'2000-01-01',minDate:'2000-1-1',maxDate:'%y-%M-%d'})"></li>
-            <li class="col3"><input type="text" id="interval" name="interval" /></li>
-            <li class="col4"><input type="text" id="period" name="period" /></li>
-            <li class="col5"><input type="text" id="initMoney" name="initMoney" value="0.0" /></li>
+            <li class="col3"><input type="text" id="interval" name="interval" value="20" /></li>
+            <li class="col4"><select id="period"><option value="D">日</option></select></li>
+            <li class="col5"><input type="text" id="initMoney" name="initMoney" value="1000000.0" /></li>
             <li class="col6"><input type="text" id="fee" name="fee" /></li>
         </ul>
     </div>
@@ -203,9 +203,49 @@
         }
 
         function backtesting(){
-            //alert("回测");
+            // alert("回测");
+            startDate = $("#startDate").val();
+            endDate = $("#endDate").val();
+            interval = $("#interval").val();
+            period = $("#period").val();
+            initMoney = $("#initMoney").val();
+            if (startDate == '') {
+                alert("开始日期不能为空");
+                return;
+            }
+            if (endDate == '') {
+                alert("结束日期不能为空");
+                return;
+            }
+            if (interval == '') {
+                alert("调仓周期不能为空");
+                return;
+            }
+            if (period == '') {
+                alert("周期类型不能为空");
+                return;
+            }
+            if (initMoney == '') {
+                alert("初始资金不能为空");
+                return;
+            }
 
-            $("#loading").show();
+            stockExpression = $("#stockExpression").val();
+            baseVariableExpression = $("#baseVariableExpression").val();
+            conditionVariableExpression = $("#conditionVariableExpression").val();
+            if (stockExpression == '') {
+                alert("回测票池表达式不能为空");
+                return;
+            }
+            if (baseVariableExpression == '') {
+                alert("基础变量表达式不能为空");
+                return;
+            }
+            if (conditionVariableExpression == '') {
+                alert("条件变量表达式不能为空");
+                return;
+            }
+
             $('input').attr("readonly","readonly")
             // 票池来源
             constituentStockStr = "";
@@ -299,6 +339,16 @@
             }
             $("#sellFundPercentStr").val(sellFundPercentStr);
 
+            if (buyConditionStr == '0') {
+                alert("买入条件不能为空");
+                return;
+            }
+            //if (1==1) {
+                //alert("正常");
+                //return;
+            //}
+
+            $("#loading").show();
 
             document.getElementById("quantForm").submit();
         }
