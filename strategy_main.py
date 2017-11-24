@@ -121,6 +121,7 @@ def quant_post():
         conn = bt.getConnection()
         # todo 获取最大的策略id，加1
         strategyId = str(st.getMaxStrategyId(conn) + 1)
+        print strategyId
 
         # todo 返回策略收益率结果，，策略曲线
         result = frameM.execute(strategyId, periodType, changePeriod, startDateStr, endDateStr, initMoney, stocktype_list,
@@ -134,7 +135,7 @@ def quant_post():
         assetsDf = asserts[['date_new', 'asset']]
         assetsDf.to_csv('asserts_'+strategyId+'.csv', index=False, sep=',')
 
-
+        conn = bt.getConnection()
         # 查询订单信息
         orderDf = st.getOrderList(strategyId, conn)
         # 查询仓位信息
@@ -173,14 +174,14 @@ def support_jsonp(f):
 @app.route('/json_index', methods=['POST', 'GET'])
 @support_jsonp
 def json_index():
-    # print 'start'
     conn = bt.getConnection()
-    strategyId = '3'
-    #asserts.to_csv('asserts_' + strategyId + '.txt', index=False, sep='')
+    # print request
+    print request.args.get('strategyId')
+    strategyId = request.args.get('strategyId')
     assetsDf = pd.read_csv('asserts_' + strategyId + '.csv')
-    #df = assetsDf[['date', 'asset']]
     assetsList = [list(x) for x in assetsDf.values]
-    print assetsList
+    #print st.getPositionListByStrategyId(strategyId, conn)
+    #print assetsList
     return Response(json.dumps(assetsList), mimetype='application/json')
 
 

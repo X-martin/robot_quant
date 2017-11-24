@@ -213,8 +213,8 @@ def savePosition(positionList, conn):
 '''
 def deleteByStrategyId(strategyId, conn):
     try:
-        deleteOrderSql = "DELETE from r_order where strategy_id='"+strategyId+"'"
-        deletePositionSql = "DELETE from r_position where strategy_id='"+strategyId+"'"
+        deleteOrderSql = "DELETE from r_order where strategy_id="+strategyId
+        deletePositionSql = "DELETE from r_position where strategy_id="+strategyId
         cur = conn.cursor()
         cur.execute(deleteOrderSql)
         cur.execute(deletePositionSql)
@@ -266,7 +266,7 @@ def updatePosition(positionList):
 获取账户信息
 '''
 def getAccountInfo(strategyId, tradedate, conn):
-    sql = "select * from r_position where strategy_id="+str(strategyId) + " and stockcode='000000' and tradedate=DATE_FORMAT('"+tradedate+"', '%Y-%m-%d')"
+    sql = "select * from r_position where strategy_id="+ strategyId + " and stockcode='000000' and tradedate=DATE_FORMAT('"+tradedate+"', '%Y-%m-%d')"
     #print sql
     positionDf = pd.read_sql(sql, conn)
     return positionDf
@@ -275,7 +275,7 @@ def getAccountInfo(strategyId, tradedate, conn):
 获取仓位列表
 '''
 def getPositionList(strategyId, tradedate, conn):
-    sql = "select strategy_id, stockcode, tradedate, current_price, price, volume from r_position where strategy_id="+str(strategyId)+" and stockcode!='000000' and tradedate=DATE_FORMAT('"+tradedate+"', '%Y-%m-%d')"
+    sql = "select strategy_id, stockcode, tradedate, current_price, price, volume from r_position where strategy_id="+strategyId+" and stockcode!='000000' and tradedate=DATE_FORMAT('"+tradedate+"', '%Y-%m-%d')"
     positionDf = pd.read_sql(sql, conn)
     return positionDf
 
@@ -284,8 +284,7 @@ def getPositionList(strategyId, tradedate, conn):
 
 '''
 def getOrderList(strategyId, conn):
-    sql = "select * from r_order where strategy_id="+str(strategyId)+" order by tradedate"
-    #print sql
+    sql = "select * from r_order where strategy_id="+strategyId+" order by tradedate"
     orderDf = pd.read_sql(sql, conn)
     return orderDf
 
@@ -293,7 +292,7 @@ def getOrderList(strategyId, conn):
 获取仓位列表
 '''
 def getPositionListByStrategyId(strategyId, conn):
-    sql = "select strategy_id, stockcode, tradedate, current_price, price, volume from r_position where strategy_id="+str(strategyId)+" and stockcode!='000000' order by tradedate"
+    sql = "select strategy_id, stockcode, tradedate, current_price, price, volume from r_position where strategy_id="+strategyId+" and stockcode!='000000' order by tradedate"
     positionDf = pd.read_sql(sql, conn)
     return positionDf
 
@@ -301,7 +300,7 @@ def getPositionListByStrategyId(strategyId, conn):
 获取资金列表
 '''
 def getAccountListByStrategyId(strategyId, conn):
-    sql = "select strategy_id, stockcode, tradedate, current_price, price, volume from r_position where strategy_id="+str(strategyId)+" and stockcode='000000' order by tradedate"
+    sql = "select strategy_id, stockcode, tradedate, current_price, price, volume from r_position where strategy_id="+strategyId+" and stockcode='000000' order by tradedate"
     positionDf = pd.read_sql(sql, conn)
     return positionDf
 
@@ -309,7 +308,7 @@ def getAccountListByStrategyId(strategyId, conn):
 获取仓位列表
 '''
 def getPositionListByTradedate(strategyId, startDateStr, endDateStr, conn):
-    sql = "select strategy_id, stockcode, tradedate, current_price, price, volume from r_position where strategy_id="+str(strategyId)+" and tradedate>=DATE_FORMAT('"+startDateStr+"', '%Y-%m-%d') and tradedate<=DATE_FORMAT('"+endDateStr+"', '%Y-%m-%d') ORDER BY tradedate"
+    sql = "select strategy_id, stockcode, tradedate, current_price, price, volume from r_position where strategy_id="+strategyId+" and tradedate>=DATE_FORMAT('"+startDateStr+"', '%Y-%m-%d') and tradedate<=DATE_FORMAT('"+endDateStr+"', '%Y-%m-%d') ORDER BY tradedate"
     positionDf = pd.read_sql(sql, conn)
     return positionDf
 
@@ -330,3 +329,4 @@ positionList=[]
 
 #savePosition(1, orderList)
 '''
+
