@@ -267,7 +267,7 @@ def updatePosition(positionList):
 '''
 def getAccountInfo(strategyId, tradedate, conn):
     sql = "select * from r_position where strategy_id="+ strategyId + " and stockcode='000000' and tradedate=DATE_FORMAT('"+tradedate+"', '%Y-%m-%d')"
-    #print sql
+    #print sql 
     positionDf = pd.read_sql(sql, conn)
     return positionDf
 
