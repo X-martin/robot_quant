@@ -24,8 +24,8 @@ def init():
     # 周期类型 ：D、天 W、周 M、月
     cc.periodType = 'D'
     cc.changePeriod = 20
-    cc.startDateStr='2010-1-1'
-    cc.endDateStr='2012-1-1'
+    cc.startDateStr='2012-1-1'
+    cc.endDateStr='2013-1-1'
     cc.initMoney=1000000
 
 
@@ -74,7 +74,7 @@ def tradeNew(tradedate):
     buystocklist = stocklist
     # 计算得出中间条件、筛选股票的条件
     factor_txt = 'MA5 = MA(trade_closeprice,5)\nMA10 = MA(trade_closeprice, 10)'
-    filter_txt = 'gx = CROSS(MA5, MA10)\nasc5 = SORT(MA5, asc, 5)'
+    filter_txt = 'gx = CROSS(MA5, MA10)\nasc5 = SORT(MA5, desc, 5)'
     d1, d2 = intp.interp(factor_txt, filter_txt)
     # 通过买入条件得出买入股票列表
     for key in ['asc5']:
