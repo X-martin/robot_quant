@@ -43,6 +43,7 @@ def quant_post():
     orderList = []
     positionList = []
     # accountList = []
+    strategyId = None
     try:
         # 策略参数
         startDateStr = request.form['startDate']
@@ -121,7 +122,7 @@ def quant_post():
         conn = bt.getConnection()
         # todo 获取最大的策略id，加1
         strategyId = str(st.getMaxStrategyId(conn) + 1)
-        print strategyId
+        print "strategyId start:"+strategyId
 
         # todo 返回策略收益率结果，，策略曲线
         result = frameM.execute(strategyId, periodType, changePeriod, startDateStr, endDateStr, initMoney, stocktype_list,
