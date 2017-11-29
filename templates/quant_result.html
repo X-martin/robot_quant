@@ -24,7 +24,7 @@
         </table>
        <div id="container" style="height: 400px; min-width: 310px"></div>
         <script type="text/javascript">
-        $.getJSON('http://localhost:5000/json_index?filename=aapl-c.json&callback=?', function (data) {
+        $.getJSON('http://localhost:5000/json_index?filename=aapl-c.json&callback=?&strategyId={{strategyId}}', function (data) {
             // Create the chart
             Highcharts.stockChart('container', {
                 rangeSelector: {
