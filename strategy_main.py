@@ -112,8 +112,8 @@ def quant_post():
         #startDateStr = '2011-1-1'
         #endDateStr = '2013-1-1'
         #initMoney = 1000000
-        stocktype_list = ['300', '500', '50']
-        stocklist = [('300', '2010-1-1', '2012-1-1'), ('500', '2017-1-1', '2017-8-1'), ('50', '2017-1-1', '2017-8-1')]
+        stocktype_list = constituentStockStr.split(",")
+        stocklist = constituentStockStr.split(",")#[('300', '2010-1-1', '2012-1-1'), ('500', '2017-1-1', '2017-8-1'), ('50', '2017-1-1', '2017-8-1')]
         #stockExpression = "(s1Ns2)Us3"
         #baseVariableExpression = r'MA5 = MA(trade_closeprice,5)\nMA10 = MA(trade_closeprice, 10)'
         #conditionVariableExpression = r'gx = CROSS(MA5, MA10)\nasc5 = SORT(MA5, desc, 5)'
