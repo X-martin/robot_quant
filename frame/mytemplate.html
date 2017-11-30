@@ -22,8 +22,10 @@ from datetime import datetime
 def getStockList(tradedate):
     tbd = MysqlBasedata.MysqlBasedata()
 {{stocklistStr}}
-    return tbd.get_stocklist_by_type(tradedate, '300')
-
+    # return tbd.get_stocklist_by_type(tradedate, '300')
+    s = eval("FormulaUtil.l1_analysis(\""+stockExpression+"\")")
+    s = s.replace("\'", "")
+    return s.split(',')
 
 def trade(tradedate, ip):
     # 数据库操作类初始化
