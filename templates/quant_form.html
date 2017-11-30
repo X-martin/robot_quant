@@ -51,8 +51,9 @@
                         <input type="hidden" id="constituentStockStr" name="constituentStockStr" />
                         <select name="constituentStock">
                             <option value="0">请选择</option>
-                            <option value="hs300">沪深300</option>
-                            <option value="zz500">中证500</option>
+                            <option value="50">上证50</option>
+                            <option value="300">沪深300</option>
+                            <option value="500">中证500</option>
                         </select>
                     </td>
                     <td>
@@ -143,7 +144,7 @@
         // 增加票池行
         function addStockListRow() {
             i = i + 1;
-            stocklistHtml = '<tr id="stockTableTr_'+i+'"><td>票池'+i+'</td><td><select name="constituentStock"><option value="0">请选择</option><option value="hs300">沪深300</option><option value="zz500">中证500</option></select></td><td><select name="area"><option value="0">请选择</option><option value="1">北京</option><option value="2">上海</option><option value="3">天津</option><option value="4">重庆</option></select></td><td><select name="concept"><option value="0">请选择</option><option value="1">新零售</option><option value="2">区块链</option></select></td><td><select name="industry"><option value="0">请选择</option><option value="1">银行</option><option value="2">券商</option></select></td><td><input type="button" value="删除" onclick="delStockListRow(\''+i+'\')" /></td></tr>';
+            stocklistHtml = '<tr id="stockTableTr_'+i+'"><td>票池'+i+'</td><td><select name="constituentStock"><option value="0">请选择</option><option value="50">上证50</option><option value="300">沪深300</option><option value="500">中证500</option></select></td><td><select name="area"><option value="0">请选择</option><option value="1">北京</option><option value="2">上海</option><option value="3">天津</option><option value="4">重庆</option></select></td><td><select name="concept"><option value="0">请选择</option><option value="1">新零售</option><option value="2">区块链</option></select></td><td><select name="industry"><option value="0">请选择</option><option value="1">银行</option><option value="2">券商</option></select></td><td><input type="button" value="删除" onclick="delStockListRow(\''+i+'\')" /></td></tr>';
 
             // alert(stocklistHtml);
             $("#stockTable").append(stocklistHtml);
@@ -237,6 +238,8 @@
                 alert("回测票池表达式不能为空");
                 return;
             }
+
+
             if (baseVariableExpression == '') {
                 alert("基础变量表达式不能为空");
                 return;
@@ -264,7 +267,13 @@
                     constituentStockStr = constituentStockStr+',';
                 }
             }
+            // alert("股票池："+stockExpression)
             // alert(constituentStockStr);
+            stockExpressionArr = stockExpression.split("s");
+            if (constituentStocks.length != stockExpressionArr.length-1) {
+                alert("票池与票池表达式不一致，请检查确认");
+                return;
+            }
             $("#constituentStockStr").val(constituentStockStr);
             for (i=0;i<areas.length;i++){
                 areaStr=areaStr+areas[i].value;
@@ -343,10 +352,10 @@
                 alert("买入条件不能为空");
                 return;
             }
-            //if (1==1) {
+            if (1==1) {
                 //alert("正常");
                 //return;
-            //}
+            }
 
             $("#loading").show();
 
