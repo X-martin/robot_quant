@@ -21,12 +21,12 @@ import sys
 import os
 import time
 
-#import frame.my as my
 reload(sys)
 sys.setdefaultencoding('utf8')
 
 
 import traceback
+import common.FormulaUtil as FormulaUtil
 
 
 class loader(object):
@@ -50,7 +50,7 @@ class loader(object):
 def run():
     # 初始化
     load = loader()
-    m = load.load("my.py")
+    m = load.load("my.py_")
     #my.init()
     func_init = m["init"]
     func_init()
@@ -64,7 +64,7 @@ def run():
 
 
     #load = loader()
-    #m = load.load("my.py")
+    #m = load.load("my.py_")
     func = m["handle_data"]
 
     for d in datelist:
@@ -100,11 +100,11 @@ def generateCode():
                               stockExpression='', stocklistStr=stocklistStr, baseVariableExpression=r'MA5 = MA(trade_closeprice,5)\nMA10 = MA(trade_closeprice, 10)', \
                               conditionVariableExpression=r'gx = CROSS(MA5, MA10)\nasc5 = SORT(MA5, asc, 5)' ,buyConditionlist=buyConditionlist, sellConditionlist=sellConditionlist)
     print codestr
-    f = open('my.py', 'w')
+    f = open('my.py_', 'w')
     f.write(codestr)
     f.close()
     load = loader()
-    m = load.load("my.py")
+    m = load.load("my.py_")
     print m
     c = m["getStockList"]
     print dir(m)
@@ -142,11 +142,34 @@ def execute(strategyId, periodType, changePeriod, startDateStr, endDateStr, init
             baseVariableExpression, conditionVariableExpression, buyConditionlist, sellConditionlist):
     benchCode = '000300.SH'
     stocklistStr = ''
+    keywordList = []
     for index in range(len(stocklist)):
         i = index + 1
         stocktype = stocktype_list[index]
-        stocklistStr += "    s"+str(i) + " = str(tbd.get_stocklist_by_type(tradedate, '"+stocktype+"'))\n"
-    stocklistStr += "    s = \""+stockExpression+"\"\n"
+        stocklistStr += "    s"+str(i) + " = tbd.get_stocklist_by_type(tradedate, '"+stocktype+"')\n"
+        stocklistStr += "    str"+str(i) + " = \"\'\"+'\\',\\''.join(s"+str(i)+")+\"\'\"\n"
+        # stocklistStr += "    str"+str(i) + " = str"+str(i) + ".replace('\'', '')\n"
+        keywordList.append("str"+str(i))
+    stocklistStr += "    stockExpression = \""+stockExpression+"\".replace('s', 'str')\n"
+    stocklistStr += "    for str in "+str(keywordList)+":\n"
+    stocklistStr += "        stockExpression = stockExpression.replace(str, '\"+'+str+'+\"\')\n"
+    stocklistStr += "        print stockExpression\n"
+    # stocklistStr += "    stockExpression = stockExpression.replace(str, '"+'\"+str+'+"'\")\n"
+    # print stocklistStr
+    '''
+    str1 = "'"+'\',\''.join(s1)+"'"
+    str2 = "'"+'\',\''.join(s2)+"'"
+    str3 = "'"+'\',\''.join(s3)+"'"
+    s = "(str1Nstr2)Ustr3"
+    for str in ['str1', 'str2', 'str3']:
+        s = s.replace(str, '"+'+str+'+"')
+        print s
+    stockExpression = stockExpression.replace('s', 'str') #"(str11Nstr22)Ustr33"
+    for str in ['str11', 'str22', 'str33']:
+        s = s.replace(str, '"+' + str + '+"')
+        print s
+    # stocklistStr += "    s = \""+stockExpression+"\"\n"
+    '''
 
     template = env.get_template('mytemplate.html')
     codestr = template.render(stockExpression='', stocklistStr=stocklistStr, baseVariableExpression=baseVariableExpression, \
@@ -160,6 +183,7 @@ def execute(strategyId, periodType, changePeriod, startDateStr, endDateStr, init
     f = file(filename, 'w')
     f.write(codestr)
     f.close()
+
     load = loader()
     m = load.load(filename)
     conn = bt.getConnection()
@@ -186,7 +210,7 @@ if __name__ == '__main__':
     c.startDateStr='2010-1-1'
     c.endDateStr='2010-6-1'
     # run()
-    # generateCode()
+    #generateCode()
     #print my.getStockList()
     # print getSummary()
     periodType = 'D'
@@ -207,4 +231,32 @@ if __name__ == '__main__':
     #everyStockCash = 10000
     #print everyStockCash / 5.6
     #print int(everyStockCash / (5.6 * 100))
-    print 'a,b,dccc,d'.split(",")
+    # print 'a,b,dccc,d'.split(",")
+    '''
+    s1 = ['000001.SZ', '000002.SZ', '000003.SZ']
+    s2 = ['000003.SZ', '000004.SZ', '000005.SZ']
+    s3 = ['000006.SZ', '000007.SZ', '000008.SZ']
+    str1 = "'"+'\',\''.join(s1)+"'"
+    str2 = "'"+'\',\''.join(s2)+"'"
+    str3 = "'"+'\',\''.join(s3)+"'"
+    s = "(str1Nstr2)Ustr3"
+    for str in ['str1', 'str2', 'str3']:
+        s = s.replace(str, '"+'+str+'+"')
+        print s
+
+    stockExpression = "s1Us2".replace('s', 'str')
+    for str in ['str1', 'str2']:
+        stockExpression = stockExpression.replace(str, '"+'+str+'+"')
+        print stockExpression
+
+    exec s
+    sss = "FormulaUtil.l1_analysis(\""+s+"\")"
+    exec sss
+    s = eval(sss)
+    print s
+    sss = "print FormulaUtil.l1_analysis(\"(" + str1 + "N" + str2 + ")U"+str3+"\")"
+    exec sss
+    #print FormulaUtil.l1_analysis("('000001.SZ','000002.SZ','000003.SZ'U'000003.SZ','000004.SZ','000005.SZ')U'000006.SZ','000007.SZ','000008.SZ')"
+
+    #print "    stockExpression = stockExpression.replace(str, '\"+'+str+'+\"\')\n"
+    #s = s.replace(str, '"+' + str + '+"')'''
