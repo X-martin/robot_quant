@@ -88,15 +88,17 @@
         </div>
         <div>
             回测票池表达式:
-            <textarea id="stockExpression" name="stockExpression" cols="40" rows="2"></textarea>
+            <textarea id="stockExpression" name="stockExpression" cols="40" rows="2">s1Ns2</textarea>
+            (s1Us2)Ns3
         </div>
         <div>
             基础变量表达式:
-            <textarea id="baseVariableExpression" name="baseVariableExpression" cols="40" rows="8"></textarea>
+            <textarea id="baseVariableExpression" name="baseVariableExpression" cols="40" rows="8">MA5=MA(trade_closeprice,5)
+MA10=MA(trade_closeprice, 10)</textarea>
         </div>
         <div>
             条件变量表达式:
-            <textarea id="conditionVariableExpression" name="conditionVariableExpression" cols="40" rows="8" onblur="changefactorlist();"></textarea>
+            <textarea id="conditionVariableExpression" name="conditionVariableExpression" cols="40" rows="8" onblur="changefactorlist();">asc5=SORT(MA5, desc, 5)</textarea>
         </div>
         <div>买入卖出条件 <!--input type="button" value="添加" onclick="addConditionRow();"--></div>
         <div id="buyConditionDiv_1">
