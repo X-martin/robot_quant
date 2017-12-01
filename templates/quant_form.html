@@ -272,7 +272,8 @@ MA10=MA(trade_closeprice, 10)</textarea>
             // alert("股票池："+stockExpression)
             // alert(constituentStockStr);
             stockExpressionArr = stockExpression.split("s");
-            if (constituentStocks.length <= stockExpressionArr.length-1) {
+            // alert(constituentStocks.length+"-"+stockExpressionArr.length)
+            if (constituentStocks.length > stockExpressionArr.length-1) {
                 alert("票池与票池表达式不一致，请检查确认");
                 return;
             }
