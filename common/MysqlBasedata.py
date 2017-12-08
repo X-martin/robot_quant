@@ -306,8 +306,11 @@ def ___getTradeDay___(conn, start_date=None, end_date=None, type=1):
 
 def ___updateTradeDayDfRow___(row, df):
     d = row['tradedate']
-    #print row
-    dfNew = df[df.FACTOR_DATE<=d]
+    # print type(d)
+    # print df.FACTOR_DATE.tolist()
+    dNew = pd.to_datetime(d)
+    # df['FACTOR_DATE'] = df['FACTOR_DATE'].map(lambda x: x.date())
+    dfNew = df[df.FACTOR_DATE<=dNew]
     #print dfNew
     if len(dfNew)==0:
         return row
