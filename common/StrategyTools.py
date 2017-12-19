@@ -312,6 +312,14 @@ def getPositionListByTradedate(strategyId, startDateStr, endDateStr, conn):
     positionDf = pd.read_sql(sql, conn)
     return positionDf
 
+'''
+获取指数的行情列表
+'''
+def getIndexListByTradedate(indexCode, startDateStr, endDateStr, conn):
+    sql = "select TRADEDATE, CLOSEPRICE from ST_INDEXTRADE_DATA where INDEXCODE = '"+indexCode+"' and tradedate>=DATE_FORMAT('"+startDateStr+"', '%Y-%m-%d') and tradedate<=DATE_FORMAT('"+endDateStr+"', '%Y-%m-%d') ORDER BY tradedate"
+    indexDf = pd.read_sql(sql, conn)
+    return indexDf
+
 conn = bt.getConnection()
 #print getPositionList(1, conn)
 #print getOrderList(1, conn)
