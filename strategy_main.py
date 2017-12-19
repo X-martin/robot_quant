@@ -136,6 +136,14 @@ def quant_post():
         assetsDf = asserts[['date_new', 'asset']]
         assetsDf.to_csv('asserts_'+strategyId+'.csv', index=False, sep=',')
 
+        # 基准指数
+        indexDf = st.getIndexListByTradedate('000300.SH', startDateStr, endDateStr, conn)
+        indexDf['date_new'] = indexDf['TRADEDATE'].map(lambda x: time.mktime(x.timetuple()) * 1000)
+        indexDf['CLOSEPRICE'] = indexDf['CLOSEPRICE'].map(lambda x: 3000/x*initMoney)
+        indexDf = indexDf[['date_new', 'CLOSEPRICE']]
+        indexDf.to_csv('baseline_'+strategyId+'.csv', index=False, sep=',')
+        print indexDf
+
         conn = bt.getConnection()
         # 查询订单信息
         orderDf = st.getOrderList(strategyId, conn)
@@ -178,9 +186,16 @@ def json_index():
     conn = bt.getConnection()
     # print request
     print request.args.get('strategyId')
+    print request.args.get('filename')
     strategyId = request.args.get('strategyId')
-    assetsDf = pd.read_csv('asserts_' + strategyId + '.csv')
-    assetsList = [list(x) for x in assetsDf.values]
+    filename = request.args.get('filename')
+    assetsList = []
+    if filename == 'current':
+        assetsDf = pd.read_csv('asserts_' + strategyId + '.csv')
+        assetsList = [list(x) for x in assetsDf.values]
+    else:
+        assetsDf = pd.read_csv('baseline_' + strategyId + '.csv')
+        assetsList = [list(x) for x in assetsDf.values]
     #print st.getPositionListByStrategyId(strategyId, conn)
     #print assetsList
     return Response(json.dumps(assetsList), mimetype='application/json')
