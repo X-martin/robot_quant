@@ -91,6 +91,22 @@
             <textarea id="stockExpression" name="stockExpression" cols="40" rows="2">s1Ns2</textarea>
             (s1Us2)Ns3
         </div>
+        <div align="right">
+            <span style="align:left;">因子列表</span>
+            <div>
+            <table id="factorTable" border="1" align="right"><tr><td>名称</td><td>英文标识</td></tr>
+            {% for item in factorList %}
+            <tr>
+                <td>
+                    {{item[1]}}
+                </td>
+                <td>
+                    {{item[2]}}
+                </td>
+            </tr>
+            {% endfor %}
+            </table></div>
+        </div>
         <div>
             基础变量表达式:
             <textarea id="baseVariableExpression" name="baseVariableExpression" cols="40" rows="8">MA5=MA(trade_closeprice,5)
@@ -273,7 +289,7 @@ MA10=MA(trade_closeprice, 10)</textarea>
             // alert(constituentStockStr);
             stockExpressionArr = stockExpression.split("s");
             // alert(constituentStocks.length+"-"+stockExpressionArr.length)
-            if (constituentStocks.length > stockExpressionArr.length-1) {
+            if (constituentStocks.length > 0 && constituentStocks.length > stockExpressionArr.length-1) {
                 alert("票池与票池表达式不一致，请检查确认");
                 return;
             }

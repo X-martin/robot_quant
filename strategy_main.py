@@ -26,13 +26,18 @@ app.secret_key = 'some_secret'
 fileroot = app.config["FILE_ROOT"]
 imageurl_prefix = app.config['IMAGEURL_PREFIX']
 lineBreak = app.config['LINE_BREAK']
+hostname = app.config['HOSTNAME']
 
 '''
 选项界面
 '''
 @app.route('/')
 def quant_index():
-    return render_template('quant_form.html')
+    conn = bt.getConnection()
+    factorDf = st.getFactorList(conn)
+    factorList = [tuple(x) for x in factorDf.values]
+    print factorList
+    return render_template('quant_form.html', factorList=factorList)
 
 @app.route('/quant_post', methods=['POST', 'GET'])
 def quant_post():
@@ -161,7 +166,7 @@ def quant_post():
     finish = datetime.now()
     print "耗时：" , finish - start
 
-    return render_template('quant_result.html', orderList=orderList, positionList=positionList, summaryList=summaryList, strategyId=strategyId)
+    return render_template('quant_result.html', orderList=orderList, positionList=positionList, summaryList=summaryList, strategyId=strategyId, hostname=hostname)
 
 '''
 jsonp修饰

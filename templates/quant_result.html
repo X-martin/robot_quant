@@ -65,13 +65,13 @@
               valueDecimals: 2,
               split: true
             },
-
+            colors: ['#ED561B', '#058DC7', '#6AF9C4', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
             series: seriesOptions
           });
         }
 
         $.each(names, function(i, name) {
-          $.getJSON('http://localhost:5000/json_index?filename=' + name.toLowerCase() + '&callback=?&strategyId={{strategyId}}', function(data) {
+          $.getJSON('http://{{hostname}}/json_index?filename=' + name.toLowerCase() + '&callback=?&strategyId={{strategyId}}', function(data) {
             seriesOptions[i] = {
               name: name,
               data: data

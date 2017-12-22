@@ -320,6 +320,14 @@ def getIndexListByTradedate(indexCode, startDateStr, endDateStr, conn):
     indexDf = pd.read_sql(sql, conn)
     return indexDf
 
+'''
+获取因子列表
+'''
+def getFactorList(conn):
+    sql = "select FACTOR_ID, FACTOR_NAME, FACTOR_ENNAME from ST_FACTOR ORDER BY factor_id"
+    factorDf = pd.read_sql(sql, conn)
+    return factorDf
+
 conn = bt.getConnection()
 #print getPositionList(1, conn)
 #print getOrderList(1, conn)
